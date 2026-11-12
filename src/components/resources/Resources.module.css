@@ -1,0 +1,262 @@
+/* ── Filters: underline tabs ──────────────────────── */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 40px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--line);
+}
+
+.filterGroup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 4px;
+}
+
+.filterLabel {
+  margin-right: 8px;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.filterGroup button {
+  position: relative;
+  min-height: 46px;
+  padding: 0 10px;
+  color: var(--muted);
+  font-size: 14.5px;
+  font-weight: 600;
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.filterGroup button::after {
+  content: '';
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--ink);
+  transform: scaleX(0);
+  transition: transform 360ms var(--ease-out);
+}
+
+.filterGroup button:hover {
+  color: var(--ink);
+}
+
+.filterGroup button[aria-pressed='true'] {
+  color: var(--ink);
+}
+
+.filterGroup button[aria-pressed='true']::after {
+  transform: scaleX(1);
+}
+
+/* ── Case studies ─────────────────────────────────── */
+.cases {
+  display: grid;
+  gap: 20px;
+}
+
+@media (min-width: 720px) {
+  .cases {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .cases {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+  }
+}
+
+.case {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: clamp(24px, 2.8vw, 30px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--text);
+  animation: fade-in var(--dur) var(--ease);
+  transition:
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+.case:hover {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-lg);
+  color: var(--text);
+  transform: translateY(-3px);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.caseLogo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.caseLogo i {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  box-shadow: inset 0 -8px 12px rgba(0, 0, 0, 0.18);
+}
+
+.caseLogo b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.tags span + span::before {
+  content: '/';
+  margin: 0 8px;
+  color: var(--faint);
+  font-weight: 400;
+}
+
+.case h3 {
+  font-size: 1.25rem;
+  line-height: 1.28;
+  letter-spacing: -0.02em;
+}
+
+.case > p {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.results {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 2px solid var(--ink);
+}
+
+.results div {
+  display: grid;
+  gap: 2px;
+}
+
+.results b {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.results span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* ── Blog ─────────────────────────────────────────── */
+.posts {
+  display: grid;
+  gap: 0 32px;
+}
+
+@media (min-width: 720px) {
+  .posts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .posts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.post {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 0 28px;
+  border-top: 1px solid var(--line-strong);
+  color: var(--text);
+  animation: fade-in var(--dur) var(--ease);
+}
+
+.post::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: 2px;
+  background: var(--primary);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 520ms var(--ease-out);
+}
+
+.post:hover {
+  color: var(--text);
+}
+
+.post:hover::before {
+  transform: scaleX(1);
+}
+
+.post h3 {
+  font-size: 1.125rem;
+  line-height: 1.32;
+  letter-spacing: -0.015em;
+}
+
+.post:hover h3 {
+  color: var(--primary-text);
+}
+
+.post > p:last-child {
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.meta b {
+  color: var(--primary-text);
+  font-weight: 700;
+}

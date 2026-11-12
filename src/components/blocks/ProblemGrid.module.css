@@ -1,0 +1,96 @@
+.grid {
+  display: grid;
+  gap: 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: clamp(24px, 2.8vw, 34px);
+  border: 1px solid color-mix(in srgb, var(--surface) 60%, var(--line));
+  border-radius: var(--radius-xl);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface) 92%, transparent),
+    color-mix(in srgb, var(--surface) 74%, transparent)
+  );
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    var(--shadow-sm);
+  transition:
+    transform 420ms var(--ease-out),
+    box-shadow 420ms var(--ease-out),
+    border-color 420ms var(--ease);
+}
+
+:root[data-theme='dark'] .card {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    var(--shadow-sm);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--accent) 34%, var(--line));
+  box-shadow: var(--shadow-lg);
+}
+
+.index {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 6px;
+  color: var(--accent-text);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.index i {
+  color: var(--faint);
+  font-style: normal;
+  font-weight: 500;
+}
+
+.pain {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 1.05rem + 0.7vw, 1.65rem);
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -0.024em;
+}
+
+.rule {
+  display: block;
+  height: 1px;
+  margin: 8px 0 4px;
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 0%, transparent) 70%);
+}
+
+.title {
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+}
+
+.body {
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+}

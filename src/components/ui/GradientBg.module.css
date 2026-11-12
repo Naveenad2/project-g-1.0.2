@@ -1,0 +1,237 @@
+.root {
+  --g-base: linear-gradient(158deg, #021821 0%, #03313b 38%, #005a59 74%, #03454d 100%);
+  --g1: rgba(0, 196, 186, 0.78);
+  --g2: rgba(0, 128, 122, 0.95);
+  --g3: rgba(94, 224, 214, 0.4);
+  --g4: rgba(255, 138, 36, 0.58);
+  --g5: rgba(255, 160, 72, 0.3);
+  --g-arc: rgba(255, 255, 255, 0.07);
+  --g-dots: rgba(255, 255, 255, 0.16);
+  --g-grain: 0.12;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--g-base);
+  pointer-events: none;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.b1 {
+  top: -40%;
+  right: -12%;
+  width: 72%;
+  height: 115%;
+  background: radial-gradient(closest-side, var(--g1), transparent);
+  animation: drift-a 34s var(--ease-in-out) infinite alternate;
+}
+
+.b2 {
+  bottom: -62%;
+  left: -18%;
+  width: 80%;
+  height: 125%;
+  background: radial-gradient(closest-side, var(--g2), transparent);
+  animation: drift-b 38s var(--ease-in-out) infinite alternate;
+}
+
+.b3 {
+  top: 6%;
+  left: 30%;
+  width: 40%;
+  height: 58%;
+  background: radial-gradient(closest-side, var(--g3), transparent);
+  animation: drift-c 30s var(--ease-in-out) infinite alternate;
+}
+
+.b4 {
+  right: 0%;
+  bottom: -34%;
+  width: 54%;
+  height: 84%;
+  background: radial-gradient(closest-side, var(--g4), transparent);
+  animation: drift-d 36s var(--ease-in-out) infinite alternate;
+}
+
+/* Second, softer warm light high on the left */
+.b5 {
+  top: -18%;
+  left: 8%;
+  width: 38%;
+  height: 56%;
+  background: radial-gradient(closest-side, var(--g5), transparent);
+  animation: drift-c 40s var(--ease-in-out) infinite alternate-reverse;
+}
+
+/* Fine dot texture, fading out from the upper right */
+.dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--g-dots) 1px, transparent 1.4px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(65% 75% at 80% 30%, #000, transparent 75%);
+  mask-image: radial-gradient(65% 75% at 80% 30%, #000, transparent 75%);
+}
+
+/* Hairline orbit arcs, anchored right */
+.arcs {
+  position: absolute;
+  top: 50%;
+  right: -12%;
+  width: min(1000px, 90vw);
+  height: auto;
+  transform: translateY(-46%);
+  fill: none;
+  stroke: var(--g-arc);
+  stroke-width: 1;
+}
+
+/* Luminous horizon along the lower edge */
+.horizon {
+  position: absolute;
+  left: -30%;
+  right: -30%;
+  bottom: -560px;
+  height: 620px;
+  border-radius: 50%;
+  border-top: 1.5px solid rgba(170, 255, 246, 0.8);
+  background:
+    radial-gradient(22% 16% at 64% 0%, rgba(255, 158, 70, 0.42), transparent 75%),
+    radial-gradient(55% 30% at 50% 0%, rgba(0, 196, 186, 0.55), rgba(0, 128, 122, 0.18) 55%, transparent 80%);
+  box-shadow:
+    0 -2px 18px rgba(94, 224, 214, 0.55),
+    0 -30px 80px rgba(0, 179, 170, 0.32);
+}
+
+.grain {
+  position: absolute;
+  inset: 0;
+  opacity: var(--g-grain);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Calmer field for dark showcase sections (static) */
+.deep {
+  --g-base: linear-gradient(165deg, #031a22 0%, #042630 50%, #063a42 100%);
+  --g1: rgba(0, 179, 170, 0.45);
+  --g2: rgba(0, 128, 122, 0.6);
+  --g3: rgba(94, 224, 214, 0.18);
+  --g4: rgba(255, 138, 36, 0.32);
+  --g5: rgba(255, 160, 72, 0.18);
+  --g-arc: rgba(255, 255, 255, 0.05);
+  --g-dots: rgba(255, 255, 255, 0.1);
+}
+
+.deep .blob,
+.soft .blob {
+  animation: none;
+}
+
+.soft .dots {
+  -webkit-mask-image: radial-gradient(50% 60% at 85% 20%, #000, transparent 75%);
+  mask-image: radial-gradient(50% 60% at 85% 20%, #000, transparent 75%);
+}
+
+/* Light mesh for light sections */
+.soft {
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 16%, #000 84%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 16%, #000 84%, transparent);
+  --g-base: transparent;
+  --g1: rgba(0, 179, 170, 0.22);
+  --g2: rgba(94, 224, 214, 0.26);
+  --g3: rgba(255, 255, 255, 0.85);
+  --g4: rgba(255, 138, 36, 0.26);
+  --g5: rgba(255, 176, 102, 0.18);
+  --g-arc: rgba(0, 128, 122, 0.08);
+  --g-dots: rgba(0, 110, 105, 0.14);
+  --g-grain: 0;
+}
+
+/* Closing call-to-action field: brighter brand teal */
+.cta {
+  --g-base: linear-gradient(135deg, #032c36 0%, #006c67 48%, #034650 100%);
+  --g1: rgba(0, 210, 198, 0.7);
+  --g2: rgba(5, 26, 34, 0.75);
+  --g3: rgba(94, 224, 214, 0.36);
+  --g4: rgba(255, 138, 36, 0.58);
+  --g5: rgba(255, 170, 90, 0.34);
+}
+
+.warm {
+  --g3: rgba(255, 176, 102, 0.28);
+  --g4: rgba(255, 138, 36, 0.66);
+  --g5: rgba(255, 170, 90, 0.38);
+}
+
+.soft.warm {
+  --g3: rgba(255, 255, 255, 0.85);
+  --g4: rgba(255, 138, 36, 0.3);
+  --g5: rgba(255, 176, 102, 0.22);
+}
+
+:root[data-theme='dark'] .root {
+  --g-base: linear-gradient(158deg, #010c10 0%, #031c23 45%, #04333a 100%);
+  --g1: rgba(0, 179, 170, 0.5);
+  --g2: rgba(0, 128, 122, 0.66);
+  --g3: rgba(94, 224, 214, 0.22);
+  --g4: rgba(255, 138, 36, 0.36);
+  --g5: rgba(255, 160, 72, 0.18);
+}
+
+:root[data-theme='dark'] .deep {
+  --g-base: linear-gradient(165deg, #010c10 0%, #03161c 60%, #052229 100%);
+  --g1: rgba(0, 179, 170, 0.3);
+  --g2: rgba(0, 128, 122, 0.4);
+}
+
+:root[data-theme='dark'] .soft {
+  --g-base: transparent;
+  --g1: rgba(0, 179, 170, 0.14);
+  --g2: rgba(0, 128, 122, 0.16);
+  --g3: rgba(94, 224, 214, 0.05);
+  --g4: rgba(255, 138, 36, 0.12);
+  --g5: rgba(255, 160, 72, 0.07);
+  --g-dots: rgba(255, 255, 255, 0.06);
+  --g-arc: rgba(255, 255, 255, 0.04);
+}
+
+:root[data-theme='dark'] .cta {
+  --g-base: linear-gradient(135deg, #02222a 0%, #00504c 50%, #032f36 100%);
+}
+
+@keyframes drift-a {
+  to {
+    transform: translate3d(-5%, 4%, 0) scale(1.04);
+  }
+}
+
+@keyframes drift-b {
+  to {
+    transform: translate3d(6%, -5%, 0) scale(1.05);
+  }
+}
+
+@keyframes drift-c {
+  to {
+    transform: translate3d(-8%, 6%, 0) scale(0.95);
+  }
+}
+
+@keyframes drift-d {
+  to {
+    transform: translate3d(-6%, -6%, 0) scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blob {
+    animation: none;
+  }
+}

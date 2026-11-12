@@ -1,0 +1,44 @@
+/*
+ * Helvetica Now Display (Monotype) is a commercial typeface, so it is not
+ * bundled. These declarations use the copy installed on the visitor's device
+ * when present; otherwise the stack in --font-display falls back to
+ * Helvetica Neue → Helvetica → Inter.
+ *
+ * To self-host a licensed copy, drop the .woff2 files into /public/fonts and
+ * add a url() after each local() below, e.g.
+ *   src: local('Helvetica Now Display Bold'), url('/fonts/HelveticaNowDisplay-Bold.woff2') format('woff2');
+ */
+
+@font-face {
+  font-family: 'Helvetica Now Display';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Helvetica Now Display'), local('HelveticaNowDisplay-Regular'), local('Helvetica Now Display Regular');
+}
+
+@font-face {
+  font-family: 'Helvetica Now Display';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: local('Helvetica Now Display Medium'), local('HelveticaNowDisplay-Medium');
+}
+
+@font-face {
+  font-family: 'Helvetica Now Display';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src:
+    local('Helvetica Now Display Bold'), local('HelveticaNowDisplay-Bold'), local('Helvetica Now Display Medium'),
+    local('HelveticaNowDisplay-Medium');
+}
+
+@font-face {
+  font-family: 'Helvetica Now Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Helvetica Now Display Bold'), local('HelveticaNowDisplay-Bold');
+}

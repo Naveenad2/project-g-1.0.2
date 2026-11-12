@@ -1,0 +1,147 @@
+.tiles {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.slot {
+  display: flex;
+  min-width: 0;
+}
+
+.tile {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.title {
+  font-size: 1.1875rem;
+  line-height: 1.28;
+  letter-spacing: -0.018em;
+}
+
+.body {
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.62;
+}
+
+.meta {
+  color: var(--primary-text);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+.icon {
+  margin-bottom: 8px;
+  color: var(--primary-text);
+}
+
+.icon svg {
+  width: 26px;
+  height: 26px;
+  stroke-width: 1.5;
+}
+
+.footer {
+  margin-top: auto;
+  padding-top: 10px;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+/* Editorial columns: each item under a top rule that draws in on hover */
+.grid {
+  gap: 40px 32px;
+}
+
+.grid .tile {
+  position: relative;
+  padding-top: 22px;
+  border-top: 1px solid var(--line-strong);
+}
+
+.grid .tile::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: 2px;
+  background: var(--primary);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 520ms var(--ease-out);
+}
+
+:global(.section--deep) .grid .tile::before,
+:global(.is-dark) .grid .tile::before {
+  background: var(--deep-accent);
+}
+
+.grid .tile:hover::before {
+  transform: scaleX(1);
+}
+
+/* Raised cards */
+.cards {
+  gap: 16px;
+}
+
+.cards .tile {
+  padding: clamp(22px, 2.6vw, 30px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(120% 80% at 100% 0%, color-mix(in srgb, var(--brand-teal-bright) 7%, transparent), transparent 55%), var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform 420ms var(--ease-out),
+    box-shadow 420ms var(--ease-out),
+    border-color 420ms var(--ease);
+}
+
+.cards .tile:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: color-mix(in srgb, var(--primary) 30%, var(--line));
+}
+
+:global(.section--deep) .cards .tile,
+:global(.is-dark) .cards .tile {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+:global(.section--deep) .cards .tile:hover,
+:global(.is-dark) .cards .tile:hover {
+  border-color: rgba(94, 224, 214, 0.38);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 30px 60px -30px rgba(0, 0, 0, 0.6);
+}
+
+@media (min-width: 640px) {
+  .cols2,
+  .cols3,
+  .cols4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .cols3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .cols4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .grid.cols4 {
+    gap: 44px 28px;
+  }
+}

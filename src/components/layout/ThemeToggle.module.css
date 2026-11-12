@@ -1,0 +1,54 @@
+.toggle {
+  display: inline-grid;
+  place-items: center;
+  height: 38px;
+  padding: 0 4px;
+  border-radius: var(--radius-sm);
+  flex: none;
+}
+
+.track {
+  position: relative;
+  display: block;
+  width: 46px;
+  height: 26px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface-2);
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+.toggle:hover .track {
+  border-color: var(--line-ink);
+}
+
+.thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--accent-text);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--dur) var(--ease-out),
+    background-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+
+:global(:root[data-theme='dark']) .track {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+:global(:root[data-theme='dark']) .thumb {
+  transform: translateX(20px);
+  background: #ffffff;
+  color: var(--brand-navy);
+}

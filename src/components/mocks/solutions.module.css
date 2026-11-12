@@ -1,0 +1,247 @@
+.step {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 50%;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.step[data-tone='success'] {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.step[data-tone='warning'] {
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+/* White-label covers: two booklets standing side by side, offset for depth */
+.covers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(14px, 3vw, 28px);
+  padding: clamp(16px, 3vw, 28px) clamp(8px, 2vw, 20px) clamp(24px, 4vw, 40px);
+}
+
+.cover {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 240px;
+  padding: 22px 18px;
+  border-radius: 3px 8px 8px 3px;
+  background: linear-gradient(90deg, #e9eeed 0 6px, #ffffff 6px);
+  color: #5f7783;
+  font-size: 12px;
+  box-shadow:
+    inset 6px 0 0 #d7e0de,
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 30px 50px -24px rgba(0, 0, 0, 0.55),
+    0 8px 16px -8px rgba(0, 0, 0, 0.25);
+  transition:
+    transform 700ms var(--ease-out),
+    box-shadow 700ms var(--ease-out);
+}
+
+.coverB {
+  transform: translateY(18px);
+}
+
+.covers:hover .coverA {
+  transform: translateY(-6px);
+}
+
+.covers:hover .coverB {
+  transform: translateY(10px);
+}
+
+.coverLogo {
+  width: 30px;
+  height: 30px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+}
+
+.cover b {
+  color: #0f2d3d;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.012em;
+}
+
+.cover i {
+  display: block;
+  height: 6px;
+  margin-top: 9px;
+  border-radius: 3px;
+  background: #e5ebea;
+}
+
+.cover i:first-of-type {
+  margin-top: auto;
+}
+
+.cover i.short {
+  width: 60%;
+}
+
+/* Audit log */
+.log {
+  padding: 6px 0;
+  font-size: 13px;
+}
+
+.logRow {
+  display: grid;
+  grid-template-columns: 98px minmax(0, 1fr);
+  gap: 14px;
+  padding: 11px 18px;
+  border-top: 1px solid var(--line);
+}
+
+.logRow:first-child {
+  border-top: 0;
+}
+
+.logRow time {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.logRow b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Policy excerpt */
+.excerpt {
+  margin-top: 8px;
+  color: var(--text);
+  line-height: 1.8;
+}
+
+/* Approval path as a stepper */
+.path {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 0;
+}
+
+.path li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.path li::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  flex: none;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+.path li + li::after {
+  order: -1;
+  content: '';
+  width: 14px;
+  height: 1.5px;
+  margin-left: 8px;
+  background: var(--line-strong);
+}
+
+.path .pathDone {
+  color: var(--ink);
+}
+
+.path .pathDone::before {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.path .pathOn {
+  color: var(--primary-text);
+  font-weight: 600;
+}
+
+.path .pathOn::before {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+/* Cascade */
+.level {
+  display: grid;
+  gap: 2px;
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-xs);
+}
+
+.level b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.level small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.level[data-depth='0'] {
+  border-color: color-mix(in srgb, var(--success) 40%, var(--line));
+}
+
+.tree {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 0 14px;
+  padding-left: 22px;
+}
+
+.tree > li {
+  position: relative;
+}
+
+.tree > li::before {
+  content: '';
+  position: absolute;
+  left: -22px;
+  top: -8px;
+  width: 20px;
+  height: 34px;
+  border-left: 1.5px solid var(--line-strong);
+  border-bottom: 1.5px solid var(--line-strong);
+  border-bottom-left-radius: 8px;
+}
+
+.tree > li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: -22px;
+  top: 24px;
+  bottom: -8px;
+  border-left: 1.5px solid var(--line-strong);
+}

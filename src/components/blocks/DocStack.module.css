@@ -1,0 +1,116 @@
+.scene {
+  position: relative;
+  width: min(100%, 340px);
+  aspect-ratio: 1 / 0.86;
+  margin-inline: auto;
+  perspective: 1600px;
+}
+
+.stack {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 62%;
+  aspect-ratio: 1 / 1.3;
+  transform: translate(-50%, -50%) rotateX(58deg) rotateZ(-38deg);
+  transform-style: preserve-3d;
+  animation: drift 7s var(--ease-in-out) infinite alternate;
+}
+
+@keyframes drift {
+  from {
+    transform: translate(-50%, -50%) rotateX(58deg) rotateZ(-38deg) translateZ(0);
+  }
+  to {
+    transform: translate(-50%, -50%) rotateX(56deg) rotateZ(-34deg) translateZ(14px);
+  }
+}
+
+.sheet {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9%;
+  padding: 14% 12%;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow:
+    0 0 0 1px rgba(15, 45, 61, 0.08),
+    -1px 1px 0 #d8e2e0,
+    -2px 2px 0 #cfdad8,
+    -3px 3px 0 #c6d2d0;
+  transition: transform 700ms var(--ease-out);
+}
+
+.s1 {
+  transform: translateZ(66px);
+}
+
+.s2 {
+  transform: translateZ(44px);
+  background: #f2f6f5;
+}
+
+.s3 {
+  transform: translateZ(22px);
+  background: #e5eeec;
+}
+
+.s4 {
+  transform: translateZ(0);
+  background: #d7e4e1;
+  box-shadow: -18px 22px 46px rgba(0, 0, 0, 0.35);
+}
+
+.scene:hover .s1 {
+  transform: translateZ(120px);
+}
+
+.scene:hover .s2 {
+  transform: translateZ(80px);
+}
+
+.scene:hover .s3 {
+  transform: translateZ(40px);
+}
+
+.line,
+.lineH {
+  display: block;
+  height: 5%;
+  min-height: 5px;
+  border-radius: 2px;
+  background: #dfe7e5;
+}
+
+.lineH {
+  width: 46%;
+  height: 7%;
+  background: #0f2d3d;
+}
+
+.linked {
+  background: linear-gradient(90deg, #00b3aa 0 30%, #dfe7e5 30%);
+}
+
+.seal {
+  position: absolute;
+  right: 10%;
+  bottom: 9%;
+  display: grid;
+  place-items: center;
+  width: 26%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #00807a;
+  color: #ffffff;
+  box-shadow:
+    0 0 0 4px rgba(0, 128, 122, 0.16),
+    -2px 3px 6px rgba(0, 0, 0, 0.18);
+}
+
+.seal svg {
+  width: 60%;
+  height: 60%;
+}

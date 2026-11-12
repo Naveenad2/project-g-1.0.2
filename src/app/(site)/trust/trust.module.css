@@ -1,0 +1,70 @@
+.toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 0;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+
+.toc a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 0;
+  margin-right: 14px;
+  color: var(--ink);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.toc a::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid var(--faint);
+  border-bottom: 1.5px solid var(--faint);
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform var(--dur) var(--ease);
+}
+
+.toc a:hover {
+  color: var(--primary-text);
+}
+
+.toc a:hover::after {
+  border-color: currentColor;
+  transform: rotate(45deg) translate(1px, -1px);
+}
+
+.kv {
+  border-top: 2px solid var(--ink);
+}
+
+.kv > div {
+  display: grid;
+  gap: 6px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.kv dt {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.kv dd {
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+@media (min-width: 640px) {
+  .kv > div {
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 24px;
+  }
+}

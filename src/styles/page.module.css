@@ -1,0 +1,200 @@
+/* Layout helpers shared by several pages. */
+
+.split {
+  display: grid;
+  gap: clamp(32px, 4vw, 48px);
+}
+
+@media (min-width: 1024px) {
+  .split {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(48px, 6vw, 88px);
+    align-items: start;
+  }
+  .splitEven {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .splitCenter {
+    align-items: center;
+  }
+}
+
+.stickyHead {
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  .stickyHead {
+    position: sticky;
+    top: calc(var(--header-space) + 20px);
+  }
+}
+
+.split h2 {
+  max-width: 20ch;
+}
+
+/* Regulator tags in solution heroes */
+.regs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.regs span {
+  padding: 7px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  box-shadow: var(--shadow-xs);
+}
+
+/* Two-column "before / after" day lists */
+.days {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 900px) {
+  .days {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+}
+
+.dayCol {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
+.dayHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.dayHead::after {
+  content: '';
+  width: 40px;
+  height: 3px;
+}
+
+.before::after {
+  background: var(--accent);
+}
+
+.after {
+  background: var(--brand-navy);
+  color: #ffffff;
+  border-bottom-color: transparent;
+}
+
+.after::after {
+  background: var(--brand-teal-bright);
+}
+
+.day {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 14px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--line);
+}
+
+.day:first-of-type {
+  border-top: 0;
+}
+
+.dayName {
+  color: var(--primary-text);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+.day b {
+  display: block;
+  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.day p {
+  margin-top: 4px;
+  color: var(--text);
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+/* Question list ("making the case") */
+.questions {
+  display: grid;
+  border-top: 2px solid var(--ink);
+}
+
+.questions li {
+  display: grid;
+  gap: 6px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+
+.questions b {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Long-form article text */
+.article {
+  display: grid;
+  gap: 18px;
+  color: var(--text);
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+/* Generic list of plain checklist rows inside a card */
+.panel {
+  padding: clamp(22px, 3vw, 32px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.notice {
+  margin-bottom: 24px;
+  padding: 14px 16px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+.placeholderNote {
+  margin-top: 20px;
+}

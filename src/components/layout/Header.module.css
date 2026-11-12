@@ -1,0 +1,544 @@
+/*
+ * Floating glass navigation bar.
+ * Over the gradient hero it is dark glass (the header carries the global `is-dark` token set);
+ * once the page scrolls it turns into a frosted light bar. The header takes no layout space
+ * (negative margin), so every hero starts under it and fills the viewport top edge.
+ */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--header-space);
+  margin-bottom: calc(-1 * var(--header-space));
+  padding-top: var(--header-gap);
+  pointer-events: none;
+}
+
+.shell {
+  height: var(--header-h);
+  transition: transform 420ms var(--ease-out);
+}
+
+.scrolled .shell {
+  transform: translateY(-4px);
+}
+
+.bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  height: var(--header-h);
+  padding: 0 10px 0 20px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.04));
+  -webkit-backdrop-filter: saturate(160%) blur(18px);
+  backdrop-filter: saturate(160%) blur(18px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  pointer-events: auto;
+  transition:
+    background 360ms var(--ease),
+    border-color 360ms var(--ease),
+    box-shadow 360ms var(--ease);
+}
+
+.scrolled .bar {
+  border-color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 1px 2px rgba(15, 45, 61, 0.06),
+    0 16px 40px -18px rgba(15, 45, 61, 0.32);
+}
+
+:root[data-theme='dark'] .scrolled .bar {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(12, 24, 30, 0.78);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 18px 40px -18px rgba(0, 0, 0, 0.8);
+}
+
+/* Reading progress: a hairline along the bar's lower edge */
+.progress {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--brand-teal), var(--brand-mint));
+  transform: scaleX(0);
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  .progress {
+    animation: read-progress linear both;
+    animation-timeline: scroll(root block);
+  }
+}
+
+@keyframes read-progress {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  padding: 6px 0;
+}
+
+/* ── Desktop navigation ─────────────────────────────── */
+.nav {
+  display: none;
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
+}
+
+.navList {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.navItem {
+  position: relative;
+}
+
+.navLink {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 10px;
+  color: var(--ink);
+  font-size: 14.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    color var(--dur-fast) var(--ease),
+    background-color var(--dur) var(--ease);
+}
+
+.navLink:hover,
+.navLink[aria-expanded='true'] {
+  color: var(--ink);
+  background: var(--surface-3);
+}
+
+.scrolled .navLink:hover,
+.scrolled .navLink[aria-expanded='true'] {
+  background: var(--surface-2);
+}
+
+.navLink.active {
+  color: var(--primary-text);
+}
+
+.navLink.active::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  width: 16px;
+  height: 2px;
+  margin-left: -8px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.caret {
+  color: var(--muted);
+  transition: transform var(--dur) var(--ease);
+}
+
+.navLink[aria-expanded='true'] .caret {
+  transform: rotate(180deg);
+}
+
+/* Dropdown panel: a light glass sheet that floats under the bar */
+.panel {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 50%;
+  z-index: 10;
+  min-width: 300px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow:
+    0 2px 6px rgba(15, 45, 61, 0.05),
+    0 40px 80px -30px rgba(15, 45, 61, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -8px);
+  transition:
+    opacity var(--dur) var(--ease),
+    transform var(--dur) var(--ease-out),
+    visibility 0s linear var(--dur);
+}
+
+/* hover bridge across the gap under the trigger */
+.panel::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 18px;
+}
+
+.panelOpen {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+  transition:
+    opacity var(--dur) var(--ease),
+    transform var(--dur) var(--ease-out),
+    visibility 0s;
+}
+
+.panel_product {
+  width: 680px;
+  left: -110px;
+  transform: translateY(-8px);
+}
+
+.panel_product.panelOpen {
+  transform: none;
+}
+
+.panel_solutions {
+  width: 480px;
+}
+
+.panel_resources {
+  width: 420px;
+}
+
+.panelGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+}
+
+.panelList {
+  display: grid;
+  gap: 2px;
+}
+
+.panelLink {
+  position: relative;
+  display: grid;
+  gap: 3px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  transition: background-color var(--dur-fast) var(--ease);
+}
+
+.panelLink:hover {
+  background: var(--surface-2);
+}
+
+.panelLinkTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.panelLink:hover .panelLinkTitle {
+  color: var(--primary-text);
+}
+
+.panelLinkDesc {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.panelColumns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 10px 4px 4px;
+}
+
+.panelHeading {
+  margin: 0 0 8px;
+  padding: 0 10px 8px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.panelSimpleList {
+  display: grid;
+  gap: 1px;
+}
+
+.panelSimpleLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  color: var(--ink);
+  font-size: 14.5px;
+  font-weight: 500;
+}
+
+.panelSimpleLink svg {
+  color: var(--faint);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+
+.panelSimpleLink:hover {
+  background: var(--surface-2);
+  color: var(--primary-text);
+}
+
+.panelSimpleLink:hover svg {
+  opacity: 1;
+  transform: none;
+  color: var(--primary-text);
+}
+
+/* Right-hand actions */
+.actions {
+  display: none;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+  flex: none;
+}
+
+.textAction,
+.login {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  font-size: 14.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.login {
+  font-weight: 500;
+}
+
+.textAction:hover,
+.login:hover {
+  color: var(--primary-text);
+}
+
+.divider {
+  width: 1px;
+  height: 22px;
+  background: var(--line-strong);
+}
+
+/* ── Compact (mobile / tablet) ─────────────────────────── */
+.compactActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.burger {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  color: var(--ink);
+  background: var(--surface);
+  transition:
+    background var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+/* Floating drawer sheet under the bar */
+.drawer {
+  position: fixed;
+  top: calc(var(--header-space) - 2px);
+  left: var(--gutter);
+  right: var(--gutter);
+  max-height: calc(100dvh - var(--header-space) - 12px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: 0 40px 80px -30px rgba(7, 28, 36, 0.55);
+  pointer-events: auto;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition:
+    opacity var(--dur) var(--ease),
+    transform var(--dur) var(--ease-out),
+    visibility 0s linear var(--dur);
+}
+
+.drawerOpen {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity var(--dur) var(--ease),
+    transform var(--dur) var(--ease-out),
+    visibility 0s;
+}
+
+.drawerInner {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 8px 20px 20px;
+}
+
+.mGroup {
+  border-bottom: 1px solid var(--line);
+}
+
+.mSummary,
+.mTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 2px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  list-style: none;
+}
+
+.mTop {
+  border-bottom: 1px solid var(--line);
+}
+
+.mCaret {
+  color: var(--muted);
+  transition: transform var(--dur) var(--ease);
+}
+
+.mGroup[open] .mCaret {
+  transform: rotate(180deg);
+}
+
+.mLinks {
+  display: grid;
+  gap: 2px;
+  padding: 0 0 14px;
+}
+
+.mSub + .mSub {
+  margin-top: 12px;
+}
+
+.mSub .panelHeading {
+  margin-bottom: 4px;
+  padding: 4px 12px 6px;
+}
+
+.mLink {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: var(--ink);
+  font-size: 15.5px;
+  font-weight: 500;
+}
+
+.mLink small {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.mLink:hover,
+.mLink:active {
+  background: var(--surface-2);
+  color: var(--primary-text);
+}
+
+.mActions {
+  display: grid;
+  gap: 10px;
+}
+
+@media (min-width: 640px) {
+  .mActions {
+    grid-template-columns: 1fr 1fr;
+  }
+  .mLogin {
+    grid-column: 1 / -1;
+  }
+}
+
+.mLogin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+@media (max-width: 479px) {
+  .bar {
+    padding-left: 16px;
+    gap: 12px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .nav,
+  .actions {
+    display: flex;
+  }
+  .compactActions,
+  .drawer {
+    display: none;
+  }
+}
+
+@media (min-width: 1280px) and (max-width: 1379px) {
+  .navLink {
+    padding: 0 9px;
+    font-size: 14px;
+  }
+  .actions {
+    gap: 12px;
+  }
+}

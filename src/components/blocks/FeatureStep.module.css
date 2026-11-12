@@ -1,0 +1,160 @@
+/*
+ * Feature card. Cards sit in a bento grid (rules in globals.css under .feature-card):
+ * two per row with rows aligned through subgrid, and a lone last card running full width
+ * with the visual beside the copy.
+ */
+.card {
+  --pad: clamp(22px, 2.6vw, 34px);
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 6;
+  row-gap: 0;
+  align-content: start;
+  min-width: 0;
+  padding: var(--pad) var(--pad) 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(120% 60% at 100% 0%, color-mix(in srgb, var(--brand-teal-bright) 7%, transparent), transparent 60%), var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color 360ms var(--ease),
+    box-shadow 360ms var(--ease-out);
+}
+
+.card:hover {
+  border-color: color-mix(in srgb, var(--primary) 28%, var(--line));
+  box-shadow: var(--shadow-md);
+}
+
+.meta {
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.num {
+  color: var(--faint);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.label {
+  color: var(--primary-text);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.title {
+  grid-row: 2;
+  max-width: 24ch;
+  font-size: clamp(1.4rem, 1.1rem + 0.9vw, 1.9rem);
+  letter-spacing: -0.028em;
+  line-height: 1.14;
+}
+
+.pain {
+  grid-row: 3;
+  margin-top: 14px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.painKey {
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.body {
+  grid-row: 4;
+  margin-top: 14px;
+  color: var(--text);
+  font-size: 15.5px;
+  line-height: 1.66;
+}
+
+.body > p + p {
+  margin-top: 10px;
+}
+
+.bullets {
+  grid-row: 5;
+  margin-top: 16px;
+  align-self: start;
+}
+
+.visual {
+  grid-row: 6;
+  align-self: end;
+  min-width: 0;
+  margin: 22px calc(var(--pad) * -1 + 10px) 0;
+}
+
+.visual :global(.caption) {
+  margin: 12px 14px 12px;
+}
+
+.show {
+  --show-radius: calc(var(--radius-xl) - 10px);
+  --show-pad: clamp(12px, 1.8vw, 22px);
+}
+
+/* A lone last card spans the row: copy on the left, visual on the right. */
+@media (min-width: 1024px) {
+  .card:nth-child(odd of .card):nth-last-child(1 of .card) {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    grid-template-rows: 1fr repeat(5, auto) 1fr;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    column-gap: clamp(32px, 4vw, 64px);
+    padding-bottom: var(--pad);
+  }
+  .card:nth-child(odd of .card):nth-last-child(1 of .card) > :not(.visual) {
+    grid-column: 1;
+  }
+  .card:nth-child(odd of .card):nth-last-child(1 of .card) > .meta {
+    grid-row: 2;
+  }
+  .card:nth-child(odd of .card):nth-last-child(1 of .card) > .title {
+    grid-row: 3;
+  }
+  .card:nth-child(odd of .card):nth-last-child(1 of .card) > .pain {
+    grid-row: 4;
+  }
+  .card:nth-child(odd of .card):nth-last-child(1 of .card) > .body {
+    grid-row: 5;
+  }
+  .card:nth-child(odd of .card):nth-last-child(1 of .card) > .bullets {
+    grid-row: 6;
+  }
+  .card:nth-child(odd of .card):nth-last-child(1 of .card) > .visual {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: center;
+    margin: calc(var(--pad) * -1 + 10px) calc(var(--pad) * -1 + 10px) calc(var(--pad) * -1 + 10px) 0;
+  }
+}
+
+@media (max-width: 1023px) {
+  .card {
+    grid-template-rows: none;
+    grid-row: auto;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .meta,
+  .title,
+  .pain,
+  .body,
+  .bullets,
+  .visual {
+    grid-row: auto;
+  }
+}
