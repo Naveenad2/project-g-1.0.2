@@ -15,7 +15,18 @@ const N = STAGES.length;
 const SUMMARY =
   '§ 4.2 changed · 1 draft, 3 linked items, 1 procedure, 1 workflow, 2 reviews, 1 risk rating and 1 report flagged · owners notified · nothing missed';
 const DESKTOP = '(min-width: 1024px)';
-const lineFor = (desktop: boolean) => (desktop ? 0.55 : 0.72);
+
+/**
+ * Where a chapter begins. On desktop: just past the middle of the screen. On phones and tablets the 3D band
+ * is pinned at the top, so a chapter begins as its title reaches the top of the reading area under the band:
+ * the model builds while its own title and text are on screen.
+ */
+const lineAt = (stage: HTMLElement | null, desktop: boolean) => {
+  const vh = window.innerHeight;
+  if (desktop || !stage) return Math.round(vh * 0.55);
+  const top = parseFloat(getComputedStyle(stage).top) || 0;
+  return Math.round(Math.min(vh * 0.8, top + stage.offsetHeight + vh * 0.1));
+};
 
 type Align = 'above' | 'below' | 'left' | 'right';
 
@@ -26,7 +37,7 @@ const LABELS: [string, number, string, Align?][] = [
   ['r2', 0, 'Controls', 'right'],
   ['r3', 0, 'Policies', 'right'],
   ['r4', 0, 'Procedures', 'right'],
-  ['r5', 0, '+ your own registry', 'right'],
+  ['r5', 0, '+ your own registry'],
   ['r42', 0, '§ 4.2'],
   ['m0', 1, 'cites § 4.2'],
   ['m1', 1, 'contradicts?'],
@@ -53,13 +64,13 @@ const LABELS: [string, number, string, Align?][] = [
   ['yb', 5, 'Board'],
   ['yv', 5, 'v3 · every decision recorded', 'below'],
   ['a0', 6, 'Published to me'],
-  ['a1', 6, '3'],
+  ['a1', 6, '3', 'right'],
   ['a2', 6, 'read', 'left'],
   ['a3', 6, 'due', 'left'],
   ['a4', 6, 'read', 'left'],
   ['a5', 6, 'read by 1,240 of 1,300', 'below'],
   ['k0', 7, 'score 3.6'],
-  ['k1', 7, 'evidence attached', 'right'],
+  ['k1', 7, 'evidence attached', 'below'],
   ['k2', 7, 'likelihood →', 'below'],
   ['i0', 8, '§ 4.2'],
   ['i1', 8, '7 items affected · 3 owners notified', 'below'],
@@ -173,11 +184,11 @@ export function CapabilityStory({ intro }: { intro?: ReactNode }) {
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
       mm.add({ desktop: DESKTOP, mobile: '(max-width: 1023.98px)' }, (context) => {
-        const line = `${lineFor(Boolean(context.conditions?.desktop)) * 100}%`;
+        const desktop = Boolean(context.conditions?.desktop);
         ScrollTrigger.create({
           trigger: track,
-          start: `top ${line}`,
-          end: `bottom ${line}`,
+          start: () => `top ${lineAt(stageRef.current, desktop)}px`,
+          end: () => `bottom ${lineAt(stageRef.current, desktop)}px`,
           onRefresh: measure,
           onUpdate: (self) => {
             const t = toStory(self.progress * track.offsetHeight);

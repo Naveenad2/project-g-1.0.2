@@ -83,16 +83,28 @@ paint, so there is no flash. All colours are tokens in `src/styles/tokens.css`, 
 - **Closing call to action (`CtaBand`):** open to the page, not a card. Centred copy sits on saturated tangerine
   and teal light that fades into the page on every side.
 - **How it works (`CapabilityStory` + `src/components/story/scene.ts`):** a frameless three.js scene that blends
-  into the page. The section's heading opens the story beside an establishing shot: the document on its pedestal,
-  with glowing blueprint slots and guide paths where the capabilities will be built. Materials are glossy porcelain
-  (wrapped key light, sky and ground ambient, two specular lobes) and liquid glass (fresnel rim, sheen, glint), with
-  drifting light motes. Quality adapts: if frames run long, the scene renders fewer pixels. A policy document on a glass pedestal sits at the centre, and the ten capabilities are built around it
-  in porcelain and glass. The steps scroll as real text. Scroll position, measured from the steps' own positions, drives
-  a camera that orbits from one capability to the next, swoops into the document for Magpie AI, rises for the Impact
-  Analyser's shockwave and pulls back to show everything connected. Objects out of focus fade into the page colour.
-  The original illustration labels are plain HTML annotations projected beside the objects, never in boxes. On
-  desktop the stage is pinned full-bleed behind the text and fades out under the text column; on phones and tablets
-  it is a band pinned under the header. Without WebGL the story still reads as text.
+  into the page, with the copy in the lead: large titles and body text, and the scene fading out well before the
+  text column. The section's heading opens the story beside an establishing shot: the policy document on its tray,
+  on a faint drafting grid, with dashed footprints and guide paths where the capabilities will be built.
+  - **Models:** each capability is drawn as the product shows it, not as abstract shapes. Thin matte cards carry
+    printed interface detail: tabbed register cards, Magpie's suggestions lifting off the clauses they touch, a
+    policy joined to its regulation, control, risk and owner, an SOP flow in two swimlanes, a workflow canvas with
+    its form and escalation matrix, the lifecycle rail with the board tier, a roster of readers, the 5 × 5 heat map
+    and a dashboard. There are no spheres, cubes, glass or gloss.
+  - **How it is built:** every model is a few merged meshes built from flat outlines (`Geo`), coloured by role from
+    one palette uniform, so a theme switch is a single uniform update. Connectors are constant-width screen-space
+    lines (`Lines`) that draw in, carry a travelling highlight and the Impact Analyser's wave. A whole chapter is
+    under 80 draw calls and about 20k triangles. Quality also adapts: if frames run long, the scene renders fewer
+    pixels.
+  - **Scroll:** the steps scroll as real text. Scroll position, measured from the steps' own positions, drives a
+    camera that orbits from one capability to the next, comes in to the document for Magpie AI, rises for the
+    Impact Analyser's shockwave and pulls back to show everything connected. Objects out of focus fade into the page
+    colour. The original illustration labels are plain HTML annotations projected beside the objects, never in
+    boxes.
+  - **Layout:** on desktop the stage is pinned full-bleed behind the text, and the camera steps back on narrower
+    screens so each model stays clear of the copy. On phones and tablets it is a band, 40% of the screen, pinned
+    under the header, and a chapter begins as its title reaches the top of the reading area below the band. Without
+    WebGL the story still reads as text.
 - **Motion:** `MotionProvider` runs Lenis smooth scrolling on GSAP's ticker. On every route it reveals `.reveal`
   blocks with staggered fades and section headings line by line (SplitText, reverted afterwards). Only content that
   starts below the fold is ever hidden, so nothing flashes and nothing stays hidden if scripts fail. Hero copy enters

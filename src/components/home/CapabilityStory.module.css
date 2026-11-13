@@ -123,12 +123,12 @@
   transform-origin: top center;
 }
 
-/* Desktop: the scene dissolves into the page behind the text column */
+/* Desktop: the scene dissolves into the page well before the text column, so the copy reads on a clean ground */
 @media (min-width: 1024px) and (hover: hover) {
   .canvas,
   .labels {
-    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.18) 24%, #000 46%);
-    mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.18) 24%, #000 46%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 34%, rgba(0, 0, 0, 0.3) 44%, #000 56%);
+    mask-image: linear-gradient(90deg, transparent 0%, transparent 34%, rgba(0, 0, 0, 0.3) 44%, #000 56%);
   }
 }
 
@@ -141,8 +141,9 @@
     background: linear-gradient(
       90deg,
       var(--bg) 0%,
-      color-mix(in srgb, var(--bg) 82%, transparent) 24%,
-      color-mix(in srgb, var(--bg) 0%, transparent) 46%
+      var(--bg) 34%,
+      color-mix(in srgb, var(--bg) 70%, transparent) 44%,
+      color-mix(in srgb, var(--bg) 0%, transparent) 56%
     );
     pointer-events: none;
   }
@@ -157,7 +158,7 @@
 
 .track {
   position: relative;
-  max-width: min(520px, 40vw);
+  max-width: min(600px, 42vw);
 }
 
 /* The section's own heading opens the story, beside the scene's establishing shot */
@@ -188,15 +189,15 @@
 }
 
 .step:not(.on) .stepInner {
-  opacity: 0.22;
+  opacity: 0.18;
 }
 
 .meta {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 2px 12px;
-  font-size: 15px;
+  gap: 2px 14px;
+  font-size: 16px;
   line-height: 1.45;
 }
 
@@ -204,7 +205,7 @@
 .analyser {
   color: var(--brand-orange);
   font-family: var(--font-display);
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 600;
   letter-spacing: -0.01em;
 }
@@ -230,42 +231,46 @@
   color: var(--accent-text);
 }
 
+/* The copy leads: a large title and a comfortable reading size */
 .title {
-  margin-top: 14px;
-  font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.6rem);
-  line-height: 1.08;
-  letter-spacing: -0.034em;
+  margin-top: 16px;
+  font-size: clamp(2.25rem, 1.25rem + 2.25vw, 3.5rem);
+  line-height: 1.04;
+  letter-spacing: -0.036em;
 }
 
 .body {
-  margin-top: 16px;
+  margin-top: 20px;
   color: var(--text);
-  font-size: 17px;
-  line-height: 1.66;
+  font-size: clamp(1.0625rem, 0.95rem + 0.3vw, 1.25rem);
+  line-height: 1.62;
 }
 
 .summary {
-  margin-top: 18px;
-  padding-top: 14px;
+  margin-top: 20px;
+  padding-top: 16px;
   border-top: 1px solid var(--line);
   color: var(--ink);
-  font-size: 14.5px;
+  font-size: 15.5px;
   font-weight: 500;
   line-height: 1.6;
   font-variant-numeric: tabular-nums;
 }
 
 .cta {
-  margin-top: 22px;
+  margin-top: 26px;
+  font-size: 17px;
 }
 
-/* Phones and tablets: the stage is a blended band pinned under the header; the story scrolls beneath it */
+/* Phones and tablets: the stage is a blended band pinned under the header; the story scrolls beneath it.
+   The band is kept to 40% of the screen so each chapter's title and text have room below their model. */
 @media (max-width: 1023.98px) {
   .stage {
     top: var(--header-space);
     z-index: 2;
-    height: 50svh;
-    min-height: 300px;
+    height: 40svh;
+    min-height: 250px;
+    max-height: 480px;
     margin-bottom: 0;
     background: var(--bg);
   }
@@ -311,8 +316,28 @@
   }
   .step {
     align-items: flex-start;
-    min-height: 72svh;
-    padding-top: 36px;
+    min-height: 70svh;
+    padding-top: 8px;
+  }
+  .step:not(.on) .stepInner {
+    opacity: 0.28;
+  }
+  .meta b,
+  .analyser {
+    font-size: 18px;
+  }
+  .title {
+    margin-top: 12px;
+    font-size: clamp(1.9rem, 1.25rem + 3vw, 2.75rem);
+    line-height: 1.06;
+  }
+  .body {
+    margin-top: 14px;
+    font-size: 17.5px;
+    line-height: 1.6;
+  }
+  .cta {
+    margin-top: 20px;
   }
   .outro {
     height: 50svh;
