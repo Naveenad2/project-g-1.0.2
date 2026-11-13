@@ -7,6 +7,7 @@ import { Icon } from '@/components/ui/Icon';
 import { Logo } from '@/components/ui/Logo';
 import { isMenu, primaryNav, type NavMenu } from '@/lib/navigation';
 import { routes } from '@/lib/routes';
+import { lockScroll } from '@/lib/scroll';
 import { ThemeToggle } from './ThemeToggle';
 import styles from './Header.module.css';
 
@@ -115,6 +116,7 @@ export function Header() {
     const root = document.documentElement;
     const prev = root.style.overflow;
     root.style.overflow = 'hidden';
+    lockScroll(true);
     const mq = window.matchMedia(DESKTOP_QUERY);
     const onChange = () => mq.matches && setDrawerOpen(false);
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setDrawerOpen(false);
@@ -122,6 +124,7 @@ export function Header() {
     document.addEventListener('keydown', onKey);
     return () => {
       root.style.overflow = prev;
+      lockScroll(false);
       mq.removeEventListener('change', onChange);
       document.removeEventListener('keydown', onKey);
     };
@@ -140,14 +143,14 @@ export function Header() {
     closeTimer.current = window.setTimeout(() => setOpenMenu(null), 160);
   };
 
-  const headerClass = [styles.header, scrolled || drawerOpen ? styles.scrolled : 'is-dark', openMenu ? styles.menuOpen : '']
+  const headerClass = [styles.header, scrolled || drawerOpen ? styles.scrolled : '', openMenu ? styles.menuOpen : '']
     .filter(Boolean)
     .join(' ');
 
   return (
     <header className={headerClass}>
       <div className={`container ${styles.shell}`}>
-        <div className={styles.bar}>
+        <div className={styles.bar} data-keep-blur="">
           <Link href={routes.home} className={styles.brand} aria-label="Gieom.cloud home" onClick={closeAll}>
             <Logo height={22} />
           </Link>
@@ -227,7 +230,7 @@ export function Header() {
         </div>
       </div>
 
-      <div id="mobile-menu" className={`${styles.drawer} ${drawerOpen ? styles.drawerOpen : ''}`} inert={!drawerOpen}>
+      <div id="mobile-menu" className={`${styles.drawer} ${drawerOpen ? styles.drawerOpen : ''}`} inert={!drawerOpen} data-lenis-prevent="">
         <div className={`container ${styles.drawerInner}`}>
           <nav aria-label="Mobile">
             {primaryNav.map((item) =>

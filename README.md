@@ -15,6 +15,15 @@ npm run lint && npm run typecheck && npm run format:check
 
 Requires Node 20.9 or newer.
 
+### Testing on a phone or tablet
+
+`npm run dev` prints a **Network** address (for example `http://192.168.1.10:3000`); open that on a device on the
+same Wi-Fi. Next.js blocks its dev resources for any host other than `localhost` unless the host is listed in
+`allowedDevOrigins`. Without it, live reload and the on-demand chunks (the globe, the 3D story) fail on the device.
+`next.config.ts` adds this machine's own network addresses automatically, so restart `npm run dev` after it changes
+or when you join a different network. Development mode is unoptimised, so judge smoothness on a production build:
+`npm run build && npm start`, then open the printed network address.
+
 ## Deploying
 
 `next build` writes a fully static site to `out/` (`output: 'export'` in `next.config.ts`). Upload that folder to
@@ -40,26 +49,66 @@ paint, so there is no flash. All colours are tokens in `src/styles/tokens.css`, 
 
 ## Design system
 
-- **Surfaces:** every hero is a full-width brand gradient with rounded lower corners and a luminous horizon line. Dark
-  showcase sections (`.section--deep`), the closing call-to-action card and the footer are inset rounded panels. Light
-  areas sit on a continuous page wash (`--page-bg`) of teal, mint and warm light, so nothing is flat white. Dark panels use the `is-dark` token set,
-  and light islands inside them (forms, product windows) use `is-light`.
-- **Gradients:** `GradientBg` (`src/components/ui/GradientBg.tsx`) layers slowly drifting radial light in navy, teal,
-  mint and orange, with variants `hero`, `deep`, `soft` and `cta`. It is text-free and static under reduced motion.
-- **Header:** a floating glass bar. It is dark glass over the gradient hero and turns frosted white once the page scrolls.
-- **Sharp text by rule:** nothing that contains text is rotated, scaled or put in perspective, so text is never
-  rasterised soft. Depth comes from glass, light, shadow and 2D motion. Only the text-free `DocStack` and the platform
-  layer stack use CSS 3D.
-- **Layouts:** dense bento grids. Feature cards (`FeatureStep`) align their rows with `subgrid`, and a lone last card
-  runs full width. The platform bento and features bento follow the same pattern. `Showcase` frames product visuals on a
-  gradient or glass plate.
-- **Home showpieces:** the hero app window with the live linking demo and the regulators band along the hero's base;
-  `CapabilityMap`, ten line illustrations joined by one dotted path, with the description of the selected one underneath (the Impact
-  analyser wave runs along the path); and `FeatureTabs`, an auto-advancing list beside one live demo.
+- **Palette:** Gieom.cloud Tangerine & Teal. Tangerine `#FF8A24` for primary calls to action, with navy text; teal
+  `#00B3AA` for the secondary action and shapes; deep teal `#00807A` for links; navy `#0F2D3D` for headings, body copy
+  and dark bands; mint `#EDF9F6` for section backgrounds; and off-white `#FDFDFD` for the page. The tangerine-to-teal
+  signature gradient is kept for accents (globe arcs, progress lines). Every value is a token in `tokens.css`. Dark mode
+  is a navy theme, not black.
+- **Surfaces:** the page is off-white with a fine film grain. Heroes are full-width light gradients with rounded lower
+  corners. Mint bands (`.section--mint`) fade in and out at their edges. Navy bands (`.section--deep`), the closing
+  call to action and the footer are inset rounded panels with an animated field. Dark panels use the `is-dark` token
+  set, and light islands inside them (forms, product windows) use `is-light`.
+- **Gradients:** `GradientBg` layers five soft radial lights (tangerine, teal, white, peach, aqua) that drift on long,
+  offset loops, and adds a static grain. Only `transform` animates, on the compositor, so it never repaints or
+  flickers. Variants: `hero`, `soft`, `deep` and `cta`. It is static under reduced motion.
+- **The earth:** `Globe` (`src/components/globe`) is a three.js scene drawn as a porcelain sphere with a faint
+  graticule. Land is a field of dots, sampled from Natural Earth (public domain) and stored in `landPoints.ts`. Arcs
+  in the signature gradient link the regulators the site names: RBI, SEBI, IRDAI, CBUAE, ADGM, DFSA, SAMA, CBB, QFCRA
+  and FATF. The scene also has pulsing hubs, travelling light, two dotted orbits and an atmosphere halo. It loads only
+  when it nears the viewport, renders only while it is visible and the tab is active, and fades in on its first frame.
+  Framings: `hero` (home), `art` (inner heroes without a product visual) and `horizon` (the closing call to action,
+  always in the navy palette).
+- **Home hero:** a sticky stage holding the copy, the giant earth and the regulators band. Its lower edge is pinned
+  with `svh`, so a phone's address bar never makes it jump. The sheet carrying the live linking demo slides up over
+  it, opening with a short introduction beside the demo. With a mouse, the copy drifts away and the camera dollies
+  into the earth; on touch screens only the light changes, so nothing jitters against native scrolling.
+- **Tour:** the heading, the tour's title and chapters, and a link sit beside a contained, glass-framed poster rather
+  than a full-width image.
+- **Closing call to action (`CtaBand`):** open to the page, not a card. Centred copy sits on saturated tangerine
+  and teal light that fades into the page on every side.
+- **How it works (`CapabilityStory` + `src/components/story/scene.ts`):** a frameless three.js scene that blends
+  into the page. The section's heading opens the story beside an establishing shot: the document on its pedestal,
+  with glowing blueprint slots and guide paths where the capabilities will be built. Materials are glossy porcelain
+  (wrapped key light, sky and ground ambient, two specular lobes) and liquid glass (fresnel rim, sheen, glint), with
+  drifting light motes. Quality adapts: if frames run long, the scene renders fewer pixels. A policy document on a glass pedestal sits at the centre, and the ten capabilities are built around it
+  in porcelain and glass. The steps scroll as real text. Scroll position, measured from the steps' own positions, drives
+  a camera that orbits from one capability to the next, swoops into the document for Magpie AI, rises for the Impact
+  Analyser's shockwave and pulls back to show everything connected. Objects out of focus fade into the page colour.
+  The original illustration labels are plain HTML annotations projected beside the objects, never in boxes. On
+  desktop the stage is pinned full-bleed behind the text and fades out under the text column; on phones and tablets
+  it is a band pinned under the header. Without WebGL the story still reads as text.
+- **Motion:** `MotionProvider` runs Lenis smooth scrolling on GSAP's ticker. On every route it reveals `.reveal`
+  blocks with staggered fades and section headings line by line (SplitText, reverted afterwards). Only content that
+  starts below the fold is ever hidden, so nothing flashes and nothing stays hidden if scripts fail. Hero copy enters
+  through CSS (`.load-in`, `Rise`), and client-side navigations fade the new page in (`template.tsx`). Everything
+  respects `prefers-reduced-motion`.
+- **Sharp text by rule:** nothing that contains text is rotated, scaled or put in perspective. Motion on text is
+  translate and opacity only, cleared when it ends.
+- **Liquid glass:** cards, the secondary button, the header, the demo window and the replay control share the
+  `--glass-*` tokens. These give a translucent fill with a specular sheen, a bright rim, a soft teal inner glow and a
+  navy shadow. Real backdrop blur is kept to the few surfaces with detail behind them, so scrolling stays light on
+  phones.
+- **Phones and tablets (touch screens):** built to avoid the usual causes of mobile flicker.
+  - Gradients stay still.
+  - Only the header bar keeps a backdrop blur.
+  - Nothing masks a live WebGL canvas or the regulators marquee; soft overlays do the fading instead.
+  - Scrolling is native: Lenis is off, and there are no scroll-linked reveals, parallax or text movement.
+  - The feature tabs advance only when tapped.
+  - The page transition is a plain fade.
+  - The globe canvases keep their drawing buffer within a pixel budget phones and tablets will allocate.
+- **No template tropes:** no icons in tinted squares, no status pills with dots, no numbered step badges, no glass
+  kicker pills and no gradient text. Lists use a short teal rule.
 - **Interaction:** `SpotlightController` lights `[data-spotlight]` cards under the cursor with one delegated listener.
-- **States:** `Status` and `Severity` glyphs replace coloured pills, and entity chips carry type glyphs.
-- **Motion:** word-by-word headline reveals, scroll-driven reveals, gradient drift and a reading-progress hairline. All
-  of it respects `prefers-reduced-motion`, and the timed tours pause on hover, on focus and off-screen.
 
 ## Project structure
 
@@ -78,9 +127,12 @@ src/
     not-found.tsx
   components/
     layout/                  Header (floating bar, mega menu, drawer), Footer, ThemeToggle, SpotlightController
-    blocks/                  PageHero, ProblemGrid, FeatureStep, Tiles, CtaBand, DocStack, Timeline, Faq,
+    motion/                  MotionProvider (Lenis + GSAP reveals)
+    globe/                   Globe (React wrapper), scene (three.js), landPoints (encoded land dots)
+    blocks/                  PageHero, ProblemGrid, FeatureStep, Tiles, CtaBand, Timeline, Faq,
                              IndustryPage template, LegalLayout
-    home/                    CapabilityMap and CapabilityArt, FeatureTabs, PlatformStack bento, animated product demos
+    home/                    HomeHero, CapabilityStory, FeatureTabs, PlatformStack index, product demos
+    story/                   scene (three.js) for the How it works story
     mocks/                   Product UI mock-ups used across pages (registers, RCSA, workflow…)
     forms/                   Field primitives, Contact/Demo/Trial forms, StaticForm
     pricing/, resources/     Pricing tiers toggle, case-study and blog filters
@@ -89,6 +141,7 @@ src/
     routes.ts                Every internal URL in one place
     navigation.ts            Header and footer menus
     hooks.ts                 useInView, useSequence (demo timelines), reduced-motion
+    scroll.ts                Smooth-scroll instance, scroll lock and scroll-to helpers
     geometry.ts              Layout offsets for demo cursor targets, unaffected by entrance transforms
     theme.ts                 Theme bootstrap and toggle logic
   styles/                    Design tokens, fonts, shared page modules

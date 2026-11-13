@@ -6,7 +6,6 @@ import { Field, FormCard, Input, Select, Textarea } from '@/components/forms/Fie
 import { StaticForm } from '@/components/forms/StaticForm';
 import { Table, Tr, mockStyles as m } from '@/components/mocks/primitives';
 import { ArrowLink } from '@/components/ui/ButtonLink';
-import { Icon } from '@/components/ui/Icon';
 import { Ph, Section, SectionHeader, SectionLabel } from '@/components/ui/Section';
 import { routes } from '@/lib/routes';
 import styles from '@/styles/page.module.css';
@@ -76,7 +75,6 @@ export default function TrustPage() {
           variant="cards"
           items={[
             {
-              icon: <Icon name="shield" size={20} />,
               title: 'SOC 2 Type II',
               body: (
                 <>
@@ -86,7 +84,6 @@ export default function TrustPage() {
               footer: <ArrowLink href="#docs">Request the report</ArrowLink>,
             },
             {
-              icon: <Icon name="lock" size={20} />,
               title: 'ISO/IEC 27001',
               body: (
                 <>
@@ -96,7 +93,6 @@ export default function TrustPage() {
               footer: <ArrowLink href="#docs">Request the certificate</ArrowLink>,
             },
             {
-              icon: <Icon name="checkCircle" size={20} />,
               title: 'Regional assessments',
               body: (
                 <>

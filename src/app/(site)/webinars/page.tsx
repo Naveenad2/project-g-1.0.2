@@ -102,7 +102,6 @@ export default function WebinarsPage() {
                 Register
               </a>
               <a href="#" className="btn btn--secondary">
-                <Icon name="calendar" size={16} />
                 Add to calendar
               </a>
             </div>

@@ -1,0 +1,156 @@
+.wrap {
+  position: relative;
+}
+
+/* Sticky stage, stuck by its lower edge when it is taller than the (small) viewport. */
+.hero {
+  position: sticky;
+  top: min(0px, calc(100svh - var(--hero-h, 100svh)));
+  z-index: 0;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding-top: calc(var(--header-space) + clamp(24px, 5vw, 64px));
+  color: var(--text);
+}
+
+.grid {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 660px;
+}
+
+.part {
+  position: relative;
+  z-index: 2;
+}
+
+/* Phones and tablets: intro, actions, then the earth in the first screen, then the intro paragraph */
+.intro {
+  order: 1;
+}
+
+.actions {
+  order: 2;
+}
+
+.earthSlot {
+  position: relative;
+  z-index: 1;
+  order: 3;
+  width: 100vw;
+  height: clamp(300px, 92vw, 720px);
+  margin: clamp(8px, 2vw, 20px) 0 0 calc(var(--gutter) * -1);
+  pointer-events: none;
+}
+
+/* Fades the earth into the copy below without masking the live canvas */
+.earthSlot::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 32%;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 0%, transparent), color-mix(in srgb, var(--bg) 94%, transparent));
+}
+
+.earth {
+  --size: min(148vw, 1080px);
+  position: absolute;
+  top: calc(var(--size) * -0.07);
+  left: 50%;
+  width: var(--size);
+  aspect-ratio: 1;
+  margin-left: calc(var(--size) / -2);
+}
+
+.lede {
+  order: 4;
+  margin-top: clamp(-40px, -6vw, -16px);
+}
+
+.proof {
+  order: 5;
+}
+
+.band {
+  position: relative;
+  z-index: 2;
+  padding: clamp(32px, 5vw, 56px) 0 clamp(22px, 3vw, 34px);
+}
+
+/* Dims the stage as the next sheet slides over it */
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: linear-gradient(180deg, rgba(15, 45, 61, 0.02), rgba(15, 45, 61, 0.2));
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* The sheet that slides over the stage */
+.cover {
+  position: relative;
+  z-index: 1;
+  border-radius: var(--hero-radius) var(--hero-radius) 0 0;
+  background: var(--page-bg);
+  background-color: var(--bg);
+  box-shadow:
+    0 -1px 0 rgba(255, 255, 255, 0.9),
+    0 -36px 80px -36px rgba(15, 45, 61, 0.34);
+}
+
+:root[data-theme='dark'] .cover {
+  box-shadow:
+    0 -1px 0 rgba(237, 249, 246, 0.08),
+    0 -36px 80px -30px rgba(0, 0, 0, 0.6);
+}
+
+/* Desktop: copy on the left in reading order; the earth fills the right of the stage */
+@media (min-width: 1100px) {
+  .grid {
+    position: static;
+    flex: 1;
+  }
+  .copy {
+    position: static;
+    display: block;
+    max-width: min(47vw, 660px);
+  }
+  .lede {
+    margin-top: 0;
+  }
+  .earthSlot {
+    position: absolute;
+    inset: 0;
+    width: auto;
+    height: auto;
+    margin: 0;
+  }
+  .earthSlot::after {
+    display: none;
+  }
+  .earth {
+    --size: min(94vw, 148vh, 1560px);
+    left: auto;
+    right: calc(var(--size) / -2 + 17vw);
+    top: calc(50% - var(--size) / 2 + 40px);
+    margin: 0;
+  }
+  .band {
+    padding-top: clamp(28px, 3vw, 40px);
+  }
+}

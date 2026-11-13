@@ -1,56 +1,65 @@
 .band {
+  isolation: isolate;
   overflow: clip;
+  padding-block: clamp(88px, 11vw, 168px);
+  text-align: center;
 }
 
-.card {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  padding: clamp(36px, 5.5vw, 80px) clamp(24px, 5.5vw, 80px);
-  border-radius: var(--radius-xl);
-  box-shadow: 0 40px 90px -50px rgba(0, 64, 61, 0.9);
+/* Saturated tangerine and teal light behind the copy, feathered into the page on every side */
+.band::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(30% 56% at 50% 52%, rgba(255, 255, 255, 0.92), transparent 72%),
+    radial-gradient(36% 74% at 30% 56%, rgba(0, 179, 170, 0.38), transparent 70%),
+    radial-gradient(34% 70% at 71% 44%, rgba(255, 138, 36, 0.34), transparent 70%),
+    radial-gradient(26% 50% at 54% 88%, rgba(94, 224, 214, 0.26), transparent 70%);
+  -webkit-mask-image: radial-gradient(70% 90% at 50% 50%, #000 52%, transparent 100%);
+  mask-image: radial-gradient(70% 90% at 50% 50%, #000 52%, transparent 100%);
+  pointer-events: none;
+}
+
+.warm::before {
+  background:
+    radial-gradient(30% 56% at 50% 52%, rgba(255, 255, 255, 0.92), transparent 72%),
+    radial-gradient(36% 74% at 30% 56%, rgba(0, 179, 170, 0.34), transparent 70%),
+    radial-gradient(36% 72% at 71% 44%, rgba(255, 138, 36, 0.42), transparent 70%),
+    radial-gradient(26% 50% at 54% 88%, rgba(255, 176, 102, 0.3), transparent 70%);
+}
+
+:root[data-theme='dark'] .band::before {
+  background:
+    radial-gradient(30% 56% at 50% 52%, rgba(15, 45, 61, 0.9), transparent 72%),
+    radial-gradient(36% 74% at 30% 56%, rgba(0, 179, 170, 0.3), transparent 70%),
+    radial-gradient(34% 70% at 71% 44%, rgba(255, 138, 36, 0.24), transparent 70%);
 }
 
 .inner {
   position: relative;
   z-index: 1;
-  display: grid;
-  gap: 32px;
-  align-items: center;
 }
 
 .copy {
   display: grid;
   gap: 18px;
-  justify-items: start;
+  justify-items: center;
+  max-width: 780px;
+  margin-inline: auto;
 }
 
 .copy h2 {
-  max-width: 20ch;
-  font-size: clamp(2rem, 1.3rem + 2.4vw, 3.4rem);
-  letter-spacing: -0.036em;
+  max-width: 18ch;
+  font-size: clamp(2.3rem, 1.3rem + 3vw, 4rem);
+  letter-spacing: -0.042em;
 }
 
 .copy p {
-  max-width: 54ch;
-  color: rgba(255, 255, 255, 0.82);
+  max-width: 50ch;
 }
 
 .actions {
-  margin-top: 12px;
-}
-
-.art {
-  display: none;
-}
-
-@media (min-width: 900px) {
-  .inner {
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
-    gap: 48px;
-  }
-  .art {
-    display: block;
-    margin: -40px 0;
-  }
+  justify-content: center;
+  margin-top: 14px;
 }

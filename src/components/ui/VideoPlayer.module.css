@@ -14,7 +14,7 @@
 
 /* Rises into place as it scrolls in (2D only, so the poster stays sharp) */
 @supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
+  @media (prefers-reduced-motion: no-preference) and (hover: hover) {
     .player {
       animation: screen-rise linear both !important;
       animation-timeline: view() !important;

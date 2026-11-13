@@ -71,7 +71,7 @@
 
 /* Settle in as it enters the viewport (2D only) */
 @supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
+  @media (prefers-reduced-motion: no-preference) and (hover: hover) {
     .inner {
       animation: showcase-in linear both;
       animation-timeline: view();

@@ -2,14 +2,15 @@
   position: relative;
 }
 
-/* Full-bleed gradient hero with rounded lower corners; the floating header sits inside it. */
+/* Full-bleed light gradient hero with rounded lower corners; the floating header sits inside it. */
 .panel {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  padding: calc(var(--header-space) + clamp(40px, 5vw, 80px)) 0 clamp(80px, 9vw, 136px);
+  padding: calc(var(--header-space) + clamp(40px, 5.5vw, 88px)) 0 clamp(80px, 9vw, 140px);
   border-radius: 0 0 var(--hero-radius) var(--hero-radius);
   color: var(--text);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--brand-teal-bright) 14%, transparent);
 }
 
 .compact {
@@ -24,7 +25,7 @@
 
 .grid {
   display: grid;
-  gap: clamp(40px, 5vw, 60px);
+  gap: clamp(40px, 5vw, 64px);
   align-items: center;
 }
 
@@ -41,7 +42,7 @@
 
 /* Breadcrumb */
 .crumb {
-  margin-bottom: 26px;
+  margin-bottom: 28px;
   font-size: 13.5px;
 }
 
@@ -56,29 +57,31 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: rgba(255, 255, 255, 0.86);
+  color: var(--ink);
   font-weight: 500;
 }
 
 .crumb li + li::before {
-  content: '/';
-  color: rgba(255, 255, 255, 0.36);
+  content: '';
+  width: 18px;
+  height: 1px;
+  background: var(--line-strong);
 }
 
 .crumb a {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--muted);
 }
 
 .crumb a:hover {
-  color: #ffffff;
+  color: var(--primary-text);
 }
 
 .copy h1 {
-  margin-top: 16px;
-  font-size: clamp(2.4rem, 1.3rem + 3.3vw, 4.4rem);
+  margin-top: 18px;
+  font-size: clamp(2.5rem, 1.3rem + 3.5vw, 4.6rem);
   font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 1.02;
+  letter-spacing: -0.044em;
+  line-height: 1.01;
 }
 
 .title_narrow {
@@ -95,13 +98,13 @@
 
 .split .copy h1 {
   max-width: 19ch;
-  font-size: clamp(2.2rem, 1.3rem + 2.4vw, 3.5rem);
+  font-size: clamp(2.25rem, 1.3rem + 2.5vw, 3.6rem);
 }
 
 .lede {
-  margin-top: 22px;
+  margin-top: 24px;
   max-width: 60ch;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text);
 }
 
 .extra {
@@ -110,7 +113,7 @@
 }
 
 .actions {
-  margin-top: 34px;
+  margin-top: 36px;
 }
 
 .visual {
@@ -122,19 +125,65 @@
   margin-top: 20px;
 }
 
+/* The dotted earth. Phones and small tablets: it rises from the foot of the hero, under the copy. */
+.withArt {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0;
+}
+
+.withArt .grid {
+  order: 1;
+}
+
+.withArt .after {
+  order: 2;
+}
+
 .art {
-  display: none;
+  position: relative;
+  z-index: 0;
+  order: 3;
+  height: clamp(200px, 58vw, 420px);
+  margin-top: clamp(24px, 6vw, 48px);
+  pointer-events: none;
+}
+
+.artEarth {
+  --size: min(150vw, 980px);
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: var(--size);
+  aspect-ratio: 1;
+  margin-left: calc(var(--size) / -2);
+}
+
+/* Tablets and up: the earth sits to the right of the copy */
+@media (min-width: 900px) {
+  .withArt {
+    display: block;
+    padding-bottom: clamp(80px, 9vw, 140px);
+  }
+  .withArt .copy {
+    max-width: min(60%, 760px);
+  }
+  .art {
+    position: absolute;
+    inset: 0;
+    height: auto;
+    margin: 0;
+  }
+  .artEarth {
+    --size: clamp(560px, 54vw, 880px);
+    top: calc(50% - var(--size) / 2 + var(--header-space) / 2);
+    left: auto;
+    right: max(-14vw, -220px);
+    margin: 0;
+  }
 }
 
 @media (min-width: 1024px) {
-  .withArt .grid {
-    grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.7fr);
-    gap: 56px;
-  }
-  .art {
-    display: block;
-    align-self: center;
-  }
   .split .grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
     gap: 64px;

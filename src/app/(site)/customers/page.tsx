@@ -3,7 +3,6 @@ import { CtaBand } from '@/components/blocks/CtaBand';
 import { PageHero } from '@/components/blocks/PageHero';
 import { CaseStudies } from '@/components/resources/CaseStudies';
 import { ButtonLink } from '@/components/ui/ButtonLink';
-import { Icon } from '@/components/ui/Icon';
 import { Ph, Section, SectionLabel } from '@/components/ui/Section';
 import { routes } from '@/lib/routes';
 import c from './customers.module.css';
@@ -53,7 +52,6 @@ export default function CustomersPage() {
         <div className={c.quotes}>
           {quotes.map(([q, who]) => (
             <figure key={q} className={`${c.quote} reveal`}>
-              <Icon name="quote" size={28} />
               <blockquote>
                 &ldquo;<Ph>{q}</Ph>&rdquo;
               </blockquote>

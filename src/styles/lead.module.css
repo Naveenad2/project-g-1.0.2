@@ -42,7 +42,7 @@
 .lede {
   margin-top: 20px;
   max-width: 54ch;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text);
 }
 
 .formCol {
@@ -51,8 +51,8 @@
 
 .formCol > * {
   box-shadow:
-    0 2px 6px rgba(3, 20, 26, 0.12),
-    0 50px 100px -40px rgba(0, 0, 0, 0.65) !important;
+    0 2px 6px rgba(15, 45, 61, 0.06),
+    0 50px 100px -48px rgba(15, 45, 61, 0.45) !important;
 }
 
 /* Contact routes */
@@ -64,17 +64,20 @@
 
 .ways li {
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr);
-  gap: 14px;
-  padding: 16px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 4px;
+  padding: 18px 20px;
+  border: 1px solid var(--glass-border);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025));
-  transition: border-color var(--dur) var(--ease);
+  background: var(--glass-bg);
+  transition:
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+  box-shadow: var(--glass-shadow);
 }
 
 .ways li:hover {
-  border-color: rgba(94, 224, 214, 0.4);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow-hover);
 }
 
 .ic {
@@ -117,10 +120,11 @@
   display: grid;
   grid-template-columns: 96px minmax(0, 1fr);
   gap: 16px;
-  padding: 16px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 18px 20px;
+  border: 1px solid var(--glass-border);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025));
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
 }
 
 .time {
@@ -167,7 +171,7 @@
   bottom: 4px;
   width: 2px;
   border-radius: 2px;
-  background: linear-gradient(180deg, rgba(94, 224, 214, 0.5), rgba(255, 255, 255, 0.1));
+  background: linear-gradient(180deg, rgba(0, 179, 170, 0.5), color-mix(in srgb, var(--line) 100%, transparent));
 }
 
 .steps li:last-child::before {
@@ -179,10 +183,11 @@
   place-items: center;
   width: 36px;
   height: 36px;
-  border-radius: 11px;
-  background: var(--grad-primary);
-  color: #fff;
+  border-radius: 50%;
+  border: 1.5px solid var(--brand-orange);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-display);
   font-size: 14px;
   font-weight: 700;
-  box-shadow: 0 8px 18px -8px rgba(0, 179, 170, 0.8);
 }

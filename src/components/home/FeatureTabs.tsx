@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { Showcase } from '@/components/ui/Showcase';
-import { useInView, usePrefersReducedMotion } from '@/lib/hooks';
+import { useInView, useMediaQuery, usePrefersReducedMotion } from '@/lib/hooks';
 import f from './FeatureTabs.module.css';
 
 export interface FeatureTab {
@@ -28,7 +28,10 @@ export function FeatureTabs({ items }: { items: FeatureTab[] }) {
   const [hold, setHold] = useState(false);
   const reduced = usePrefersReducedMotion();
   const [ref, inView] = useInView<HTMLDivElement>(0.3);
-  const playing = auto && !hold && inView && !reduced;
+  // On narrow and touch screens the demo sits under the open item, so advancing would move content
+  // while someone reads; there the list only changes when tapped.
+  const compact = useMediaQuery('(max-width: 1023px), (hover: none)');
+  const playing = auto && !hold && inView && !reduced && !compact;
 
   useEffect(() => {
     if (!playing) return;

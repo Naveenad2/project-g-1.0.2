@@ -4,7 +4,6 @@ import { PageHero } from '@/components/blocks/PageHero';
 import { Tiles } from '@/components/blocks/Tiles';
 import { Timeline } from '@/components/blocks/Timeline';
 import { ButtonLink } from '@/components/ui/ButtonLink';
-import { Icon } from '@/components/ui/Icon';
 import { Ph, Section } from '@/components/ui/Section';
 import { routes } from '@/lib/routes';
 import styles from '@/styles/page.module.css';
@@ -106,7 +105,6 @@ export default function AboutPage() {
           {[0, 1, 2, 3].map((i) => (
             <li key={i} className={`${a.person} reveal`}>
               <div className={a.photo}>
-                <Icon name="user" size={28} strokeWidth={1.4} />
                 <span>[Photo]</span>
               </div>
               <b>
@@ -123,7 +121,6 @@ export default function AboutPage() {
       <Section tight>
         <ul className={a.offices}>
           <li className="reveal">
-            <Icon name="pin" size={18} />
             <b>
               <Ph>[City, India]</Ph>
             </b>
@@ -132,7 +129,6 @@ export default function AboutPage() {
             </span>
           </li>
           <li className="reveal">
-            <Icon name="pin" size={18} />
             <b>
               <Ph>[City, UAE]</Ph>
             </b>
@@ -141,7 +137,6 @@ export default function AboutPage() {
             </span>
           </li>
           <li className="reveal">
-            <Icon name="layers" size={18} />
             <b>Working across</b>
             <span>India, UAE, Saudi Arabia, Bahrain, Qatar, Kuwait, Oman</span>
           </li>

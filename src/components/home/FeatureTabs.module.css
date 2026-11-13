@@ -6,9 +6,9 @@
 
 .item {
   min-width: 0;
-  border: 1px solid var(--line);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.22));
   transition:
     background 360ms var(--ease),
     border-color 360ms var(--ease),
@@ -20,10 +20,9 @@
 }
 
 .open {
-  border-color: color-mix(in srgb, var(--primary) 34%, var(--line));
-  background:
-    radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--brand-teal-bright) 10%, transparent), transparent 55%), var(--surface);
-  box-shadow: var(--shadow-md);
+  border-color: var(--glass-border);
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
 }
 
 .head {
@@ -207,4 +206,8 @@
     position: sticky;
     top: calc(var(--header-space) + 16px);
   }
+}
+
+:global(:root[data-theme='dark']) .item:not(.open) {
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
 }

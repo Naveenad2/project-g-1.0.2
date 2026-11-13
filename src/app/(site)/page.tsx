@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import { CoverageDemo } from '@/components/home/CoverageDemo';
 import { DraftDemo } from '@/components/home/DraftDemo';
@@ -6,12 +7,13 @@ import { CtaBand } from '@/components/blocks/CtaBand';
 import { FeatureTabs, type FeatureTab } from '@/components/home/FeatureTabs';
 import { GovernDemo } from '@/components/home/GovernDemo';
 import { LinkDemo } from '@/components/home/LinkDemo';
-import { CapabilityMap } from '@/components/home/CapabilityMap';
+import { CapabilityStory } from '@/components/home/CapabilityStory';
+import { HomeHero } from '@/components/home/HomeHero';
 import { PlatformStack, type PlatformModule } from '@/components/home/PlatformStack';
 import { SopDemo } from '@/components/home/SopDemo';
 import { ButtonLink } from '@/components/ui/ButtonLink';
 import { GradientBg } from '@/components/ui/GradientBg';
-import { Icon, type IconName } from '@/components/ui/Icon';
+import { Icon } from '@/components/ui/Icon';
 import { Rise } from '@/components/ui/Rise';
 import { Section, SectionHeader } from '@/components/ui/Section';
 import { VideoPlayer } from '@/components/ui/VideoPlayer';
@@ -61,10 +63,9 @@ const modules: PlatformModule[] = [
   },
 ];
 
-const features: { title: string; icon: IconName; items: string[] }[] = [
+const features: { title: string; items: string[] }[] = [
   {
     title: 'Policy and procedure management',
-    icon: 'file',
     items: [
       'Document registry with version, status and owner on every item',
       '"Published to me": each person\'s own list of what to read and sign',
@@ -75,7 +76,6 @@ const features: { title: string; icon: IconName; items: string[] }[] = [
   },
   {
     title: 'Authoring and review',
-    icon: 'users',
     items: [
       'Rich document editor with regulatory, control and risk linkage',
       'Magpie AI co-pilot inside drafting, workflow and form setup',
@@ -86,7 +86,6 @@ const features: { title: string; icon: IconName; items: string[] }[] = [
   },
   {
     title: 'Procedures and SOPs',
-    icon: 'flow',
     items: [
       'SOP designer for drawing procedures with roles, decisions and hand-offs',
       'Video walkthroughs embedded in the step they belong to',
@@ -97,7 +96,6 @@ const features: { title: string; icon: IconName; items: string[] }[] = [
   },
   {
     title: 'Governance registers',
-    icon: 'shield',
     items: [
       'Risk register and control registry, mapped to each other',
       'Regulations library with clause-level linkage to documents',
@@ -107,7 +105,6 @@ const features: { title: string; icon: IconName; items: string[] }[] = [
   },
   {
     title: 'Organisation and discovery',
-    icon: 'search',
     items: [
       'Hierarchical tagging and admin-managed tag pools',
       'Global search across documents and registers',
@@ -117,7 +114,6 @@ const features: { title: string; icon: IconName; items: string[] }[] = [
   },
   {
     title: 'Workflow, reporting and administration',
-    icon: 'settings',
     items: [
       'No-code workflow builder with escalation matrix and test runner',
       'Form builder and role-specific task inboxes',
@@ -210,73 +206,75 @@ const steps: FeatureTab[] = [
   },
 ];
 
+const delay = (ms: number) => ({ '--d': ms }) as CSSProperties;
+
 export default function HomePage() {
   return (
     <>
-      {/* Hero */}
-      <section className={styles.hero} id="top">
-        <div className={`is-dark ${styles.heroPanel}`}>
-          <GradientBg variant="hero" horizon />
-          <div className={`container ${styles.heroGrid}`}>
-            <div className={styles.heroCopy}>
-              <p className={styles.kicker}>
-                <b>Gieom.cloud</b>
-                <span>Policy &amp; procedure management for regulated industries</span>
-              </p>
-              <h1 className={styles.heroTitle}>
-                <Rise>AI-powered policies and procedures.</Rise>{' '}
-                <span className={styles.heroSub}>
-                  <Rise offset={4}>Always</Rise>{' '}
-                  <span className={styles.nowrap}>
-                    <Rise offset={5}>audit-ready.</Rise>
-                  </span>
+      <HomeHero
+        intro={
+          <>
+            <p className={`${styles.kicker} load-in`} style={delay(60)}>
+              <b>Gieom.cloud</b>
+              <span>Policy &amp; procedure management for regulated industries</span>
+            </p>
+            <h1 className={styles.heroTitle}>
+              <Rise>AI-powered policies and procedures.</Rise>{' '}
+              <span className={styles.heroSub}>
+                <Rise offset={4}>Always</Rise>{' '}
+                <span className={styles.nowrap}>
+                  <Rise offset={5}>audit-ready.</Rise>
                 </span>
-              </h1>
-              <p className={`lede ${styles.heroLede}`}>
-                Compliance teams lose weeks matching policies to regulators&apos; circulars by hand. Gieom.cloud ties every policy clause to
-                the rule it meets, turns procedures into flows staff can follow, runs the approvals and keeps the evidence. The next audit
-                becomes a walkthrough rather than a scramble.
-              </p>
-              <div className={`actions ${styles.heroActions}`}>
-                <ButtonLink href={routes.trial} arrow>
-                  Start free trial
-                </ButtonLink>
-                <ButtonLink href={routes.demo} variant="secondary">
-                  Book a demo
-                </ButtonLink>
-                <Link href={`${routes.productPolicy}#tour`} className={styles.tourLink}>
-                  <span className={styles.tourIcon} aria-hidden="true">
-                    <Icon name="play" size={12} />
-                  </span>
-                  Watch the 2-minute tour
-                </Link>
-              </div>
-              <ul className={styles.proof} aria-label="What the platform records for every clause">
-                <li>
-                  <b>Clause</b>
-                  <span>the rule it meets</span>
-                </li>
-                <li>
-                  <b>Version</b>
-                  <span>who approved it</span>
-                </li>
-                <li>
-                  <b>Policy</b>
-                  <span>who has read it</span>
-                </li>
-                <li>
-                  <b>Change</b>
-                  <span>what it affects</span>
-                </li>
-              </ul>
-            </div>
-            <div className={styles.heroVisual}>
-              <LinkDemo />
-            </div>
+              </span>
+            </h1>
+          </>
+        }
+        lede={
+          <p className={`lede load-in ${styles.heroLede}`} style={delay(560)}>
+            Compliance teams lose weeks matching policies to regulators&apos; circulars by hand. Gieom.cloud ties every policy clause to the
+            rule it meets, turns procedures into flows staff can follow, runs the approvals and keeps the evidence. The next audit becomes a
+            walkthrough rather than a scramble.
+          </p>
+        }
+        actions={
+          <div className={`actions load-in ${styles.heroActions}`} style={delay(720)}>
+            <ButtonLink href={routes.trial} arrow>
+              Start free trial
+            </ButtonLink>
+            <ButtonLink href={routes.demo} variant="secondary">
+              Book a demo
+            </ButtonLink>
+            <Link href={`${routes.productPolicy}#tour`} className={styles.tourLink}>
+              <span className={styles.tourIcon} aria-hidden="true">
+                <Icon name="play" size={12} />
+              </span>
+              Watch the 2-minute tour
+            </Link>
           </div>
-
-          <section className={styles.regsBand} aria-label="Regulatory frameworks covered">
-            <h2 className={styles.regsTitle}>Included regulatory frameworks</h2>
+        }
+        proof={
+          <ul className={`${styles.proof} load-in`} style={delay(900)} aria-label="What the platform records for every clause">
+            <li>
+              <b>Clause</b>
+              <span>the rule it meets</span>
+            </li>
+            <li>
+              <b>Version</b>
+              <span>who approved it</span>
+            </li>
+            <li>
+              <b>Policy</b>
+              <span>who has read it</span>
+            </li>
+            <li>
+              <b>Change</b>
+              <span>what it affects</span>
+            </li>
+          </ul>
+        }
+        band={
+          <section className={`${styles.regsBand} load-in`} style={delay(1100)} aria-label="Regulatory frameworks covered">
+            <h2 className={`container ${styles.regsTitle}`}>Included regulatory frameworks</h2>
             <div className={styles.marquee}>
               {[0, 1].map((copy) => (
                 <ul key={copy} className={styles.regs} aria-hidden={copy === 1 ? true : undefined}>
@@ -290,25 +288,52 @@ export default function HomePage() {
               ))}
             </div>
           </section>
-        </div>
-      </section>
-
-      {/* How it works: the ten capabilities around the live document */}
-      <section id="how" className={`section ${styles.how}`}>
-        <GradientBg variant="soft" warm />
-        <div className={`container ${styles.layer} ${styles.wide}`}>
-          <SectionHeader
-            title="Gieom.cloud brings all of it together."
-            lede="Policies live in Word. The regulatory mapping lives in a spreadsheet. Procedures live in slide decks nobody opens. Approvals live in email. Gieom.cloud puts all of it in one place and the document itself carries the proof."
-          />
-          <div id="map" className={styles.mapWrap}>
-            <CapabilityMap />
+        }
+        cover={
+          <div className={styles.cover}>
+            <GradientBg variant="vivid" warm />
+            <svg className={styles.streams} viewBox="0 0 1600 760" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M1620 140 C 1380 140, 1300 290, 1080 330" />
+              <path d="M1620 390 C 1400 390, 1300 370, 1080 382" />
+              <path d="M1620 640 C 1360 640, 1290 470, 1080 432" />
+            </svg>
+            <div className={`container ${styles.layer} ${styles.coverGrid}`}>
+              <div className={`${styles.coverCopy} reveal`}>
+                <h2 className={styles.coverTitle}>Link a clause to the rule it meets, right in the document.</h2>
+                <p className={styles.coverText}>
+                  Select a sentence, add a linkage and choose the regulatory clauses it satisfies. Reviewers and auditors see the link
+                  inline, with the regulator&apos;s text one click away.
+                </p>
+                <Link href={routes.productRegisters} className="link-arrow">
+                  Registers &amp; linked items
+                  <Icon name="arrowRight" size={15} strokeWidth={2} />
+                </Link>
+              </div>
+              <div id="linkdemo" className={`${styles.demo} reveal`}>
+                <LinkDemo />
+              </div>
+            </div>
           </div>
+        }
+      />
+
+      {/* How it works: one document, ten capabilities, told as you scroll */}
+      <section id="how" className={`section ${styles.how}`}>
+        <GradientBg variant="soft" />
+        <div id="map" className={`${styles.layer} ${styles.mapWrap}`}>
+          <CapabilityStory
+            intro={
+              <SectionHeader
+                split={false}
+                title="Gieom.cloud brings all of it together."
+                lede="Policies live in Word. The regulatory mapping lives in a spreadsheet. Procedures live in slide decks nobody opens. Approvals live in email. Gieom.cloud puts all of it in one place and the document itself carries the proof."
+              />
+            }
+          />
         </div>
       </section>
 
-      <section className={`section ${styles.steps}`}>
-        <GradientBg variant="soft" />
+      <section className={`section section--mint ${styles.steps}`}>
         <div className={`container ${styles.layer}`}>
           <FeatureTabs items={steps} />
         </div>
@@ -325,24 +350,33 @@ export default function HomePage() {
 
       {/* Feature tour */}
       <Section id="tour" className={styles.tour}>
-        <SectionHeader
-          title="See how Gieom.cloud saves your team hours every week."
-          lede="A two-minute tour of the policy lifecycle from the first draft to the last acknowledgement. Then shorter clips on each feature."
-        />
-        <div className={styles.tourStage}>
-          <VideoPlayer
-            href={`${routes.productPolicy}#tour`}
-            image="/assets/policy_editor.jpg"
-            label="Open the feature tour"
-            title="Gieom.cloud, start to finish"
-            subtitle="Registry · drafting · linkage · approvals · acknowledgement"
-          />
+        <div className={styles.tourGrid}>
+          <div className={styles.tourCopy}>
+            <SectionHeader
+              split={false}
+              title="See how Gieom.cloud saves your team hours every week."
+              lede="A two-minute tour of the policy lifecycle from the first draft to the last acknowledgement. Then shorter clips on each feature."
+            />
+            <div className={`${styles.tourMeta} reveal`}>
+              <b>Gieom.cloud, start to finish</b>
+              <span>Registry · drafting · linkage · approvals · acknowledgement</span>
+            </div>
+            <Link href={`${routes.productPolicy}#tour`} className={`link-arrow ${styles.tourCta}`}>
+              Open the feature tour
+              <Icon name="arrowRight" size={15} strokeWidth={2} />
+            </Link>
+          </div>
+          <div className={`${styles.tourStage} reveal`}>
+            <VideoPlayer href={`${routes.productPolicy}#tour`} image="/assets/policy_editor.jpg" label="Open the feature tour" />
+          </div>
         </div>
       </Section>
 
       {/* Who it's for */}
-      <Section id="who">
-        <h2 className={`${styles.whoTitle} reveal`}>For the people who get the call when the auditor arrives.</h2>
+      <Section id="who" tone="mint">
+        <h2 className={styles.whoTitle} data-split="">
+          For the people who get the call when the auditor arrives.
+        </h2>
         <div className={styles.audiences}>
           <article className={`${styles.audience} reveal`} data-spotlight="">
             <p className="eyebrow">Consultants</p>
@@ -360,7 +394,7 @@ export default function HomePage() {
               For consultants
             </ButtonLink>
           </article>
-          <article className={`is-dark ${styles.audience} ${styles.audienceDark} reveal reveal--late`} data-spotlight="">
+          <article className={`is-dark ${styles.audience} ${styles.audienceDark} reveal`} data-spotlight="">
             <GradientBg variant="cta" />
             <p className="eyebrow">In-house compliance</p>
             <h3>Know what is due and what is covered before anyone asks</h3>
@@ -391,14 +425,9 @@ export default function HomePage() {
           <div className={styles.features}>
             {features.map((f, i) => (
               <article key={f.title} className={`${styles.featureCard} reveal`} data-spotlight="">
-                <div className={styles.featureTop}>
-                  <span className={styles.featureIcon} aria-hidden="true">
-                    <Icon name={f.icon} size={22} />
-                  </span>
-                  <span className={styles.featureIndex} aria-hidden="true">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                </div>
+                <span className={styles.featureIndex} aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
                 <h3>{f.title}</h3>
                 <ul className="checklist">
                   {f.items.map((it) => (

@@ -6,7 +6,6 @@ export interface TileItem {
   body?: ReactNode;
   meta?: ReactNode;
   footer?: ReactNode;
-  icon?: ReactNode;
 }
 
 interface TilesProps {
@@ -24,7 +23,6 @@ export function Tiles({ items, columns = 3, variant = 'grid', className }: Tiles
       {items.map((item, i) => (
         <div key={i} className={`${styles.slot} reveal`}>
           <article className={styles.tile} data-spotlight={cards ? '' : undefined}>
-            {item.icon && <div className={styles.icon}>{item.icon}</div>}
             {item.meta && <div className={styles.meta}>{item.meta}</div>}
             <h3 className={styles.title}>{item.title}</h3>
             {item.body && <div className={styles.body}>{item.body}</div>}

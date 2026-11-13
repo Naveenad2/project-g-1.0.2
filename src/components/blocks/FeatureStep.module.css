@@ -12,19 +12,18 @@
   align-content: start;
   min-width: 0;
   padding: var(--pad) var(--pad) 10px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
-  background:
-    radial-gradient(120% 60% at 100% 0%, color-mix(in srgb, var(--brand-teal-bright) 7%, transparent), transparent 60%), var(--surface);
-  box-shadow: var(--shadow-sm);
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
   transition:
     border-color 360ms var(--ease),
     box-shadow 360ms var(--ease-out);
 }
 
 .card:hover {
-  border-color: color-mix(in srgb, var(--primary) 28%, var(--line));
-  box-shadow: var(--shadow-md);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow-hover);
 }
 
 .meta {

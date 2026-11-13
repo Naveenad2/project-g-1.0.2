@@ -30,7 +30,7 @@ export default function TrialPage() {
   return (
     <>
       <section className={l.lead}>
-        <div className={`is-dark ${l.panel}`}>
+        <div className={l.panel}>
           <GradientBg variant="hero" horizon />
           <div className={`container ${l.grid}`}>
             <div>

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { GradientBg } from './GradientBg';
 
 type Tone = 'default' | 'subtle' | 'mint' | 'peach' | 'deep';
 
@@ -19,6 +20,7 @@ export function Section({ id, tone = 'default', tight, bordered, className, cont
     .join(' ');
   return (
     <section id={id} className={cls} aria-label={ariaLabel}>
+      {tone === 'deep' && <GradientBg variant="deep" />}
       <div className={['container', containerClassName].filter(Boolean).join(' ')}>{children}</div>
     </section>
   );

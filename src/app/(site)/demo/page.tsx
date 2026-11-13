@@ -35,7 +35,7 @@ export default function DemoPage() {
   return (
     <>
       <section className={l.lead}>
-        <div className={`is-dark ${l.panel}`}>
+        <div className={l.panel}>
           <GradientBg variant="hero" warm horizon />
           <div className={`container ${l.grid}`}>
             <div>

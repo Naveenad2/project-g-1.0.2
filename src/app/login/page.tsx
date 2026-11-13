@@ -4,7 +4,6 @@ import { Field, Input } from '@/components/forms/Field';
 import { StaticForm } from '@/components/forms/StaticForm';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { GradientBg } from '@/components/ui/GradientBg';
-import { Icon } from '@/components/ui/Icon';
 import { Logo } from '@/components/ui/Logo';
 import { routes } from '@/lib/routes';
 import s from './login.module.css';
@@ -40,7 +39,6 @@ export default function LoginPage() {
               Continue with Microsoft
             </a>
             <a href="#" className={s.ssoBtn}>
-              <Icon name="lock" size={18} />
               Continue with your identity provider (SAML)
             </a>
           </div>
@@ -67,7 +65,7 @@ export default function LoginPage() {
       </div>
 
       <aside className={`is-dark ${s.right}`}>
-        <GradientBg variant="hero" />
+        <GradientBg variant="cta" warm />
         <div className={s.rightInner}>
           <p className={s.label}>Gieom.cloud</p>
           <h2 className={s.headline}>AI-powered policies and procedures. Always audit-ready.</h2>

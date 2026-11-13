@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
+import { Globe } from '@/components/globe/Globe';
 import { GradientBg } from '@/components/ui/GradientBg';
 import { Rise } from '@/components/ui/Rise';
 import { Showcase } from '@/components/ui/Showcase';
 import { routes } from '@/lib/routes';
-import { DocStack } from './DocStack';
 import styles from './PageHero.module.css';
 
 interface PageHeroProps {
@@ -20,7 +20,7 @@ interface PageHeroProps {
   caption?: ReactNode;
   /** Present the visual without the glass plate. */
   flatVisual?: boolean;
-  /** Show the document stack beside heroes that have no visual (desktop only). */
+  /** Show the dotted earth beside heroes that have no visual (tablet and up). */
   art?: boolean;
   /** Narrow the heading measure on single-column heroes. */
   titleWidth?: 'narrow' | 'medium' | 'wide';
@@ -28,6 +28,8 @@ interface PageHeroProps {
   compact?: boolean;
   children?: ReactNode;
 }
+
+const delay = (ms: number) => ({ '--d': ms }) as CSSProperties;
 
 export function PageHero({
   crumb,
@@ -50,15 +52,22 @@ export function PageHero({
   return (
     <section className={styles.hero}>
       <div
-        className={['is-dark', styles.panel, compact ? styles.compact : '', split ? styles.split : '', showArt ? styles.withArt : '']
+        className={[styles.panel, compact ? styles.compact : '', split ? styles.split : '', showArt ? styles.withArt : '']
           .filter(Boolean)
           .join(' ')}
       >
         <GradientBg variant="hero" warm={tone === 'peach'} horizon />
+        {showArt && (
+          <div className={styles.art}>
+            <div className={styles.artEarth} data-parallax="0.06">
+              <Globe variant="art" />
+            </div>
+          </div>
+        )}
         <div className={`container ${styles.grid}`}>
           <div className={styles.copy}>
             {crumb && (
-              <nav aria-label="Breadcrumb" className={styles.crumb}>
+              <nav aria-label="Breadcrumb" className={`${styles.crumb} load-in`} style={delay(40)}>
                 <ol>
                   <li>
                     <Link href={routes.home}>Home</Link>
@@ -67,21 +76,30 @@ export function PageHero({
                 </ol>
               </nav>
             )}
-            <p className="eyebrow">{eyebrow}</p>
+            <p className="eyebrow load-in" style={delay(100)}>
+              {eyebrow}
+            </p>
             <h1 className={styles[`title_${titleWidth}`]}>
               <Rise>{title}</Rise>
             </h1>
-            {lede && <p className={`lede ${styles.lede}`}>{lede}</p>}
-            {extra && <div className={styles.extra}>{extra}</div>}
-            {actions && <div className={`actions ${styles.actions}`}>{actions}</div>}
+            {lede && (
+              <p className={`lede load-in ${styles.lede}`} style={delay(420)}>
+                {lede}
+              </p>
+            )}
+            {extra && (
+              <div className={`${styles.extra} load-in`} style={delay(520)}>
+                {extra}
+              </div>
+            )}
+            {actions && (
+              <div className={`actions load-in ${styles.actions}`} style={delay(600)}>
+                {actions}
+              </div>
+            )}
           </div>
-          {showArt && (
-            <div className={styles.art} aria-hidden="true">
-              <DocStack />
-            </div>
-          )}
           {visual && (
-            <figure className={styles.visual}>
+            <figure className={`${styles.visual} load-in`} style={delay(380)}>
               <Showcase variant={flatVisual ? 'bare' : 'plate'}>{visual}</Showcase>
               {caption && <figcaption className="caption">{caption}</figcaption>}
             </figure>

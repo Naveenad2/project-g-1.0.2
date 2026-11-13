@@ -99,9 +99,6 @@ export default function GuidesPage() {
         <div className={`${r.templates} reveal`}>
           {templates.map(([b, s, dl]) => (
             <a key={b} href="#" className={r.template}>
-              <span className={r.templateIc} aria-hidden="true">
-                <Icon name="file" size={20} />
-              </span>
               <b>{b}</b>
               <span>{s}</span>
               <span className={r.dl}>

@@ -2,7 +2,6 @@
 
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { Icon } from '@/components/ui/Icon';
-import { Status } from '@/components/ui/Status';
 import { offsetWithin } from '@/lib/geometry';
 import { useInView, useSequence } from '@/lib/hooks';
 import { Cursor } from './Cursor';
@@ -127,7 +126,7 @@ export function LinkDemo() {
         >
           <div className={d.top}>
             <span className={d.topTitle}>AML and Sanctions Policy</span>
-            <Status tone="warning">In review</Status>
+            <span className={d.topState}>In review</span>
             <span className={d.topMeta}>v2.1</span>
             <span className="avatar-stack" style={{ marginLeft: 'auto' }}>
               <span className="avatar" style={{ background: '#E0A030' }}>

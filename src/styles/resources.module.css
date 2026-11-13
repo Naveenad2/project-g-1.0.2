@@ -388,7 +388,7 @@
   padding-left: 4px;
   border-radius: 50%;
   background: var(--brand-orange);
-  color: #fff;
+  color: #0f2d3d;
   box-shadow:
     0 0 0 12px rgba(255, 138, 36, 0.14),
     0 18px 40px -10px rgba(255, 138, 36, 0.6);
@@ -465,7 +465,7 @@
   padding-left: 2px;
   border-radius: 50%;
   background: var(--brand-orange);
-  color: #fff;
+  color: #0f2d3d;
 }
 
 .thumbDur {

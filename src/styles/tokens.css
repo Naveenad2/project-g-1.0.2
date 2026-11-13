@@ -1,10 +1,16 @@
 /*
- * Design tokens.
- * The site always opens in the light theme. Dark mode is opt-in through the
- * header toggle, which sets data-theme="dark" on <html> and persists the choice.
+ * Design tokens — Gieom.cloud "Tangerine & Teal".
  *
- * Brand palette: navy, teal, bright teal, mint and orange — expressed through
- * animated gradient fields, glass surfaces and soft light rather than flat fills.
+ *   Tangerine  #FF8A24  primary CTA, highlights
+ *   Teal       #00B3AA  secondary CTA, shapes
+ *   Deep teal  #00807A  teal text and links (accessible)
+ *   Navy       #0F2D3D  headings, body, dark bands
+ *   Mint       #EDF9F6  section backgrounds
+ *   Off-white  #FDFDFD  page background
+ *   Signature gradient #FF8A24 → #00B3AA, used sparingly for accents.
+ *
+ * The site opens in the light theme. Dark mode is opt-in through the header toggle, which sets
+ * data-theme="dark" on <html>; it is a navy theme rather than a black one.
  */
 
 :root,
@@ -13,64 +19,77 @@
 
   /* Brand */
   --brand-navy: #0f2d3d;
-  --brand-ink: #071c24;
+  --brand-ink: #0b2431;
   --brand-teal: #00807a;
   --brand-teal-bright: #00b3aa;
-  --brand-mint: #5ee0d6;
+  --brand-mint: #5ee0d6; /* bright aqua, for accents on navy */
   --brand-orange: #ff8a24;
+  --mint: #edf9f6;
+  --off-white: #fdfdfd;
 
   /* Gradients */
-  --grad-primary: linear-gradient(180deg, #13a89f 0%, #00807a 100%);
-  --grad-primary-hover: linear-gradient(180deg, #1bb9af 0%, #008a83 100%);
-  --grad-brand: linear-gradient(120deg, #00b3aa 0%, #00807a 42%, #0f2d3d 100%);
+  --grad-signature: linear-gradient(90deg, #ff8a24 0%, #00b3aa 100%);
+  --grad-primary: linear-gradient(180deg, #ff9a3d 0%, #ff8a24 100%);
+  --grad-primary-hover: linear-gradient(180deg, #ffa552 0%, #ff922f 100%);
+  --grad-brand: linear-gradient(120deg, #00b3aa 0%, #00807a 45%, #0f2d3d 100%);
   --grad-warm: linear-gradient(120deg, #ffb066 0%, #ff8a24 100%);
   --grad-soft:
-    radial-gradient(70% 90% at 0% 0%, rgba(0, 179, 170, 0.2), transparent 60%),
-    radial-gradient(60% 80% at 100% 100%, rgba(255, 138, 36, 0.16), transparent 60%), linear-gradient(135deg, #e9f6f3, #fbf3ea);
+    radial-gradient(70% 90% at 0% 0%, rgba(0, 179, 170, 0.14), transparent 62%),
+    radial-gradient(60% 80% at 100% 100%, rgba(255, 138, 36, 0.12), transparent 62%), linear-gradient(135deg, #f3fbf9, #fffaf4);
 
-  /* Page wash: saturated teal, mint and warm light repeating down the canvas so no area is flat white */
-  --page-bg:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.06 0 0 0 0 0.2 0 0 0 0 0.24 0 0 0 0.42 -0.155'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")
-      0 0 / 240px 240px repeat,
-    radial-gradient(1000px 620px at -8% 470px, rgba(0, 179, 170, 0.26), transparent 70%) 0 0 / 100% 1800px repeat-y,
-    radial-gradient(760px 380px at 72% 300px, rgba(255, 150, 60, 0.15), transparent 70%) 0 0 / 100% 1800px repeat-y,
-    radial-gradient(900px 600px at 108% 1050px, rgba(255, 138, 36, 0.24), transparent 70%) 0 0 / 100% 1800px repeat-y,
-    radial-gradient(800px 520px at 22% 1400px, rgba(94, 224, 214, 0.26), transparent 70%) 0 0 / 100% 1800px repeat-y,
-    linear-gradient(180deg, #eaf5f2 0%, #f3f7f5 32%, #faf1e6 62%, #eaf5f2 100%);
+  /* Film grain: fine, navy-tinted, very low alpha */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.06 0 0 0 0 0.18 0 0 0 0 0.24 0 0 0 0.36 -0.135'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --grain-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.93 0 0 0 0 0.98 0 0 0 0 0.97 0 0 0 0.32 -0.115'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  /* Page: off-white with a fine grain; sections bring their own light */
+  --page-bg: var(--grain) 0 0 / 220px 220px repeat, linear-gradient(#fdfdfd, #fdfdfd);
+
+  /* Liquid glass: translucent fill with a specular sheen, a bright rim and a soft navy shadow */
+  --glass-bg:
+    radial-gradient(130% 90% at 8% -24%, rgba(255, 255, 255, 0.96), transparent 52%),
+    linear-gradient(155deg, rgba(255, 255, 255, 0.76) 0%, rgba(255, 255, 255, 0.44) 56%, rgba(255, 255, 255, 0.62) 100%);
+  --glass-border: rgba(255, 255, 255, 0.82);
+  --glass-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 0 0 1px rgba(255, 255, 255, 0.3), inset 0 -22px 36px -30px rgba(0, 128, 122, 0.32),
+    0 1px 2px rgba(15, 45, 61, 0.05), 0 28px 54px -32px rgba(15, 45, 61, 0.34);
+  --glass-shadow-hover:
+    inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 0 0 1px rgba(255, 255, 255, 0.4), inset 0 -22px 36px -28px rgba(255, 138, 36, 0.32),
+    0 2px 4px rgba(15, 45, 61, 0.05), 0 36px 64px -34px rgba(15, 45, 61, 0.42);
+  --glass-blur: blur(20px) saturate(170%);
 
   /* Surfaces */
-  --bg: #f6f9f8;
+  --bg: #fdfdfd;
   --bg-subtle: #ffffff;
-  --bg-mint: #ecf7f4;
-  --bg-peach: #fbf5ee;
+  --bg-mint: #edf9f6;
+  --bg-peach: #fff6ee;
   --surface: #ffffff;
-  --surface-2: #f5f8f7;
-  --surface-3: #e8eeed;
-  --overlay: rgba(7, 28, 36, 0.56);
+  --surface-2: #f6faf9;
+  --surface-3: #e9f2f0;
+  --overlay: rgba(15, 45, 61, 0.5);
 
   /* Text */
   --ink: #0f2d3d;
-  --text: #3a5361;
-  --muted: #5f7783;
-  --faint: #8ea1aa;
-  --on-primary: #ffffff;
+  --text: #3b5462;
+  --muted: #5d7581;
+  --faint: #8ca0a9;
+  --on-primary: #0f2d3d;
 
   /* Lines */
-  --line: #e1e8e6;
-  --line-strong: #c9d4d1;
+  --line: #e2ebe9;
+  --line-strong: #c8d6d3;
   --line-ink: #0f2d3d;
 
   /* Interactive */
   --primary: #00807a;
-  --primary-hover: #006a65;
-  --primary-soft: #e0f2ef;
-  --primary-text: #00726d;
+  --primary-hover: #006b66;
+  --primary-soft: #e3f5f1;
+  --primary-text: #00807a;
   --focus: #00a39a;
   --wipe: #0f2d3d;
 
   --accent: #ff8a24;
-  --accent-soft: #fdeddc;
-  --accent-text: #a4520a;
+  --accent-soft: #ffeedd;
+  --accent-text: #a8520a;
 
   /* Status */
   --success: #0e8a5f;
@@ -81,28 +100,28 @@
   --info-soft: #e7edfa;
   --warning: #c26a0c;
   --warning-soft: #fcefdf;
-  --neutral-soft: #ecf0f1;
+  --neutral-soft: #edf2f2;
 
-  /* Immersive dark field */
-  --deep: #061b22;
-  --deep-2: #0b2a33;
+  /* Navy bands */
+  --deep: #0f2d3d;
+  --deep-2: #12384b;
   --deep-line: rgba(255, 255, 255, 0.12);
   --deep-ink: #ffffff;
-  --deep-text: rgba(255, 255, 255, 0.76);
-  --deep-muted: rgba(255, 255, 255, 0.56);
+  --deep-text: rgba(255, 255, 255, 0.78);
+  --deep-muted: rgba(255, 255, 255, 0.58);
   --deep-accent: #5ee0d6;
 
   /* Logo */
   --logo-ink: #0f2d3d;
   --logo-accent: #00807a;
 
-  /* Elevation */
+  /* Elevation (navy-tinted) */
   --shadow-xs: 0 1px 2px rgba(15, 45, 61, 0.06);
-  --shadow-sm: 0 1px 2px rgba(15, 45, 61, 0.05), 0 6px 16px -8px rgba(15, 45, 61, 0.12);
-  --shadow-md: 0 2px 4px rgba(15, 45, 61, 0.04), 0 18px 40px -18px rgba(15, 45, 61, 0.22);
-  --shadow-lg: 0 4px 10px rgba(15, 45, 61, 0.04), 0 30px 70px -30px rgba(15, 45, 61, 0.35);
-  --shadow-3d: 0 6px 14px rgba(15, 45, 61, 0.06), 0 50px 100px -40px rgba(15, 45, 61, 0.45);
-  --glow-teal: 0 0 0 1px rgba(94, 224, 214, 0.25), 0 30px 80px -24px rgba(0, 179, 170, 0.55);
+  --shadow-sm: 0 1px 2px rgba(15, 45, 61, 0.05), 0 8px 20px -10px rgba(15, 45, 61, 0.14);
+  --shadow-md: 0 2px 4px rgba(15, 45, 61, 0.04), 0 22px 44px -22px rgba(15, 45, 61, 0.24);
+  --shadow-lg: 0 4px 10px rgba(15, 45, 61, 0.04), 0 34px 74px -32px rgba(15, 45, 61, 0.32);
+  --shadow-3d: 0 6px 14px rgba(15, 45, 61, 0.06), 0 50px 100px -40px rgba(15, 45, 61, 0.4);
+  --glow-teal: 0 0 0 1px rgba(0, 179, 170, 0.2), 0 30px 80px -24px rgba(0, 179, 170, 0.45);
 
   /* Shape */
   --radius-xs: 6px;
@@ -123,8 +142,8 @@
   --hero-radius: clamp(28px, 3.4vw, 52px);
   --header-gap: 12px;
   --header-space: calc(var(--header-gap) + var(--header-h));
-  --section-y: clamp(56px, 6.5vw, 96px);
-  --section-y-tight: clamp(44px, 5vw, 72px);
+  --section-y: clamp(64px, 7.5vw, 120px);
+  --section-y-tight: clamp(48px, 5.5vw, 84px);
 
   /* Motion */
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -142,71 +161,82 @@
   }
 }
 
+@media (max-width: 767px) {
+  :root {
+    --glass-blur: blur(12px) saturate(160%);
+  }
+}
+
 :root[data-theme='dark'] {
   color-scheme: dark;
 
   --grad-soft:
-    radial-gradient(70% 90% at 0% 0%, rgba(0, 179, 170, 0.16), transparent 60%),
-    radial-gradient(60% 80% at 100% 100%, rgba(255, 138, 36, 0.09), transparent 60%), linear-gradient(135deg, #0b1b21, #10191c);
-  --page-bg:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.8 0 0 0 0 0.95 0 0 0 0 0.95 0 0 0 0.3 -0.11'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")
-      0 0 / 240px 240px repeat,
-    radial-gradient(1000px 620px at -8% 470px, rgba(0, 179, 170, 0.15), transparent 70%) 0 0 / 100% 1800px repeat-y,
-    radial-gradient(760px 380px at 72% 300px, rgba(255, 150, 60, 0.06), transparent 70%) 0 0 / 100% 1800px repeat-y,
-    radial-gradient(900px 600px at 108% 1050px, rgba(255, 138, 36, 0.11), transparent 70%) 0 0 / 100% 1800px repeat-y,
-    radial-gradient(800px 520px at 22% 1400px, rgba(94, 224, 214, 0.08), transparent 70%) 0 0 / 100% 1800px repeat-y,
-    linear-gradient(180deg, #061116 0%, #071419 50%, #061116 100%);
+    radial-gradient(70% 90% at 0% 0%, rgba(0, 179, 170, 0.16), transparent 62%),
+    radial-gradient(60% 80% at 100% 100%, rgba(255, 138, 36, 0.1), transparent 62%), linear-gradient(135deg, #0e2b39, #112a36);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.9 0 0 0 0 0.97 0 0 0 0 0.96 0 0 0 0.26 -0.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --page-bg: var(--grain) 0 0 / 220px 220px repeat, linear-gradient(#0c2633, #0c2633);
 
-  --bg: #071217;
-  --bg-subtle: #0a171d;
-  --bg-mint: #0a1a1d;
-  --bg-peach: #121415;
-  --surface: #0e1b21;
-  --surface-2: #122229;
-  --surface-3: #182c34;
-  --overlay: rgba(0, 0, 0, 0.66);
+  --glass-bg:
+    radial-gradient(130% 90% at 8% -24%, rgba(255, 255, 255, 0.13), transparent 52%),
+    linear-gradient(155deg, rgba(25, 70, 90, 0.66) 0%, rgba(15, 45, 61, 0.46) 56%, rgba(19, 58, 76, 0.58) 100%);
+  --glass-border: rgba(237, 249, 246, 0.15);
+  --glass-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.04), inset 0 -22px 36px -30px rgba(0, 179, 170, 0.3),
+    0 28px 54px -30px rgba(0, 0, 0, 0.6);
+  --glass-shadow-hover:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.06), inset 0 -22px 36px -28px rgba(255, 138, 36, 0.3),
+    0 36px 64px -32px rgba(0, 0, 0, 0.7);
 
-  --ink: #eef5f7;
-  --text: #b8c8ce;
-  --muted: #8ba1aa;
-  --faint: #67808a;
-  --on-primary: #ffffff;
+  --bg: #0c2633;
+  --bg-subtle: #0f2d3d;
+  --bg-mint: #0f3140;
+  --bg-peach: #1a2c33;
+  --surface: #113243;
+  --surface-2: #15394b;
+  --surface-3: #1b4357;
+  --overlay: rgba(4, 16, 22, 0.66);
 
-  --line: #1b3039;
-  --line-strong: #284450;
-  --line-ink: #d5e2e6;
+  --ink: #f3faf9;
+  --text: #c3d4da;
+  --muted: #93aab4;
+  --faint: #6f8b96;
+  --on-primary: #0f2d3d;
 
-  --primary: #00807a;
-  --primary-hover: #0a958e;
-  --primary-soft: rgba(43, 191, 180, 0.12);
-  --primary-text: #4fd1c6;
-  --focus: #4fd1c6;
-  --wipe: #0a958e;
+  --line: rgba(237, 249, 246, 0.1);
+  --line-strong: rgba(237, 249, 246, 0.2);
+  --line-ink: #dbe8eb;
+
+  --primary: #00b3aa;
+  --primary-hover: #19c4bb;
+  --primary-soft: rgba(0, 179, 170, 0.15);
+  --primary-text: #3fd0c6;
+  --focus: #3fd0c6;
+  --wipe: #00b3aa;
 
   --accent: #ff9a40;
-  --accent-soft: rgba(255, 154, 64, 0.12);
+  --accent-soft: rgba(255, 154, 64, 0.14);
   --accent-text: #ffb47a;
 
   --success: #4cc89a;
-  --success-soft: rgba(76, 200, 154, 0.12);
+  --success-soft: rgba(76, 200, 154, 0.14);
   --danger: #ff8a80;
-  --danger-soft: rgba(255, 138, 128, 0.12);
+  --danger-soft: rgba(255, 138, 128, 0.14);
   --info: #8fb0ff;
-  --info-soft: rgba(143, 176, 255, 0.12);
+  --info-soft: rgba(143, 176, 255, 0.14);
   --warning: #ffb47a;
-  --warning-soft: rgba(255, 180, 122, 0.12);
+  --warning-soft: rgba(255, 180, 122, 0.14);
   --neutral-soft: rgba(185, 201, 207, 0.1);
 
-  --deep: #030c10;
-  --deep-2: #071a20;
+  --deep: #081d27;
+  --deep-2: #0b2532;
   --deep-line: rgba(255, 255, 255, 0.1);
 
   --logo-ink: #ffffff;
   --logo-accent: #5ee0d6;
 
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 16px -8px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.25), 0 18px 40px -16px rgba(0, 0, 0, 0.6);
-  --shadow-lg: 0 4px 10px rgba(0, 0, 0, 0.25), 0 30px 70px -28px rgba(0, 0, 0, 0.75);
-  --shadow-3d: 0 6px 14px rgba(0, 0, 0, 0.3), 0 50px 100px -40px rgba(0, 0, 0, 0.8);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25), 0 8px 18px -8px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.2), 0 20px 44px -18px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 4px 10px rgba(0, 0, 0, 0.2), 0 32px 72px -28px rgba(0, 0, 0, 0.6);
+  --shadow-3d: 0 6px 14px rgba(0, 0, 0, 0.25), 0 50px 100px -40px rgba(0, 0, 0, 0.65);
 }

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ContactForm } from '@/components/forms/ContactForm';
-import { Icon, type IconName } from '@/components/ui/Icon';
 import { Ph } from '@/components/ui/Section';
 import { routes } from '@/lib/routes';
 import l from '@/styles/lead.module.css';
@@ -12,9 +11,8 @@ export const metadata: Metadata = {
   description: 'Sales, support, partnerships, press or security. We reply within two business days.',
 };
 
-const ways: { icon: IconName; title: string; body: React.ReactNode }[] = [
+const ways: { title: string; body: React.ReactNode }[] = [
   {
-    icon: 'calendar',
     title: 'Sales and demos',
     body: (
       <>
@@ -23,7 +21,6 @@ const ways: { icon: IconName; title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    icon: 'lifebuoy',
     title: 'Support',
     body: (
       <>
@@ -33,7 +30,6 @@ const ways: { icon: IconName; title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    icon: 'shield',
     title: 'Security',
     body: (
       <>
@@ -43,7 +39,6 @@ const ways: { icon: IconName; title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    icon: 'users',
     title: 'Partnerships',
     body: (
       <>
@@ -52,7 +47,6 @@ const ways: { icon: IconName; title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    icon: 'pin',
     title: 'Offices',
     body: (
       <>
@@ -65,7 +59,7 @@ const ways: { icon: IconName; title: string; body: React.ReactNode }[] = [
 export default function ContactPage() {
   return (
     <section className={l.lead}>
-      <div className={`is-dark ${l.panel}`}>
+      <div className={l.panel}>
         <GradientBg variant="hero" horizon />
         <div className={`container ${l.grid}`}>
           <div>
@@ -77,9 +71,6 @@ export default function ContactPage() {
             <ul className={l.ways}>
               {ways.map((w) => (
                 <li key={w.title}>
-                  <span className={l.ic} aria-hidden="true">
-                    <Icon name={w.icon} size={20} />
-                  </span>
                   <div>
                     <b>{w.title}</b>
                     <p>{w.body}</p>

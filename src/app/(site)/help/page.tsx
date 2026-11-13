@@ -4,7 +4,7 @@ import { Tiles } from '@/components/blocks/Tiles';
 import { Input } from '@/components/forms/Field';
 import { StaticForm } from '@/components/forms/StaticForm';
 import { ArrowLink } from '@/components/ui/ButtonLink';
-import { Icon, type IconName } from '@/components/ui/Icon';
+import { Icon } from '@/components/ui/Icon';
 import { Section } from '@/components/ui/Section';
 import { routes } from '@/lib/routes';
 import r from '@/styles/resources.module.css';
@@ -14,9 +14,8 @@ export const metadata: Metadata = {
   description: 'Product documentation and support for Gieom.cloud.',
 };
 
-const topics: { icon: IconName; title: string; links: string[]; more: string }[] = [
+const topics: { title: string; links: string[]; more: string }[] = [
   {
-    icon: 'rocket',
     title: 'Getting started',
     links: [
       'Your first week in Gieom.cloud',
@@ -28,7 +27,6 @@ const topics: { icon: IconName; title: string; links: string[]; more: string }[]
     more: 'All 14 articles',
   },
   {
-    icon: 'file',
     title: 'Policies and procedures',
     links: [
       'Document setup: metadata, owner, workflow',
@@ -40,7 +38,6 @@ const topics: { icon: IconName; title: string; links: string[]; more: string }[]
     more: 'All 22 articles',
   },
   {
-    icon: 'checkCircle',
     title: 'Acknowledgement and assessments',
     links: [
       'How "Published to me" works',
@@ -51,7 +48,6 @@ const topics: { icon: IconName; title: string; links: string[]; more: string }[]
     more: 'All 9 articles',
   },
   {
-    icon: 'layers',
     title: 'Registers and RCSA',
     links: [
       'Creating risks and controls',
@@ -63,7 +59,6 @@ const topics: { icon: IconName; title: string; links: string[]; more: string }[]
     more: 'All 17 articles',
   },
   {
-    icon: 'flow',
     title: 'Workflows and forms',
     links: [
       'Building a workflow on the canvas',
@@ -74,7 +69,6 @@ const topics: { icon: IconName; title: string; links: string[]; more: string }[]
     more: 'All 11 articles',
   },
   {
-    icon: 'settings',
     title: 'Administration and security',
     links: [
       'SAML and OIDC single sign-on',
@@ -121,9 +115,6 @@ export default function HelpPage() {
         <div className={r.topics}>
           {topics.map((t) => (
             <div key={t.title} className={`${r.topic} reveal`}>
-              <span className={r.topicIc} aria-hidden="true">
-                <Icon name={t.icon} size={20} />
-              </span>
               <h2>{t.title}</h2>
               <ul>
                 {t.links.map((l) => (
@@ -146,19 +137,16 @@ export default function HelpPage() {
           variant="cards"
           items={[
             {
-              icon: <Icon name="video" size={20} />,
               title: 'Short videos',
               body: 'Every feature has a clip under two minutes.',
               footer: <ArrowLink href={`${routes.home}#tour`}>Watch the tour</ArrowLink>,
             },
             {
-              icon: <Icon name="lifebuoy" size={20} />,
               title: 'Contact support',
               body: 'Email and in-app chat, business hours in GST and IST. Enterprise customers have a named contact.',
               footer: <ArrowLink href={routes.contact}>Contact</ArrowLink>,
             },
             {
-              icon: <Icon name="checkCircle" size={20} />,
               title: 'Status',
               body: 'Live service status and incident history.',
               footer: <ArrowLink href={routes.status}>Status page</ArrowLink>,

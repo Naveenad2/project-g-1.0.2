@@ -4,7 +4,6 @@ import { Tiles } from '@/components/blocks/Tiles';
 import { Field, FormCard, Input, Select, formStyles as f } from '@/components/forms/Field';
 import { StaticForm } from '@/components/forms/StaticForm';
 import { ButtonLink } from '@/components/ui/ButtonLink';
-import { Icon } from '@/components/ui/Icon';
 import { Ph, Section, SectionLabel } from '@/components/ui/Section';
 import { routes } from '@/lib/routes';
 import styles from '@/styles/page.module.css';
@@ -108,7 +107,6 @@ export default function PartnersPage() {
               <ul>
                 {t.items.map((it, i) => (
                   <li key={i}>
-                    <Icon name="check" size={15} strokeWidth={2.2} />
                     <span>{it}</span>
                   </li>
                 ))}
