@@ -60,18 +60,24 @@ paint, so there is no flash. All colours are tokens in `src/styles/tokens.css`, 
   set, and light islands inside them (forms, product windows) use `is-light`.
 - **Gradients:** `GradientBg` layers five soft radial lights (tangerine, teal, white, peach, aqua) that drift on long,
   offset loops, and adds a static grain. Only `transform` animates, on the compositor, so it never repaints or
-  flickers. Variants: `hero`, `soft`, `deep` and `cta`. It is static under reduced motion.
+  flickers. Variants: `hero`, `soft`, `deep`, `cta` and `vivid`. It is static under reduced motion.
 - **The earth:** `Globe` (`src/components/globe`) is a three.js scene drawn as a porcelain sphere with a faint
-  graticule. Land is a field of dots, sampled from Natural Earth (public domain) and stored in `landPoints.ts`. Arcs
-  in the signature gradient link the regulators the site names: RBI, SEBI, IRDAI, CBUAE, ADGM, DFSA, SAMA, CBB, QFCRA
-  and FATF. The scene also has pulsing hubs, travelling light, two dotted orbits and an atmosphere halo. It loads only
-  when it nears the viewport, renders only while it is visible and the tab is active, and fades in on its first frame.
-  Framings: `hero` (home), `art` (inner heroes without a product visual) and `horizon` (the closing call to action,
-  always in the navy palette).
-- **Home hero:** a sticky stage holding the copy, the giant earth and the regulators band. Its lower edge is pinned
-  with `svh`, so a phone's address bar never makes it jump. The sheet carrying the live linking demo slides up over
-  it, opening with a short introduction beside the demo. With a mouse, the copy drifts away and the camera dollies
-  into the earth; on touch screens only the light changes, so nothing jitters against native scrolling.
+  graticule. Land is drawn as fine coastline outlines only, kept light so the copy beside it stays the focus. The
+  outlines come from Natural Earth's 1:110m land data (public domain), packed into `coastlines.ts`. Each one is a
+  continuous ribbon about 1 CSS pixel wide on any screen. Country borders are left out on purpose, because several
+  near the hubs are disputed. Arcs in the signature gradient link the regulators the site names: RBI, SEBI, IRDAI,
+  CBUAE, ADGM, DFSA, SAMA, CBB, QFCRA and FATF. The scene also has pulsing hubs, travelling light, two dotted orbits
+  and an atmosphere halo. It loads only when it nears the viewport, renders only while it is visible and the tab is
+  active, and fades in on its first frame. Framings: `hero` (home), `art` (inner heroes without a product visual)
+  and `horizon` (a low, wide view, not used at present). A parent can set `--globe-fade: <start> <end>` (fractions
+  of the canvas height) to fade the drawing out towards its foot. The fade is done inside the canvas, not with a CSS
+  mask, which flickers over a live canvas on phones.
+- **Home hero:** a full-width gradient panel with rounded lower corners, like the inner heroes. It holds the copy,
+  the giant earth and the regulators band. The next section (the live linking demo, with a short introduction beside
+  it) follows in normal flow. Its field rises out of the page under the hero, so nothing slides over anything. As the
+  hero scrolls away, the earth turns and moves closer inside its canvas. With a mouse, the copy also lifts and fades;
+  on touch screens only the earth responds, so nothing jitters against native scrolling. On phones and tablets the
+  earth sits between the buttons and the paragraph, and fades out before the paragraph starts.
 - **Tour:** the heading, the tour's title and chapters, and a link sit beside a contained, glass-framed poster rather
   than a full-width image.
 - **Closing call to action (`CtaBand`):** open to the page, not a card. Centred copy sits on saturated tangerine
@@ -92,6 +98,11 @@ paint, so there is no flash. All colours are tokens in `src/styles/tokens.css`, 
   starts below the fold is ever hidden, so nothing flashes and nothing stays hidden if scripts fail. Hero copy enters
   through CSS (`.load-in`, `Rise`), and client-side navigations fade the new page in (`template.tsx`). Everything
   respects `prefers-reduced-motion`.
+- **Moving between pages:** a link opens the new page at its top at once, or at its `#anchor` when it has one. The
+  jump is never animated through the new page, and a smooth-scroll glide still running from the previous page is
+  cancelled (`startPage` in `src/lib/scroll.ts`, called from `MotionProvider`). Back and forward keep the position the
+  browser restores. A link to the page you are already on, such as the logo on the home page, glides back to the top.
+  `<html data-scroll-behavior="smooth">` lets Next.js switch CSS smooth scrolling off during route changes.
 - **Sharp text by rule:** nothing that contains text is rotated, scaled or put in perspective. Motion on text is
   translate and opacity only, cleared when it ends.
 - **Liquid glass:** cards, the secondary button, the header, the demo window and the replay control share the
@@ -101,7 +112,8 @@ paint, so there is no flash. All colours are tokens in `src/styles/tokens.css`, 
 - **Phones and tablets (touch screens):** built to avoid the usual causes of mobile flicker.
   - Gradients stay still.
   - Only the header bar keeps a backdrop blur.
-  - Nothing masks a live WebGL canvas or the regulators marquee; soft overlays do the fading instead.
+  - Nothing masks a live WebGL canvas or the regulators marquee. The home earth fades out inside its own canvas,
+    the regulators marquee simply runs off the screen edges, and soft overlays do the other fades.
   - Scrolling is native: Lenis is off, and there are no scroll-linked reveals, parallax or text movement.
   - The feature tabs advance only when tapped.
   - The page transition is a plain fade.
@@ -127,8 +139,8 @@ src/
     not-found.tsx
   components/
     layout/                  Header (floating bar, mega menu, drawer), Footer, ThemeToggle, SpotlightController
-    motion/                  MotionProvider (Lenis + GSAP reveals)
-    globe/                   Globe (React wrapper), scene (three.js), landPoints (encoded land dots)
+    motion/                  MotionProvider (Lenis + GSAP reveals, scroll position when pages change)
+    globe/                   Globe (React wrapper), scene (three.js), coastlines (encoded land outlines)
     blocks/                  PageHero, ProblemGrid, FeatureStep, Tiles, CtaBand, Timeline, Faq,
                              IndustryPage template, LegalLayout
     home/                    HomeHero, CapabilityStory, FeatureTabs, PlatformStack index, product demos
@@ -141,7 +153,7 @@ src/
     routes.ts                Every internal URL in one place
     navigation.ts            Header and footer menus
     hooks.ts                 useInView, useSequence (demo timelines), reduced-motion
-    scroll.ts                Smooth-scroll instance, scroll lock and scroll-to helpers
+    scroll.ts                Smooth-scroll instance, scroll lock, page-start and scroll-to helpers
     geometry.ts              Layout offsets for demo cursor targets, unaffected by entrance transforms
     theme.ts                 Theme bootstrap and toggle logic
   styles/                    Design tokens, fonts, shared page modules

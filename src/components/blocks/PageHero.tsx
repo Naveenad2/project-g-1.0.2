@@ -20,7 +20,7 @@ interface PageHeroProps {
   caption?: ReactNode;
   /** Present the visual without the glass plate. */
   flatVisual?: boolean;
-  /** Show the dotted earth beside heroes that have no visual (tablet and up). */
+  /** Show the earth beside heroes that have no visual (tablet and up). */
   art?: boolean;
   /** Narrow the heading measure on single-column heroes. */
   titleWidth?: 'narrow' | 'medium' | 'wide';

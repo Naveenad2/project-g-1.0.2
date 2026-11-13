@@ -1,12 +1,6 @@
-.wrap {
-  position: relative;
-}
-
-/* Sticky stage, stuck by its lower edge when it is taller than the (small) viewport. */
+/* Full-bleed gradient stage with rounded lower corners, like the hero panels on the other pages */
 .hero {
-  position: sticky;
-  top: min(0px, calc(100svh - var(--hero-h, 100svh)));
-  z-index: 0;
+  position: relative;
   isolation: isolate;
   overflow: hidden;
   display: flex;
@@ -14,7 +8,9 @@
   min-height: 100vh;
   min-height: 100svh;
   padding-top: calc(var(--header-space) + clamp(24px, 5vw, 64px));
+  border-radius: 0 0 var(--hero-radius) var(--hero-radius);
   color: var(--text);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--brand-teal-bright) 14%, transparent);
 }
 
 .grid {
@@ -55,18 +51,10 @@
   pointer-events: none;
 }
 
-/* Fades the earth into the copy below without masking the live canvas */
-.earthSlot::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 32%;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 0%, transparent), color-mix(in srgb, var(--bg) 94%, transparent));
-}
-
+/* The earth fades out (inside its canvas) before the paragraph below starts, so no copy sits on it.
+   Measured: that paragraph starts at 0.70–0.76 of the canvas height on phones and tablets. */
 .earth {
+  --globe-fade: 0.58 0.68;
   --size: min(148vw, 1080px);
   position: absolute;
   top: calc(var(--size) * -0.07);
@@ -91,34 +79,6 @@
   padding: clamp(32px, 5vw, 56px) 0 clamp(22px, 3vw, 34px);
 }
 
-/* Dims the stage as the next sheet slides over it */
-.shade {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  background: linear-gradient(180deg, rgba(15, 45, 61, 0.02), rgba(15, 45, 61, 0.2));
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* The sheet that slides over the stage */
-.cover {
-  position: relative;
-  z-index: 1;
-  border-radius: var(--hero-radius) var(--hero-radius) 0 0;
-  background: var(--page-bg);
-  background-color: var(--bg);
-  box-shadow:
-    0 -1px 0 rgba(255, 255, 255, 0.9),
-    0 -36px 80px -36px rgba(15, 45, 61, 0.34);
-}
-
-:root[data-theme='dark'] .cover {
-  box-shadow:
-    0 -1px 0 rgba(237, 249, 246, 0.08),
-    0 -36px 80px -30px rgba(0, 0, 0, 0.6);
-}
-
 /* Desktop: copy on the left in reading order; the earth fills the right of the stage */
 @media (min-width: 1100px) {
   .grid {
@@ -140,10 +100,8 @@
     height: auto;
     margin: 0;
   }
-  .earthSlot::after {
-    display: none;
-  }
   .earth {
+    --globe-fade: none;
     --size: min(94vw, 148vh, 1560px);
     left: auto;
     right: calc(var(--size) / -2 + 17vw);

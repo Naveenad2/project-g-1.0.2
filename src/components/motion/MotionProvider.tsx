@@ -5,8 +5,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import Lenis from 'lenis';
 import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
-import { scrollState } from '@/lib/scroll';
+import { useEffect, useLayoutEffect, useRef } from 'react';
+import { scrollState, scrollToTop, startPage } from '@/lib/scroll';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -26,6 +26,39 @@ const touchScreen = () => window.matchMedia('(hover: none), (pointer: coarse)').
  */
 export function MotionProvider() {
   const pathname = usePathname();
+  const lastPath = useRef<string | null>(null);
+  const poppedAt = useRef(-Infinity);
+
+  // Back and forward keep the position the browser restores; only links open a page at its top.
+  useEffect(() => {
+    const onPop = () => {
+      poppedAt.current = performance.now();
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  // Runs before the new page is painted, so it never shows at the old scroll position first.
+  useLayoutEffect(() => {
+    if (lastPath.current !== null && lastPath.current !== pathname && performance.now() - poppedAt.current > 1000) startPage();
+    lastPath.current = pathname;
+  }, [pathname]);
+
+  // A link to the page you are already on (the logo on the home page, say) glides back to its top.
+  // Fragment links, including the placeholder "#" cards, are left alone.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const link = e.target instanceof Element ? e.target.closest('a[href]') : null;
+      if (!(link instanceof HTMLAnchorElement) || link.getAttribute('href')?.startsWith('#')) return;
+      if ((link.target && link.target !== '_self') || link.hasAttribute('download')) return;
+      const url = new URL(link.href, window.location.href);
+      const here = window.location;
+      if (url.origin === here.origin && url.pathname === here.pathname && url.search === here.search && !url.hash) scrollToTop();
+    };
+    document.addEventListener('click', onClick);
+    return () => document.removeEventListener('click', onClick);
+  }, []);
 
   useEffect(() => {
     if (reducedMotion() || touchScreen()) return;

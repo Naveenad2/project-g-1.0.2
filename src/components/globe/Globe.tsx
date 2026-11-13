@@ -14,9 +14,13 @@ interface GlobeProps {
 }
 
 /**
- * Dotted WebGL earth with arcs between the regulators the platform covers. three.js loads only when
- * the globe nears the viewport; the canvas fades in on its first frame and renders only while it is on
- * screen and the tab is visible. Without WebGL nothing is drawn and the gradient behind it shows.
+ * WebGL earth drawn as fine coastline outlines, with arcs between the regulators the platform covers.
+ * three.js loads only when the globe nears the viewport; the canvas fades in on its first frame and
+ * renders only while it is on screen and the tab is visible. Without WebGL nothing is drawn and the
+ * gradient behind it shows.
+ *
+ * A parent can set `--globe-fade: <start> <end>` (fractions of the canvas height from the top) to fade
+ * the drawing out towards its foot, for layouts where copy follows directly below the earth.
  */
 export function Globe({ variant = 'hero', tone = 'auto', progress, className }: GlobeProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -32,8 +36,15 @@ export function Globe({ variant = 'hero', tone = 'auto', progress, className }: 
     let started = false;
     let visible = false;
 
+    const readFade = (): [number, number] | null => {
+      const [start, end] = getComputedStyle(wrap).getPropertyValue('--globe-fade').trim().split(/\s+/).map(Number);
+      return Number.isFinite(start) && Number.isFinite(end) && end > start ? [start, end] : null;
+    };
     const sync = () => handle?.setActive(visible && !document.hidden);
-    const ro = new ResizeObserver(() => handle?.resize());
+    const ro = new ResizeObserver(() => {
+      handle?.setFade(readFade());
+      handle?.resize();
+    });
     const mo = new MutationObserver(() => handle?.setTheme(root.dataset.theme === 'dark'));
 
     const start = () => {

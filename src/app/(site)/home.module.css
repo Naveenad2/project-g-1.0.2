@@ -146,31 +146,12 @@
   overflow: hidden;
 }
 
+/* Faded edges with a mouse. Touch screens skip the mask (masked moving content can flicker there) and let the
+   names run off the screen edge, since a solid overlay cannot match the gradient behind the band. */
 @media (hover: hover) {
   .marquee {
     -webkit-mask: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
     mask: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
-  }
-}
-
-@media (hover: none) {
-  .marquee::before,
-  .marquee::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    z-index: 1;
-    width: 14%;
-    pointer-events: none;
-  }
-  .marquee::before {
-    left: 0;
-    background: linear-gradient(90deg, var(--bg), color-mix(in srgb, var(--bg) 0%, transparent));
-  }
-  .marquee::after {
-    right: 0;
-    background: linear-gradient(270deg, var(--bg), color-mix(in srgb, var(--bg) 0%, transparent));
   }
 }
 
@@ -235,26 +216,36 @@
   }
 }
 
-/* ── The sheet that slides over the hero: a vivid liquid field with the live document in glass ── */
+/* ── After the hero: a vivid liquid field with the live document in glass ── */
 .cover {
   position: relative;
   isolation: isolate;
   overflow: hidden;
   padding: clamp(64px, 8vw, 128px) 0 clamp(64px, 8vw, 128px);
-  border-radius: inherit;
 }
 
-/* The field melts into the page below */
+/* The field rises out of the page under the hero and melts into the page below */
+.cover::before,
 .cover::after {
   content: '';
   position: absolute;
   left: 0;
   right: 0;
+  pointer-events: none;
+}
+
+.cover::before {
+  top: 0;
+  z-index: 1;
+  height: clamp(96px, 12vw, 180px);
+  background: linear-gradient(180deg, var(--bg), color-mix(in srgb, var(--bg) 0%, transparent));
+}
+
+.cover::after {
   bottom: 0;
   z-index: 0;
   height: clamp(120px, 16vw, 220px);
   background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 0%, transparent), var(--bg));
-  pointer-events: none;
 }
 
 /* Light flowing in from both sides towards the document */

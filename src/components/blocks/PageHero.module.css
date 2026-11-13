@@ -125,7 +125,7 @@
   margin-top: 20px;
 }
 
-/* The dotted earth. Phones and small tablets: it rises from the foot of the hero, under the copy. */
+/* The earth. Phones and small tablets: it rises from the foot of the hero, under the copy. */
 .withArt {
   display: flex;
   flex-direction: column;

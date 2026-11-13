@@ -37,7 +37,9 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-theme="light" className={inter.variable} suppressHydrationWarning>
+    // data-scroll-behavior: Next.js drops the CSS smooth scrolling while it moves to a new page, so a page
+    // opens at its top at once instead of gliding up through its own content.
+    <html lang="en" data-theme="light" data-scroll-behavior="smooth" className={inter.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>

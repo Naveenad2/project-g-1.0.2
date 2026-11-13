@@ -1,7 +1,10 @@
 import {
+  AddEquation,
   BufferAttribute,
   BufferGeometry,
   CubicBezierCurve3,
+  CustomBlending,
+  DoubleSide,
   Group,
   Mesh,
   PerspectiveCamera,
@@ -10,12 +13,14 @@ import {
   Scene,
   ShaderMaterial,
   SphereGeometry,
+  SrcAlphaFactor,
   TubeGeometry,
   Vector2,
   Vector3,
   WebGLRenderer,
+  ZeroFactor,
 } from 'three';
-import { LAND_POINTS } from './landPoints';
+import { COASTLINES } from './coastlines';
 
 const DEG = Math.PI / 180;
 const FOV = 30;
@@ -36,6 +41,8 @@ export interface GlobeOptions {
 export interface GlobeHandle {
   setTheme(dark: boolean): void;
   setActive(active: boolean): void;
+  /** Fade the drawing out towards the bottom of the canvas: [start, end] as fractions of its height, or null. */
+  setFade(fade: [number, number] | null): void;
   resize(): void;
   dispose(): void;
 }
@@ -87,10 +94,9 @@ interface Palette {
   warm: V3;
   grid: V3;
   gridA: number;
-  dot: V3;
-  dotLimb: V3;
-  dotHot: V3;
-  dotA: number;
+  coast: V3;
+  coastLimb: V3;
+  coastA: number;
   arcA: V3;
   arcB: V3;
   arcHead: V3;
@@ -112,10 +118,9 @@ const LIGHT: Palette = {
   warm: hex('#ffd2a6'),
   grid: hex('#0f2d3d'),
   gridA: 0.07,
-  dot: hex('#0d5f66'),
-  dotLimb: hex('#7fcac3'),
-  dotHot: hex('#ff8a24'),
-  dotA: 0.82,
+  coast: hex('#0d5f66'),
+  coastLimb: hex('#7fcac3'),
+  coastA: 0.7,
   arcA: hex('#ff8a24'),
   arcB: hex('#00b3aa'),
   arcHead: hex('#ffd9b0'),
@@ -137,10 +142,9 @@ const DARK: Palette = {
   warm: hex('#8a5a2e'),
   grid: hex('#edf9f6'),
   gridA: 0.06,
-  dot: hex('#7fe9df'),
-  dotLimb: hex('#2a7f84'),
-  dotHot: hex('#ffb066'),
-  dotA: 0.86,
+  coast: hex('#7fe9df'),
+  coastLimb: hex('#2a7f84'),
+  coastA: 0.8,
   arcA: hex('#ff9a40'),
   arcB: hex('#3fd0c6'),
   arcHead: hex('#fff1e0'),
@@ -161,19 +165,87 @@ function latLng(lat: number, lng: number, r = 1): Vector3 {
   return new Vector3(-r * Math.sin(phi) * Math.cos(theta), r * Math.cos(phi), r * Math.sin(phi) * Math.sin(theta));
 }
 
-function decodeLand(): Float32Array {
-  const bin = atob(LAND_POINTS);
+/** Coastlines sit just off the sphere; long stretches are split so a straight chord never dips into it. */
+const COAST_LIFT = 1.002;
+const COAST_STEP = 1.2 * DEG;
+/** Coastline width in CSS pixels, whatever the screen's pixel density. */
+const COAST_WIDTH = 1.1;
+
+function decodeCoastlines(): Float32Array[] {
+  const bin = atob(COASTLINES);
   const bytes = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
   const pairs = new Int16Array(bytes.buffer);
-  const out = new Float32Array((pairs.length / 2) * 3);
-  for (let i = 0, j = 0; i < pairs.length; i += 2, j += 3) {
-    const v = latLng(pairs[i] / 100, pairs[i + 1] / 100, 1.004);
-    out[j] = v.x;
-    out[j + 1] = v.y;
-    out[j + 2] = v.z;
+  const lines: Float32Array[] = [];
+  let line: number[] = [];
+  let prev: Vector3 | null = null;
+  for (let i = 0; i <= pairs.length; i += 2) {
+    if (i === pairs.length || pairs[i] === 32767) {
+      if (line.length >= 6) lines.push(new Float32Array(line));
+      line = [];
+      prev = null;
+      continue;
+    }
+    const v = latLng(pairs[i] / 100, pairs[i + 1] / 100);
+    if (prev) {
+      const steps = Math.ceil(prev.angleTo(v) / COAST_STEP);
+      for (let s = 1; s < steps; s++) {
+        const m = prev
+          .clone()
+          .lerp(v, s / steps)
+          .setLength(COAST_LIFT);
+        line.push(m.x, m.y, m.z);
+      }
+    }
+    line.push(v.x * COAST_LIFT, v.y * COAST_LIFT, v.z * COAST_LIFT);
+    prev = v;
   }
-  return out;
+  return lines;
+}
+
+/**
+ * Each polyline becomes one continuous ribbon: every point is doubled, and the vertex shader pushes the
+ * two copies apart on screen along the mitred normal, so lines keep an even pixel width with clean joins.
+ */
+function coastGeometry(lines: Float32Array[]): BufferGeometry {
+  let verts = 0;
+  for (const l of lines) verts += (l.length / 3) * 2;
+  const segs = verts / 2 - lines.length;
+  const pos = new Float32Array(verts * 3);
+  const prev = new Float32Array(verts * 3);
+  const next = new Float32Array(verts * 3);
+  const side = new Float32Array(verts);
+  const index = verts > 65535 ? new Uint32Array(segs * 6) : new Uint16Array(segs * 6);
+  let v = 0;
+  let k = 0;
+  for (const l of lines) {
+    const n = l.length / 3;
+    const e = (n - 1) * 3;
+    const closed = n > 3 && l[0] === l[e] && l[1] === l[e + 1] && l[2] === l[e + 2];
+    for (let i = 0; i < n; i++) {
+      const a = i > 0 ? i - 1 : closed ? n - 2 : 0;
+      const b = i < n - 1 ? i + 1 : closed ? 1 : n - 1;
+      for (const s of [-1, 1]) {
+        pos.set(l.subarray(i * 3, i * 3 + 3), v * 3);
+        prev.set(l.subarray(a * 3, a * 3 + 3), v * 3);
+        next.set(l.subarray(b * 3, b * 3 + 3), v * 3);
+        side[v] = s;
+        v++;
+      }
+      if (i < n - 1) {
+        const o = v - 2;
+        index.set([o, o + 1, o + 2, o + 2, o + 1, o + 3], k);
+        k += 6;
+      }
+    }
+  }
+  const geo = new BufferGeometry();
+  geo.setAttribute('position', new BufferAttribute(pos, 3));
+  geo.setAttribute('aPrev', new BufferAttribute(prev, 3));
+  geo.setAttribute('aNext', new BufferAttribute(next, 3));
+  geo.setAttribute('aSide', new BufferAttribute(side, 1));
+  geo.setIndex(new BufferAttribute(index, 1));
+  return geo;
 }
 
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
@@ -222,37 +294,68 @@ void main() {
   gl_FragColor = vec4(col, 1.0);
 }`;
 
-const DOT_VS = /* glsl */ `
-attribute float aRand;
-uniform float uScale;
-uniform float uDot;
+/* Coastline ribbons: widened on screen, so the width is in pixels and the edges are antialiased here. */
+const COAST_VS = /* glsl */ `
+attribute vec3 aPrev;
+attribute vec3 aNext;
+attribute float aSide;
+uniform vec2 uRes;
+uniform float uWidth;
 varying float vFacing;
-varying float vRand;
+varying float vEdge;
+vec2 toScreen(vec4 c) {
+  return c.xy / c.w * 0.5 * uRes;
+}
 void main() {
-  vec4 wp = modelMatrix * vec4(position, 1.0);
-  vFacing = dot(normalize(wp.xyz), normalize(cameraPosition - wp.xyz));
-  vRand = aRand;
-  vec4 mv = viewMatrix * wp;
-  gl_PointSize = uScale * uDot / -mv.z;
-  gl_Position = projectionMatrix * mv;
+  mat4 mvp = projectionMatrix * modelViewMatrix;
+  vec4 c = mvp * vec4(position, 1.0);
+  vec2 s = toScreen(c);
+  vec2 d1 = s - toScreen(mvp * vec4(aPrev, 1.0));
+  vec2 d2 = toScreen(mvp * vec4(aNext, 1.0)) - s;
+  float l1 = length(d1);
+  float l2 = length(d2);
+  d1 = l1 > 1e-4 ? d1 / l1 : (l2 > 1e-4 ? d2 / l2 : vec2(1.0, 0.0));
+  d2 = l2 > 1e-4 ? d2 / l2 : d1;
+  vec2 t = d1 + d2;
+  float lt = length(t);
+  t = lt > 1e-4 ? t / lt : d1;
+  vec2 n = vec2(-t.y, t.x);
+  float miter = 1.0 / max(dot(n, vec2(-d1.y, d1.x)), 0.5);
+  float hw = uWidth * 0.5 + 1.0;
+  c.xy += n * (aSide * hw * miter) * (2.0 / uRes) * c.w;
+  vEdge = aSide * hw;
+  vec3 wp = (modelMatrix * vec4(position, 1.0)).xyz;
+  vFacing = dot(normalize(wp), normalize(cameraPosition - wp));
+  gl_Position = c;
 }`;
 
-const DOT_FS = /* glsl */ `
+const COAST_FS = /* glsl */ `
 uniform vec3 uFront;
 uniform vec3 uLimb;
-uniform vec3 uHot;
-uniform float uTime;
 uniform float uAlpha;
+uniform float uWidth;
 varying float vFacing;
-varying float vRand;
+varying float vEdge;
 void main() {
-  float d = length(gl_PointCoord - 0.5);
-  float a = (1.0 - smoothstep(0.3, 0.5, d)) * smoothstep(0.0, 0.4, vFacing);
-  if (a < 0.01) discard;
+  float hw = uWidth * 0.5;
+  float a = (1.0 - smoothstep(hw - 0.5, hw + 0.5, abs(vEdge))) * smoothstep(0.02, 0.4, vFacing);
+  if (a < 0.004) discard;
   vec3 col = mix(uLimb, uFront, smoothstep(0.05, 0.75, vFacing));
-  float tw = step(0.92, vRand) * pow(0.5 + 0.5 * sin(uTime * (0.5 + vRand) + vRand * 91.0), 14.0);
-  col = mix(col, uHot, tw);
   gl_FragColor = vec4(col, a * uAlpha);
+}`;
+
+/* Drawn last over the whole canvas: scales what is already there (colour and alpha) towards transparent. */
+const FADE_VS = /* glsl */ `
+void main() {
+  gl_Position = vec4(position.xy, 0.0, 1.0);
+}`;
+
+const FADE_FS = /* glsl */ `
+uniform vec2 uFade;
+uniform vec2 uRes;
+void main() {
+  float y = 1.0 - gl_FragCoord.y / uRes.y;
+  gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0 - smoothstep(uFade.x, uFade.y, y));
 }`;
 
 const HALO_VS = /* glsl */ `
@@ -414,6 +517,8 @@ export function createGlobe(canvas: HTMLCanvasElement, opts: GlobeOptions): Glob
   const scale = { value: 1 };
   const time = { value: 0 };
   const res = { value: new Vector2(1, 1) };
+  const coastWidth = { value: COAST_WIDTH };
+  const fade = { value: new Vector2(0, 0) };
   let palette = opts.dark || forceDark ? DARK : LIGHT;
 
   // Atmosphere halo, always facing the camera
@@ -450,31 +555,24 @@ export function createGlobe(canvas: HTMLCanvasElement, opts: GlobeOptions): Glob
   const sphere = new Mesh(new SphereGeometry(1, 128, 96), sphereMat);
   spin.add(sphere);
 
-  // Land as a field of dots
-  const landPos = decodeLand();
-  const landGeo = new BufferGeometry();
-  landGeo.setAttribute('position', new BufferAttribute(landPos, 3));
-  const rand = new Float32Array(landPos.length / 3);
-  for (let i = 0; i < rand.length; i++) rand[i] = Math.random();
-  landGeo.setAttribute('aRand', new BufferAttribute(rand, 1));
-  const dotMat = new ShaderMaterial({
-    vertexShader: DOT_VS,
-    fragmentShader: DOT_FS,
+  // Land as fine coastline outlines
+  const coastMat = new ShaderMaterial({
+    vertexShader: COAST_VS,
+    fragmentShader: COAST_FS,
     transparent: true,
     depthWrite: false,
+    side: DoubleSide,
     uniforms: {
-      uScale: scale,
-      uDot: { value: 0.0122 },
-      uTime: time,
-      uFront: { value: new Vector3(...palette.dot) },
-      uLimb: { value: new Vector3(...palette.dotLimb) },
-      uHot: { value: new Vector3(...palette.dotHot) },
-      uAlpha: { value: palette.dotA },
+      uRes: res,
+      uWidth: coastWidth,
+      uFront: { value: new Vector3(...palette.coast) },
+      uLimb: { value: new Vector3(...palette.coastLimb) },
+      uAlpha: { value: palette.coastA },
     },
   });
-  const land = new Points(landGeo, dotMat);
-  land.renderOrder = 1;
-  spin.add(land);
+  const coast = new Mesh(coastGeometry(decodeCoastlines()), coastMat);
+  coast.renderOrder = 1;
+  spin.add(coast);
 
   // Arcs between the regulators
   const arcStart = (i: number) => (reducedMotion ? -10 : 1.25 + i * 0.17);
@@ -591,6 +689,32 @@ export function createGlobe(canvas: HTMLCanvasElement, opts: GlobeOptions): Glob
   }
   roll.add(orbitGroup);
 
+  // Optional fade towards the foot of the canvas, so copy set below the earth never sits on top of it.
+  // It works on the finished frame, which a CSS mask would do too, but without the flicker a mask over a
+  // live canvas causes on phones.
+  const fadeMesh = new Mesh(
+    new PlaneGeometry(2, 2),
+    new ShaderMaterial({
+      vertexShader: FADE_VS,
+      fragmentShader: FADE_FS,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+      blending: CustomBlending,
+      blendEquation: AddEquation,
+      blendSrc: ZeroFactor,
+      blendDst: SrcAlphaFactor,
+      blendEquationAlpha: AddEquation,
+      blendSrcAlpha: ZeroFactor,
+      blendDstAlpha: SrcAlphaFactor,
+      uniforms: { uFade: fade, uRes: res },
+    }),
+  );
+  fadeMesh.frustumCulled = false;
+  fadeMesh.renderOrder = 10;
+  fadeMesh.visible = false;
+  scene.add(fadeMesh);
+
   // ── Framing and motion ──
   const pointer = new Vector2();
   const pointerNow = new Vector2();
@@ -641,6 +765,7 @@ export function createGlobe(canvas: HTMLCanvasElement, opts: GlobeOptions): Glob
     renderer.getDrawingBufferSize(v);
     scale.value = v.y / (2 * tanHalf);
     res.value.copy(v);
+    coastWidth.value = COAST_WIDTH * renderer.getPixelRatio();
   };
 
   const render = () => {
@@ -671,10 +796,9 @@ export function createGlobe(canvas: HTMLCanvasElement, opts: GlobeOptions): Glob
     sphereMat.uniforms.uWarm.value.set(...palette.warm);
     sphereMat.uniforms.uGrid.value.set(...palette.grid);
     sphereMat.uniforms.uGridA.value = palette.gridA;
-    dotMat.uniforms.uFront.value.set(...palette.dot);
-    dotMat.uniforms.uLimb.value.set(...palette.dotLimb);
-    dotMat.uniforms.uHot.value.set(...palette.dotHot);
-    dotMat.uniforms.uAlpha.value = palette.dotA;
+    coastMat.uniforms.uFront.value.set(...palette.coast);
+    coastMat.uniforms.uLimb.value.set(...palette.coastLimb);
+    coastMat.uniforms.uAlpha.value = palette.coastA;
     for (const { mat } of arcs) {
       mat.uniforms.uA.value.set(...palette.arcA);
       mat.uniforms.uB.value.set(...palette.arcB);
@@ -720,6 +844,10 @@ export function createGlobe(canvas: HTMLCanvasElement, opts: GlobeOptions): Glob
       } else {
         cancelAnimationFrame(raf);
       }
+    },
+    setFade(next) {
+      fadeMesh.visible = next !== null;
+      if (next) fade.value.set(next[0], next[1]);
     },
     resize() {
       resize();

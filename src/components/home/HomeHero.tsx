@@ -2,7 +2,7 @@
 
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Globe } from '@/components/globe/Globe';
 import { GradientBg } from '@/components/ui/GradientBg';
 import styles from './HomeHero.module.css';
@@ -19,30 +19,15 @@ interface HomeHeroProps {
 }
 
 /**
- * The home hero is a sticky stage: copy, a giant dotted earth and the regulators band. The next
- * sheet slides up over it, and while it does the camera dollies into the earth, the copy drifts up
- * and the stage dims. Everything is driven by scroll position (no timers), so it never jumps.
+ * The home hero: copy, a giant earth and the regulators band, followed by the next section in normal
+ * flow (nothing slides over it). As the hero scrolls away the earth turns and moves closer inside its
+ * own canvas, and with a mouse the copy also lifts and fades. All of it follows the scroll position
+ * (no timers), so it never jumps.
  */
 export function HomeHero({ intro, lede, actions, proof, band, cover }: HomeHeroProps) {
-  const wrapRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const earthRef = useRef<HTMLDivElement>(null);
-  const shadeRef = useRef<HTMLSpanElement>(null);
-  const coverRef = useRef<HTMLDivElement>(null);
   const [progress] = useState(() => ({ current: 0 }));
-
-  // A hero taller than the viewport sticks by its lower edge, so all of it can be read first. Only the
-  // hero's own height is measured; the viewport side is CSS `svh`, which does not change when a phone's
-  // address bar shows or hides, so the stage never jumps.
-  useLayoutEffect(() => {
-    const hero = heroRef.current;
-    if (!hero) return;
-    const set = () => hero.style.setProperty('--hero-h', `${hero.offsetHeight}px`);
-    set();
-    const ro = new ResizeObserver(set);
-    ro.observe(hero);
-    return () => ro.disconnect();
-  }, []);
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -52,29 +37,29 @@ export function HomeHero({ intro, lede, actions, proof, band, cover }: HomeHeroP
         const tl = gsap.timeline({
           defaults: { ease: 'none' },
           scrollTrigger: {
-            trigger: coverRef.current,
-            start: 'top bottom',
-            end: 'top top',
+            trigger: heroRef.current,
+            start: 'top top',
+            end: 'bottom top',
             scrub: true,
             onUpdate: (self) => {
               progress.current = self.progress;
             },
           },
         });
-        tl.to(shadeRef.current, { opacity: 1, duration: 1 }, 0);
-        // Moving text against native touch scrolling can jitter, so on touch screens only light changes.
+        // Moving text against native touch scrolling can jitter, so on touch screens only the earth
+        // (inside its canvas) responds.
         if (context.conditions?.fine) {
           tl.to('[data-hero-text]', { y: -70, duration: 1 }, 0)
             .to('[data-hero-text]', { autoAlpha: 0.08, duration: 0.7, ease: 'power1.in' }, 0.3)
             .to(earthRef.current, { yPercent: -8, duration: 1 }, 0);
         }
       });
-    }, wrapRef);
+    }, heroRef);
     return () => ctx.revert();
   }, [progress]);
 
   return (
-    <div ref={wrapRef} className={styles.wrap}>
+    <>
       <section ref={heroRef} className={styles.hero} id="top">
         <GradientBg variant="hero" warm />
         <div className={`container ${styles.grid}`}>
@@ -100,11 +85,8 @@ export function HomeHero({ intro, lede, actions, proof, band, cover }: HomeHeroP
           </div>
         </div>
         <div className={styles.band}>{band}</div>
-        <span ref={shadeRef} className={styles.shade} aria-hidden="true" />
       </section>
-      <div ref={coverRef} className={styles.cover}>
-        {cover}
-      </div>
-    </div>
+      {cover}
+    </>
   );
 }
