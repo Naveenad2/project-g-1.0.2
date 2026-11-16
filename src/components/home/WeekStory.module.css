@@ -1,0 +1,419 @@
+/* ── Every compliance week: five moments along one thread ── */
+.story {
+  --node: 18px;
+  --rail: 72px;
+  position: relative;
+}
+
+/* The thread: a faint dotted route, the drawn line in the signature gradient, a soft glow and a bright head */
+.thread {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.base {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 1.5;
+  stroke-dasharray: 1.5 7;
+  stroke-linecap: round;
+}
+
+.draw,
+.glow {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.draw {
+  stroke-width: 2.5;
+}
+
+.glow {
+  stroke-width: 10;
+  opacity: 0.16;
+}
+
+.head {
+  opacity: 0;
+  transition: opacity 400ms var(--ease);
+}
+
+.core {
+  fill: #ffffff;
+  stroke: var(--brand-orange);
+  stroke-width: 1.5;
+}
+
+:root[data-theme='dark'] .base {
+  stroke: rgba(237, 249, 246, 0.22);
+}
+
+:root[data-theme='dark'] .glow {
+  opacity: 0.28;
+}
+
+.chapters {
+  display: grid;
+}
+
+.chapter {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--rail) minmax(0, 1fr);
+  align-items: start;
+  padding: clamp(64px, 9vh, 120px) 0;
+}
+
+.chapter:first-child {
+  padding-top: clamp(16px, 3vh, 32px);
+}
+
+.chapter:last-child {
+  padding-bottom: clamp(16px, 3vh, 40px);
+}
+
+/* Copy and demo swap sides chapter by chapter */
+.chapter[data-side='left'] .copy {
+  grid-column: 1;
+  grid-row: 1;
+  padding-right: clamp(8px, 2vw, 32px);
+}
+
+.chapter[data-side='left'] .visual {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.chapter[data-side='right'] .copy {
+  grid-column: 3;
+  grid-row: 1;
+  padding-left: clamp(8px, 2vw, 32px);
+}
+
+.chapter[data-side='right'] .visual {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+/* Node on the thread, level with the chapter's title: it catches light when the thread arrives */
+.node {
+  position: relative;
+  z-index: 1;
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+  width: var(--node);
+  height: var(--node);
+  margin-top: calc(0.53em - var(--node) / 2);
+  border: 2px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--bg);
+  font-size: clamp(2rem, 1.25rem + 1.6vw, 2.9rem);
+  transition:
+    border-color 500ms var(--ease),
+    background-color 500ms var(--ease),
+    box-shadow 700ms var(--ease);
+}
+
+.node::before,
+.node::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.node::before {
+  border: 2px solid rgb(var(--glow));
+  opacity: 0;
+}
+
+.node::after {
+  inset: -9px;
+  border: 1.5px solid var(--brand-teal-bright);
+  opacity: 0;
+}
+
+.chapter[data-lit] .node {
+  border-color: rgb(var(--glow));
+  background: rgb(var(--glow));
+  box-shadow:
+    0 0 0 5px rgba(var(--glow), 0.16),
+    0 0 26px rgba(var(--glow), 0.55);
+}
+
+.chapter[data-lit] .node::before {
+  animation: week-burst 1100ms var(--ease-out) 1;
+}
+
+.chapter[data-now] .node::after {
+  animation: week-ping 2.8s var(--ease) infinite;
+}
+
+@keyframes week-burst {
+  0% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3.4);
+  }
+}
+
+@keyframes week-ping {
+  0% {
+    opacity: 0.6;
+    transform: scale(0.6);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+/* Copy: the moment, how it goes with Gieom.cloud, then the detail */
+.copy {
+  max-width: 560px;
+  transition: opacity 700ms var(--ease);
+}
+
+.title {
+  max-width: 17ch;
+  font-size: clamp(2rem, 1.25rem + 1.6vw, 2.9rem);
+  line-height: 1.06;
+  letter-spacing: -0.034em;
+}
+
+/* Each word rises out of its own line box */
+.word {
+  display: inline-block;
+  overflow: hidden;
+  margin: -0.06em 0 -0.16em;
+  padding: 0.06em 0 0.16em;
+  vertical-align: top;
+}
+
+.word > span {
+  display: inline-block;
+}
+
+.answer {
+  margin-top: 16px;
+  color: var(--primary-text);
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 1rem + 0.4vw, 1.375rem);
+  font-weight: 600;
+  line-height: 1.32;
+  letter-spacing: -0.012em;
+}
+
+.body {
+  margin-top: 14px;
+  max-width: 54ch;
+  color: var(--text);
+  font-size: clamp(1.0625rem, 1rem + 0.2vw, 1.1875rem);
+  line-height: 1.66;
+}
+
+.bullets {
+  margin-top: 14px;
+}
+
+.bullets > li {
+  font-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1.0625rem);
+}
+
+.actions {
+  margin-top: 26px;
+}
+
+/* The demo, with the light of its day behind it */
+.visual {
+  position: relative;
+  min-width: 0;
+  max-width: 640px;
+  width: 100%;
+  transition: opacity 700ms var(--ease);
+}
+
+.visual::before {
+  content: '';
+  position: absolute;
+  inset: -18% -14%;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(var(--glow), 0.34), rgba(var(--glow), 0.12) 55%, transparent);
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity 1200ms var(--ease),
+    transform 1600ms var(--ease-out);
+  pointer-events: none;
+}
+
+.chapter[data-now] .visual::before {
+  opacity: 1;
+  transform: none;
+}
+
+.chapter[data-side='left'] .visual {
+  justify-self: start;
+}
+
+.chapter[data-side='right'] .visual {
+  justify-self: end;
+}
+
+/* Desktop: the chapter being read is fully lit, the others rest a little back */
+@media (min-width: 1024px) and (hover: hover) {
+  .story[data-focus] .chapter:not([data-now]) .copy {
+    opacity: 0.42;
+  }
+  .story[data-focus] .chapter:not([data-now]) .visual {
+    opacity: 0.55;
+  }
+}
+
+/* ── Arrival: only chapters that start below the fold wait, and each plays once ── */
+.story[data-armed] .word > span {
+  transition: transform 1100ms var(--ease-out);
+  transition-delay: calc(var(--w, 0) * 55ms);
+}
+
+.story[data-armed] .copy > :not(ul):not(h3),
+.story[data-armed] .bullets > li {
+  transition:
+    opacity 900ms var(--ease-out),
+    transform 1100ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 85ms + 120ms);
+}
+
+.story[data-armed] .bullets > li::before {
+  transition: transform 700ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 85ms + 260ms);
+  transform-origin: left center;
+}
+
+.story[data-armed] .drift {
+  transition:
+    opacity 1000ms var(--ease-out),
+    translate 1300ms var(--ease-out);
+  transition-delay: 220ms;
+}
+
+.story[data-armed] .chapter[data-wait]:not([data-in]) .word > span {
+  transform: translateY(112%);
+}
+
+.story[data-armed] .chapter[data-wait]:not([data-in]) .copy > :not(ul):not(h3),
+.story[data-armed] .chapter[data-wait]:not([data-in]) .bullets > li {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.story[data-armed] .chapter[data-wait]:not([data-in]) .bullets > li::before {
+  transform: scaleX(0);
+}
+
+.story[data-armed] .chapter[data-wait]:not([data-in]) .drift {
+  opacity: 0;
+  translate: var(--from, 0) 28px;
+}
+
+.chapter[data-side='left'] .drift {
+  --from: 56px;
+}
+
+.chapter[data-side='right'] .drift {
+  --from: -56px;
+}
+
+/* ── Phones and tablets: one column, the thread down the left ── */
+@media (max-width: 1023.98px) {
+  .story {
+    --node: 16px;
+    --gap: 34px;
+  }
+  .chapter,
+  .chapter[data-side] {
+    grid-template-columns: minmax(0, 1fr);
+    padding: clamp(44px, 8vh, 80px) 0 clamp(44px, 8vh, 80px) var(--gap);
+  }
+  .chapter:first-child {
+    padding-top: 6px;
+  }
+  .chapter:last-child {
+    padding-bottom: 8px;
+  }
+  .chapter[data-side] .copy,
+  .chapter[data-side] .visual {
+    grid-column: 1;
+    grid-row: auto;
+    padding: 0;
+  }
+  .node {
+    position: absolute;
+    grid-column: auto;
+    grid-row: auto;
+    top: calc(clamp(44px, 8vh, 80px) + 0.54em - var(--node) / 2);
+    left: 0;
+    margin-top: 0;
+    font-size: clamp(1.8rem, 1.2rem + 2.6vw, 2.5rem);
+  }
+  .chapter:first-child .node {
+    top: calc(6px + 0.54em - var(--node) / 2);
+  }
+  .title {
+    max-width: 20ch;
+    font-size: clamp(1.8rem, 1.2rem + 2.6vw, 2.5rem);
+    line-height: 1.08;
+  }
+  .answer {
+    margin-top: 12px;
+  }
+  .visual,
+  .chapter[data-side] .visual {
+    justify-self: stretch;
+    width: auto;
+    max-width: none;
+    margin: clamp(28px, 5vw, 40px) 0 0 calc(var(--gap) * -1);
+  }
+  .chapter[data-side] .drift {
+    --from: 0px;
+  }
+}
+
+/* Tablets in portrait: the demo keeps a comfortable width */
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  .visual,
+  .chapter[data-side] .visual {
+    max-width: 680px;
+  }
+}
+
+@media (max-width: 479.98px) {
+  .actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .actions :global(.btn) {
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chapter[data-lit] .node::before,
+  .chapter[data-now] .node::after {
+    animation: none;
+  }
+  .visual::before {
+    transition: none;
+  }
+}

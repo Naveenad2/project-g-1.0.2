@@ -3,9 +3,10 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import type { StoryHandle } from '@/components/story/scene';
 import { Icon } from '@/components/ui/Icon';
+import { scrollState } from '@/lib/scroll';
 import { IMPACT_STAGE, STAGES } from './stages';
 import s from './CapabilityStory.module.css';
 
@@ -15,18 +16,8 @@ const N = STAGES.length;
 const SUMMARY =
   '§ 4.2 changed · 1 draft, 3 linked items, 1 procedure, 1 workflow, 2 reviews, 1 risk rating and 1 report flagged · owners notified · nothing missed';
 const DESKTOP = '(min-width: 1024px)';
-
-/**
- * Where a chapter begins. On desktop: just past the middle of the screen. On phones and tablets the 3D band
- * is pinned at the top, so a chapter begins as its title reaches the top of the reading area under the band:
- * the model builds while its own title and text are on screen.
- */
-const lineAt = (stage: HTMLElement | null, desktop: boolean) => {
-  const vh = window.innerHeight;
-  if (desktop || !stage) return Math.round(vh * 0.55);
-  const top = parseFloat(getComputedStyle(stage).top) || 0;
-  return Math.round(Math.min(vh * 0.8, top + stage.offsetHeight + vh * 0.1));
-};
+/** Scroll length in chapters: the opening shot (1), the ten capabilities, and a short hold at the end. */
+const SPAN = N + 1.4;
 
 type Align = 'above' | 'below' | 'left' | 'right';
 
@@ -77,20 +68,26 @@ const LABELS: [string, number, string, Align?][] = [
 ];
 
 /**
- * "How it works" as a 3D scroll story. The ten capabilities are told one at a time while a camera moves
- * through a single scene: the policy document at the centre, each capability built around it as you
- * reach it, then the Impact Analyser's wave through everything. The scene is a transparent canvas that
- * blends into the page; all copy stays in the page as real text.
+ * "Gieom.cloud brings all of it together" as a pinned 3D story. The section holds still while you scroll
+ * through it: the copy for each capability changes in place, the camera moves through one scene, and only
+ * the capability being told is built (the document, the other capabilities and the links between them
+ * appear for the opening shot and the Impact Analyser's overview). The index of all ten fills as you go and
+ * takes you to any capability, with the camera flying straight there.
+ *
+ * Desktop: copy on the left, the scene in its own column on the right, the index along the foot.
+ * Phones and tablets: the scene on top, the index under it, then the copy, all within one screen.
+ * Nothing is masked over the live canvas (its edges fade inside WebGL), so scrolling stays flicker-free.
  */
 export function CapabilityStory({ intro }: { intro?: ReactNode }) {
+  const storyRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const labelsRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const introRef = useRef<HTMLDivElement>(null);
-  const outroRef = useRef<HTMLDivElement>(null);
-  const stepRefs = useRef<(HTMLLIElement | null)[]>([]);
-  const barRef = useRef<HTMLSpanElement>(null);
+  const panelsRef = useRef<HTMLDivElement>(null);
+  const indexRef = useRef<HTMLDivElement>(null);
+  const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const optRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const fillRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const handleRef = useRef<StoryHandle | null>(null);
   const progressRef = useRef(-1);
   const [active, setActive] = useState(-1);
@@ -133,7 +130,7 @@ export function CapabilityStory({ intro }: { intro?: ReactNode }) {
           if (!handle) return;
           handleRef.current = handle;
           handle.setProgress(progressRef.current);
-          ro.observe(stage);
+          ro.observe(canvas);
           mo.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
           document.addEventListener('visibilitychange', sync);
           sync();
@@ -162,96 +159,155 @@ export function CapabilityStory({ intro }: { intro?: ReactNode }) {
     };
   }, []);
 
-  // Scroll position → story position, measured from the real step positions.
+  // Scroll through the pinned section → story position; the index fills along with it.
   useEffect(() => {
-    const track = trackRef.current;
-    const intro = introRef.current;
-    const outro = outroRef.current;
-    if (!track || !intro || !outro) return;
-    let tops: number[] = [];
-    let heights: number[] = [];
-    const measure = () => {
-      tops = stepRefs.current.map((li) => li?.offsetTop ?? 0);
-      heights = stepRefs.current.map((li) => Math.max(1, li?.offsetHeight ?? 1));
-    };
-    const toStory = (y: number) => {
-      if (y < intro.offsetHeight) return -1 + y / Math.max(1, intro.offsetHeight);
-      if (y >= outro.offsetTop) return N + (y - outro.offsetTop) / Math.max(1, outro.offsetHeight);
-      let k = 0;
-      while (k < N - 1 && y >= tops[k + 1]) k++;
-      return k + Math.min(0.999, (y - tops[k]) / heights[k]);
-    };
-    const ctx = gsap.context(() => {
-      const mm = gsap.matchMedia();
-      mm.add({ desktop: DESKTOP, mobile: '(max-width: 1023.98px)' }, (context) => {
-        const desktop = Boolean(context.conditions?.desktop);
-        ScrollTrigger.create({
-          trigger: track,
-          start: () => `top ${lineAt(stageRef.current, desktop)}px`,
-          end: () => `bottom ${lineAt(stageRef.current, desktop)}px`,
-          onRefresh: measure,
-          onUpdate: (self) => {
-            const t = toStory(self.progress * track.offsetHeight);
-            progressRef.current = t;
-            handleRef.current?.setProgress(t);
-            setActive(t >= 0 && t < N ? Math.floor(t) : -1);
-            if (barRef.current) barRef.current.style.transform = `scale(${Math.min(1, Math.max(0, t / N))})`;
-          },
-        });
+    const story = storyRef.current;
+    if (!story) return;
+    const apply = (p: number) => {
+      const t = -1 + p * SPAN;
+      progressRef.current = t;
+      handleRef.current?.setProgress(t);
+      setActive(t < 0 ? -1 : Math.min(N - 1, Math.floor(t)));
+      fillRefs.current.forEach((f, i) => {
+        if (f) f.style.transform = `scaleX(${Math.min(1, Math.max(0, t - i))})`;
       });
+    };
+    // Pinning starts once the script runs; before that (or without it) the story is plain text in flow.
+    story.dataset.live = '';
+    const st = ScrollTrigger.create({
+      trigger: story,
+      start: 'top top',
+      end: 'bottom bottom',
+      onUpdate: (self) => apply(self.progress),
+      onRefresh: (self) => apply(self.progress),
     });
-    measure();
-    return () => ctx.revert();
+    ScrollTrigger.refresh();
+    return () => {
+      st.kill();
+      delete story.dataset.live;
+    };
+  }, []);
+
+  // Copy that would not fit its space (short phones, the analyser's longer text) is set a little smaller.
+  useEffect(() => {
+    const area = panelsRef.current;
+    if (!area) return;
+    const fit = () => {
+      const max = area.clientHeight;
+      panelRefs.current.forEach((p) => {
+        if (!p) return;
+        p.style.setProperty('--fit', '1');
+        if (p.scrollHeight <= max) return;
+        let lo = 0.7;
+        let hi = 1;
+        for (let k = 0; k < 7; k++) {
+          const mid = (lo + hi) / 2;
+          p.style.setProperty('--fit', `${mid}`);
+          if (p.scrollHeight <= max) lo = mid;
+          else hi = mid;
+        }
+        p.style.setProperty('--fit', `${lo}`);
+      });
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(area);
+    document.fonts?.ready.then(fit).catch(() => undefined);
+    return () => ro.disconnect();
+  }, []);
+
+  // Keep the current capability in view in the sideways index (phones and tablets).
+  useEffect(() => {
+    const index = indexRef.current;
+    const opt = active >= 0 ? optRefs.current[active] : null;
+    if (!index || !opt || index.scrollWidth <= index.clientWidth + 1) return;
+    const left = opt.offsetLeft - (index.clientWidth - opt.offsetWidth) / 2;
+    index.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
+  }, [active]);
+
+  /** Go to a capability: the page jumps within the pinned section and the camera flies there. */
+  const go = useCallback((i: number) => {
+    const story = storyRef.current;
+    if (!story) return;
+    const distance = story.offsetHeight - window.innerHeight;
+    const y = story.getBoundingClientRect().top + window.scrollY + ((i + 1.45) / SPAN) * distance;
+    const lenis = scrollState.lenis;
+    if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
+    else window.scrollTo({ top: y, behavior: 'instant' });
   }, []);
 
   return (
-    <div className={s.story}>
-      <div ref={stageRef} className={`${s.stage} ${ready ? s.ready : ''}`}>
-        <canvas ref={canvasRef} className={s.canvas} />
-        <div ref={labelsRef} className={s.labels} aria-hidden="true">
-          {LABELS.map(([k, c, text, align = 'above']) => (
-            <span key={k} data-k={k} data-c={c} data-a={align} className={s.label}>
-              {text}
-            </span>
-          ))}
-        </div>
-        <span className={s.progress} aria-hidden="true">
-          <span ref={barRef} />
-        </span>
-      </div>
-
-      <div className={`container ${s.inner}`}>
-        <div ref={trackRef} className={s.track}>
-          <div ref={introRef} className={s.intro}>
+    <div ref={storyRef} className={`${s.story} ${ready ? s.ready : ''}`} style={{ '--span': SPAN } as CSSProperties}>
+      <div className={s.pin}>
+        <div ref={panelsRef} className={s.panels}>
+          <div
+            ref={(el) => void (panelRefs.current[N] = el)}
+            className={`${s.panel} ${s.introPanel} ${active < 0 ? s.on : ''}`}
+            inert={active >= 0}
+          >
             {intro}
           </div>
-          <ol className={s.steps}>
-            {STAGES.map((st, i) => (
-              <li key={st.label} ref={(el) => void (stepRefs.current[i] = el)} className={`${s.step} ${i === active ? s.on : ''}`}>
-                <div className={s.stepInner}>
-                  <p className={s.meta}>
-                    {i === IMPACT_STAGE ? (
-                      <button type="button" className={s.analyser} onClick={runImpact}>
-                        {st.label}
-                      </button>
-                    ) : (
-                      <b>{st.label}</b>
-                    )}
-                    <span>{st.sub}</span>
-                  </p>
-                  <h3 className={s.title}>{st.title}</h3>
-                  <p className={s.body}>{st.body}</p>
-                  {i === IMPACT_STAGE && <p className={s.summary}>{SUMMARY}</p>}
-                  <Link href={st.href} className={`link-arrow ${s.cta}`}>
-                    {st.cta}
-                    <Icon name="arrowRight" size={15} strokeWidth={2} />
-                  </Link>
-                </div>
-              </li>
-            ))}
-          </ol>
-          <div ref={outroRef} className={s.outro} aria-hidden="true" />
+          {STAGES.map((st, i) => (
+            <div
+              key={st.label}
+              ref={(el) => void (panelRefs.current[i] = el)}
+              className={`${s.panel} ${i === active ? s.on : ''}`}
+              inert={i !== active}
+            >
+              <p className={s.meta}>
+                {i === IMPACT_STAGE ? (
+                  <button type="button" className={s.analyser} onClick={runImpact}>
+                    {st.label}
+                  </button>
+                ) : (
+                  <b>{st.label}</b>
+                )}
+                <span>{st.sub}</span>
+              </p>
+              <h3 className={s.title}>{st.title}</h3>
+              <p className={s.body}>{st.body}</p>
+              {i === IMPACT_STAGE && <p className={s.summary}>{SUMMARY}</p>}
+              <Link href={st.href} className={`link-arrow ${s.cta}`}>
+                {st.cta}
+                <Icon name="arrowRight" size={15} strokeWidth={2} />
+              </Link>
+            </div>
+          ))}
         </div>
+
+        <div ref={stageRef} className={s.stage}>
+          <canvas ref={canvasRef} className={s.canvas} />
+          <div ref={labelsRef} className={s.labels} aria-hidden="true">
+            {LABELS.map(([k, c, text, align = 'above']) => (
+              <span key={k} data-k={k} data-c={c} data-a={align} className={s.label}>
+                {text}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <nav className={s.index} aria-label="Capabilities">
+          <div ref={indexRef} className={s.indexList}>
+            {STAGES.map((st, i) => (
+              <button
+                key={st.label}
+                ref={(el) => void (optRefs.current[i] = el)}
+                type="button"
+                className={`${s.opt} ${i === active ? s.optOn : ''}`}
+                aria-current={i === active ? 'step' : undefined}
+                onClick={() => go(i)}
+              >
+                <span className={s.optTrack} aria-hidden="true">
+                  <span ref={(el) => void (fillRefs.current[i] = el)} className={s.optFill} />
+                </span>
+                <span className={s.optNum} aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span className={s.optName}>{st.label}</span>
+              </button>
+            ))}
+          </div>
+        </nav>
       </div>
     </div>
   );

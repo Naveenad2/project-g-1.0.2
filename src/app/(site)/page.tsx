@@ -4,13 +4,14 @@ import Link from 'next/link';
 import { CoverageDemo } from '@/components/home/CoverageDemo';
 import { DraftDemo } from '@/components/home/DraftDemo';
 import { CtaBand } from '@/components/blocks/CtaBand';
-import { FeatureTabs, type FeatureTab } from '@/components/home/FeatureTabs';
 import { GovernDemo } from '@/components/home/GovernDemo';
 import { LinkDemo } from '@/components/home/LinkDemo';
 import { CapabilityStory } from '@/components/home/CapabilityStory';
 import { HomeHero } from '@/components/home/HomeHero';
 import { PlatformStack, type PlatformModule } from '@/components/home/PlatformStack';
+import { ProofDemo } from '@/components/home/ProofDemo';
 import { SopDemo } from '@/components/home/SopDemo';
+import { WeekStory, type WeekChapter } from '@/components/home/WeekStory';
 import { ButtonLink } from '@/components/ui/ButtonLink';
 import { GradientBg } from '@/components/ui/GradientBg';
 import { Icon } from '@/components/ui/Icon';
@@ -136,73 +137,58 @@ const regulators: [string, string][] = [
   ['QFCRA', 'Qatar Financial Centre Regulatory Authority'],
 ];
 
-const steps: FeatureTab[] = [
+/** Every compliance week, from the circular to the auditor (copy from Gieom's design). */
+const week: WeekChapter[] = [
   {
-    label: 'Draft',
-    title: 'The first draft already cites the rule',
-    pain: 'The problem: drafting first and back-fitting the rule later',
-    bullets: [
-      'Drafts cite the specific regulatory clause',
-      'Contradictions with existing policies are flagged as you write',
-      'Three editors in one document and no version emails',
-    ],
-    visual: <DraftDemo />,
-    caption: 'Document Assistant · draft for §4.1 CDD, inserted with its regulatory link',
-    body: (
-      <p>
-        Tell the Document Assistant what a section must cover. It drafts clause text that already cites the right circular, matches your
-        house style, and drops into the document with its links attached.
-      </p>
-    ),
-  },
-  {
-    label: 'Link',
-    title: 'See which rule every clause satisfies and where coverage is missing',
-    pain: 'The problem: a mapping spreadsheet nobody fully trusts',
+    title: 'A new circular lands on Friday evening.',
+    answer: 'Gieom.cloud shows you before you ask.',
+    body: 'Select a sentence in a policy and link it to the clause it satisfies. Reviewers and auditors see the link inline. The Consistency Check tells you what is still uncovered before anyone outside the team does.',
     bullets: [
       'Regulatory, control, risk and cross-document links',
       'Registers for India and the GCC that stay current',
       'Coverage and gaps reported per document and per regulator',
     ],
     visual: <CoverageDemo />,
-    body: (
-      <p>
-        Select a sentence and link it to a clause in the register. Reviewers and auditors see the link inline. The Consistency Check tells
-        you what is still uncovered before anyone outside the team does.
-      </p>
-    ),
   },
   {
-    label: 'Govern',
-    title: 'Approvals that run themselves and keep the trail',
-    pain: 'The problem: sign-offs chased through email',
+    title: 'On Monday that policy has to be rewritten.',
+    answer: 'The first draft already cites the rule.',
+    body: 'Tell the Document Assistant what a section must cover. It drafts clause text that already cites the right circular, matches your house style and drops into the document with its links attached.',
+    bullets: [
+      'Drafts cite the specific regulatory clause',
+      'Contradictions with existing policies are flagged as you write',
+      'Three editors in one document and no version emails',
+    ],
+    visual: <DraftDemo />,
+  },
+  {
+    title: 'Then it goes round for approval.',
+    answer: 'Approvals run themselves and keep the trail.',
+    body: 'Set the stages your governance structure needs: co-creation, review, approval, board. Gieom.cloud routes the document, chases the deadlines, records every decision and locks the version on publish.',
     bullets: ['Role-based actions at each stage', 'Due dates, overdue flags, reminders', 'Full version history and side-by-side compare'],
     visual: <GovernDemo />,
-    caption: 'Workflow wf-005 · review, approval and publish',
-    body: (
-      <p>
-        Set the stages your governance structure needs: co-creation, review, approval, board. Gieom.cloud routes the document, chases the
-        deadlines, records every decision and locks the version on publish.
-      </p>
-    ),
   },
   {
-    label: 'Procedures',
-    title: 'Procedures drawn as flows that staff can follow on screen',
-    pain: 'The problem: SOPs that describe the system instead of showing it',
+    title: 'Staff still have to follow it.',
+    answer: 'Procedures drawn as flows, with proof that staff read them.',
+    body: 'Draw the procedure in the SOP designer with roles, decisions and handoffs. Attach a screen recording to the step it belongs to and close with a short assessment. Publishing starts acknowledgement tracking.',
     bullets: [
       'Flowchart SOP designer with swim-lane roles and decision points',
       'Screen-capture videos embedded in the exact step',
       'MCQ assessments with completion and comprehension tracking',
     ],
     visual: <SopDemo />,
-    caption: 'SOP designer · onboarding flow with a screen recording on the sanctions step',
-    body: (
-      <p>
-        Draw the procedure as a flow with roles, decisions and hand-offs in the SOP designer. Attach a screen recording to the step it
-        belongs to and close with a short assessment. Staff see the action; you can prove they understood it.
-      </p>
-    ),
+  },
+  {
+    title: 'Thursday arrives and the auditor asks for proof.',
+    answer: 'Each answer is a click.',
+    body: 'Coverage per document and per regulator, the approval trail and the acknowledgement record sit in one place. The document itself carries the proof.',
+    bullets: [
+      'Impact Analyzer: see what else a change affects before you make it',
+      'Risk and control self-assessments with scoring, threaded comments',
+      'Configurable dashboards, widget builder and report designer',
+    ],
+    visual: <ProofDemo />,
   },
 ];
 
@@ -317,7 +303,19 @@ export default function HomePage() {
         }
       />
 
-      {/* How it works: one document, ten capabilities, told as you scroll */}
+      {/* Every compliance week: the story from the circular to the auditor */}
+      <section id="week" className={`section ${styles.week}`}>
+        <GradientBg variant="soft" warm />
+        <div className={`container ${styles.layer}`}>
+          <SectionHeader
+            title="Every compliance week tells the same story."
+            lede="It begins with a circular and ends with an auditor. Here is how the week usually goes and how it can go with Gieom.cloud."
+          />
+          <WeekStory chapters={week} />
+        </div>
+      </section>
+
+      {/* How it works: the ten capabilities around one document, explored in 3D */}
       <section id="how" className={`section ${styles.how}`}>
         <GradientBg variant="soft" />
         <div id="map" className={`${styles.layer} ${styles.mapWrap}`}>
@@ -330,12 +328,6 @@ export default function HomePage() {
               />
             }
           />
-        </div>
-      </section>
-
-      <section className={`section section--mint ${styles.steps}`}>
-        <div className={`container ${styles.layer}`}>
-          <FeatureTabs items={steps} />
         </div>
       </section>
 

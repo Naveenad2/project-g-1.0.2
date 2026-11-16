@@ -1,8 +1,10 @@
 import {
   BufferAttribute,
   BufferGeometry,
+  AddEquation,
   CatmullRomCurve3,
   Color,
+  CustomBlending,
   DoubleSide,
   Euler,
   Group,
@@ -18,9 +20,12 @@ import {
   Scene,
   ShaderMaterial,
   ShapeUtils,
+  SrcAlphaFactor,
   Vector2,
   Vector3,
+  Vector4,
   WebGLRenderer,
+  ZeroFactor,
 } from 'three';
 
 export interface StoryOptions {
@@ -387,6 +392,23 @@ void main() {
   a *= (1.0 - smoothstep(uRadius * 0.3, uRadius, length(p))) * uAlpha;
   if (a < 0.003) discard;
   gl_FragColor = vec4(uColor, a);
+}`;
+
+/* Multiplies what is already drawn by a fade towards the canvas edges (left, right, bottom, top widths) */
+const EDGE_VS = /* glsl */ `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = vec4(position.xy, 0.0, 1.0);
+}`;
+
+const EDGE_FS = /* glsl */ `
+uniform vec4 uEdge;
+varying vec2 vUv;
+void main() {
+  float a = smoothstep(0.0, uEdge.x, vUv.x) * smoothstep(0.0, uEdge.y, 1.0 - vUv.x);
+  a *= smoothstep(0.0, uEdge.z, vUv.y) * smoothstep(0.0, uEdge.w, 1.0 - vUv.y);
+  gl_FragColor = vec4(0.0, 0.0, 0.0, a);
 }`;
 
 /* ── Easing ─────────────────────────────────────────── */
@@ -2004,32 +2026,72 @@ export function createStory(canvas: HTMLCanvasElement, opts: StoryOptions): Stor
   /* Annotations */
   const labels = opts.labels.map((el) => ({ el, key: el.dataset.k ?? '', chapter: Number(el.dataset.c), shown: false, x: -1e4, y: -1e4 }));
 
-  /* Camera path */
+  /* In-canvas edge fade: the drawing dissolves at its own edges, with no CSS mask over the live canvas */
+  const edge = { value: new Vector4(0.1, 0.06, 0.1, 0.06) };
+  const fade = new Mesh(
+    new PlaneGeometry(2, 2),
+    new ShaderMaterial({
+      vertexShader: EDGE_VS,
+      fragmentShader: EDGE_FS,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+      blending: CustomBlending,
+      blendEquation: AddEquation,
+      blendSrc: ZeroFactor,
+      blendDst: SrcAlphaFactor,
+      uniforms: { uEdge: edge },
+    }),
+  );
+  fade.frustumCulled = false;
+  fade.renderOrder = 100;
+  scene.add(fade);
+
+  /* Camera: scroll position → a pose between the keys, and direct flights for jumps */
+  interface Pose {
+    theta: number;
+    radius: number;
+    height: number;
+    target: Vector3;
+  }
   const keys = buildKeys();
   const look = new Vector3();
   const tmp = new Vector3();
-  const pose = (t: number) => {
+  const poseAt = (t: number, out: Pose) => {
     let i = 0;
     while (i < keys.length - 2 && t > keys[i + 1].t) i++;
     const a = keys[i];
     const b = keys[i + 1];
     const raw = clamp01((t - a.t) / (b.t - a.t));
     const u = reduced ? (raw > 0.5 ? 1 : 0) : smoother(clamp01((raw - 0.26) / 0.48));
-    const theta = lerp(a.theta, b.theta, u) + (t > N ? (t - N) * 0.45 : 0);
-    const radius = lerp(a.radius, b.radius, u);
-    const height = lerp(a.height, b.height, u);
-    camera.position.set(Math.sin(theta) * radius, height, Math.cos(theta) * radius);
-    look.lerpVectors(a.target, b.target, u);
+    out.theta = lerp(a.theta, b.theta, u) + (t > N ? (t - N) * 0.45 : 0);
+    out.radius = lerp(a.radius, b.radius, u);
+    out.height = lerp(a.height, b.height, u);
+    out.target.lerpVectors(a.target, b.target, u);
+    return out;
+  };
+  const newPose = (): Pose => ({ theta: 0, radius: 1, height: 1, target: new Vector3() });
+  const cur = poseAt(-1, newPose());
+  const from = newPose();
+  const to = newPose();
+  const wrapAngle = (x: number) => Math.atan2(Math.sin(x), Math.cos(x));
+  let flight = 1;
+  let flightDur = 1;
+  let lift = 0;
+  let flightT = -1;
+  const applyPose = (p: Pose) => {
+    camera.position.set(Math.sin(p.theta) * p.radius, p.height, Math.cos(p.theta) * p.radius);
+    look.copy(p.target);
     if (zoom) camera.position.lerp(look, zoom);
     camera.lookAt(look);
     camera.updateMatrixWorld();
     focus.value.copy(look);
-    focusR.value = 3.6 + Math.max(0, height - 6) * 2.2;
+    focusR.value = 3.6 + Math.max(0, p.height - 6) * 2.2;
   };
 
   let tTarget = -1;
   let tNow = -1;
-  /** Camera pull towards the look point: >0 closer (wide phone bands), <0 further (narrow desktops). */
+  /** Camera pull towards the look point: >0 closer, <0 further. */
   let zoom = 0;
   let width = 1;
   let height = 1;
@@ -2043,30 +2105,71 @@ export function createStory(canvas: HTMLCanvasElement, opts: StoryOptions): Stor
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     camera.fov = desktop ? 30 : 33;
-    zoom = desktop ? -clamp01((1.62 - camera.aspect) / 0.3) * 0.3 : Math.min(0.14, clamp01((camera.aspect - 1.25) * 0.5));
-    if (desktop) camera.setViewOffset(width, height, -width * (width < 1280 ? 0.24 : 0.22), 0, width, height);
+    // the scene has its own column (desktop) or band (phones), so only one capability needs to fill it
+    zoom = desktop ? 0.1 - clamp01((1.15 - camera.aspect) / 0.4) * 0.24 : 0.08 + Math.min(0.14, clamp01((camera.aspect - 1.25) * 0.5));
+    // desktop: lift the drawing a little so the model sits in the middle of its column
+    if (desktop) camera.setViewOffset(width, height, 0, height * 0.07, width, height);
     else camera.clearViewOffset();
     camera.updateProjectionMatrix();
+    edge.value.set(desktop ? 0.12 : 0.05, desktop ? 0.07 : 0.05, desktop ? 0.12 : 0.1, desktop ? 0.08 : 0.06);
     renderer.getDrawingBufferSize(res.value);
     const dpr = renderer.getPixelRatio();
     lineMats.forEach(({ m, o }) => (m.uniforms.uWidth.value = o.width * dpr));
   };
 
+  /* What is on show: only the capability being told, built as you reach it and taken down as you leave.
+     The document, the other capabilities and the links between them appear for the establishing shot
+     and the Impact Analyser's overview. */
+  const OVERVIEW = 8;
+  const near = (c: number, t: number) => clamp01((t - c + 0.25) / 0.55) * (1 - clamp01((t - c - 0.8) / 0.4));
   const builds = new Float32Array(N);
+  let docShow = 1;
+  let wide = 1;
+  const approach = (v: number, target: number, rate: number, dt: number) =>
+    reduced ? target : v + (target - v) * (1 - Math.exp(-dt * rate));
+
   const update = (dt: number) => {
-    // ease towards the scroll position, independent of the display's refresh rate
-    tNow = reduced ? tTarget : tNow + (tTarget - tNow) * (1 - Math.exp(-dt * 7.5));
-    if (Math.abs(tTarget - tNow) < 0.0005) tNow = tTarget;
-    const t = tNow;
     const now = time.value;
-    pose(t);
-    for (let c = 0; c < N; c++) builds[c] = reduced ? (t >= c - 0.2 ? 1 : 0) : clamp01((t - c + 0.2) / 0.6);
+    if (flight < 1) {
+      // a jump from the index: fly straight there instead of sweeping through every chapter between
+      flight = Math.min(1, flight + dt / flightDur);
+      const e = smoother(flight);
+      const arc = Math.sin(Math.PI * e) * lift;
+      cur.theta = from.theta + wrapAngle(to.theta - from.theta) * e;
+      cur.radius = lerp(from.radius, to.radius, e) * (1 + 0.2 * arc);
+      cur.height = lerp(from.height, to.height, e) + 5 * arc;
+      cur.target.lerpVectors(from.target, to.target, e);
+      if (flight >= 1) {
+        tNow = flightT;
+        poseAt(tNow, cur);
+      }
+    } else {
+      // ease towards the scroll position, independent of the display's refresh rate
+      tNow = reduced ? tTarget : tNow + (tTarget - tNow) * (1 - Math.exp(-dt * 7.5));
+      if (Math.abs(tTarget - tNow) < 0.0005) tNow = tTarget;
+      poseAt(tNow, cur);
+    }
+    applyPose(cur);
+    const t = flight < 1 ? flightT : tNow;
+
+    const ov = clamp01((t - OVERVIEW + 0.25) / 0.5) * (1 - clamp01((t - OVERVIEW - 0.85) / 0.35));
+    const intro = 1 - clamp01((t + 0.35) / 0.35);
+    wide = approach(wide, Math.max(intro, ov), 5, dt);
+    docShow = approach(docShow, Math.max(intro, ov, near(1, t)), 5, dt);
+    pop(doc, docShow);
+    for (let c = 0; c < N; c++) {
+      const want = c === OVERVIEW ? ov : Math.max(near(c, t), ov);
+      builds[c] = approach(builds[c], want, flight < 1 ? 3.2 : 6, dt);
+      if (builds[c] < 0.001) builds[c] = want > 0 ? builds[c] : 0;
+    }
     mods.forEach((m, c) => {
       m.group.visible = builds[c] > 0.001;
       if (m.group.visible) m.update(builds[c], reduced ? 0 : now);
-      linkCh.value[c] = reduced ? (builds[c] > 0 ? 1 : 0) : clamp01((builds[c] - 0.15) / 0.6);
+      linkCh.value[c] = clamp01((Math.min(builds[c], ov) - 0.15) / 0.6);
       slotCh.value[c] = builds[c];
     });
+    guideM.uniforms.uAlpha.value = 0.5 * wide;
+    slotM.uniforms.uAlpha.value = wide;
 
     // impact wave
     const w = (now - waveStart) / 2.6;
@@ -2089,7 +2192,7 @@ export function createStory(canvas: HTMLCanvasElement, opts: StoryOptions): Stor
     // annotations: only the chapter in view, once built and the camera has settled
     const chapter = Math.floor(t);
     const frac = t - chapter;
-    const settled = touch ? frac > 0.1 && frac < 0.97 : frac > 0.18 && frac < 0.9;
+    const settled = flight >= 1 && (touch ? frac > 0.1 && frac < 0.97 : frac > 0.18 && frac < 0.9);
     for (const L of labels) {
       let show = L.chapter === chapter && settled && chapter >= 0 && chapter < N && builds[chapter] > 0.75;
       const anc = show ? anchors.get(L.key) : undefined;
@@ -2172,6 +2275,16 @@ export function createStory(canvas: HTMLCanvasElement, opts: StoryOptions): Stor
 
   return {
     setProgress(t) {
+      // a jump of more than a chapter (an index tap) becomes a direct flight
+      if (Math.abs(t - tTarget) > 1.2 && !reduced && active) {
+        Object.assign(from, { ...cur, target: from.target.copy(cur.target) });
+        poseAt(t, to);
+        const turn = Math.abs(wrapAngle(to.theta - from.theta));
+        flightDur = 1.1 + 0.5 * (turn / Math.PI) + Math.abs(to.height - from.height) * 0.01;
+        lift = Math.min(1, turn / 1.6);
+        flight = 0;
+        flightT = t;
+      }
       tTarget = t;
       if (reduced && !active) update(0);
     },

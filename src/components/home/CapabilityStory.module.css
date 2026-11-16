@@ -1,25 +1,174 @@
+/* ── Brings all of it together: a pinned 3D story ──
+   The section is tall; inside it one screen stays pinned while the scroll moves the story along. */
 .story {
+  --step: 80svh;
   position: relative;
+  height: calc(100vh + var(--span) * 80vh);
+  height: calc(100svh + var(--span) * var(--step));
 }
 
-/* Desktop: a full-bleed, frameless 3D stage pinned behind the text column */
-.stage {
+.pin {
   position: sticky;
   top: 0;
-  z-index: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  column-gap: clamp(24px, 3vw, 56px);
+  width: 100%;
+  max-width: calc(1440px + var(--gutter) * 2);
   height: 100vh;
   height: 100svh;
-  margin-bottom: -100vh;
-  margin-bottom: -100svh;
-  pointer-events: none;
+  margin: 0 auto;
+  padding: calc(var(--header-space) + clamp(8px, 2vh, 24px)) var(--gutter) clamp(14px, 2.6vh, 30px);
+}
+
+/* ── The copy: every panel shares one cell and the current one fades up in place ── */
+.panels {
+  position: relative;
+  z-index: 1;
+  grid-column: 1;
+  grid-row: 1;
+  display: grid;
+  align-items: center;
+  min-height: 0;
+}
+
+.panel {
+  --fit: 1;
+  grid-area: 1 / 1;
+  max-height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 360ms var(--ease),
+    visibility 0s linear 360ms;
+}
+
+.panel.on {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 520ms var(--ease) 100ms,
+    visibility 0s;
+}
+
+.panel.on > * {
+  animation: cap-rise 900ms var(--ease-out) both;
+}
+
+.panel.on > :nth-child(2) {
+  animation-delay: 80ms;
+}
+
+.panel.on > :nth-child(3) {
+  animation-delay: 160ms;
+}
+
+.panel.on > :nth-child(4) {
+  animation-delay: 230ms;
+}
+
+.panel.on > :nth-child(5) {
+  animation-delay: 290ms;
+}
+
+@keyframes cap-rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+.introPanel :global(.section-head) {
+  margin: 0;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 14px;
+  font-size: calc(16px * var(--fit));
+  line-height: 1.45;
+}
+
+.meta b,
+.analyser {
+  color: var(--brand-orange);
+  font-family: var(--font-display);
+  font-size: calc(19px * var(--fit));
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+:root[data-theme='dark'] .meta b,
+:root[data-theme='dark'] .analyser {
+  color: #ffb066;
+}
+
+.meta span {
+  color: var(--muted);
+}
+
+.analyser {
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 138, 36, 0.6);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 5px;
+  transition: color var(--dur) var(--ease);
+}
+
+.analyser:hover {
+  color: var(--accent-text);
+}
+
+.title {
+  margin-top: calc(16px * var(--fit));
+  font-size: calc(clamp(2.1rem, 1.2rem + 1.8vw, 3.15rem) * var(--fit));
+  line-height: 1.05;
+  letter-spacing: -0.036em;
+}
+
+.body {
+  margin-top: calc(18px * var(--fit));
+  max-width: 56ch;
+  color: var(--text);
+  font-size: calc(clamp(1.0625rem, 0.95rem + 0.3vw, 1.25rem) * var(--fit));
+  line-height: 1.6;
+}
+
+.summary {
+  margin-top: calc(18px * var(--fit));
+  padding-top: calc(14px * var(--fit));
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+  font-size: calc(15px * var(--fit));
+  font-weight: 500;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+}
+
+.cta {
+  margin-top: calc(24px * var(--fit));
+  font-size: 17px;
+}
+
+/* ── The scene: its own column, nothing laid over the canvas ── */
+.stage {
+  position: relative;
+  grid-column: 2;
+  grid-row: 1;
+  min-height: 0;
 }
 
 .canvas {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   opacity: 0;
-  transition: opacity 1.4s var(--ease);
+  transition: opacity 1.2s var(--ease);
 }
 
 .ready .canvas {
@@ -31,6 +180,7 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .label {
@@ -103,243 +253,219 @@
   height: 1px;
 }
 
-/* Progress: a hairline that fills as the story advances */
-.progress {
-  position: absolute;
-  left: max(10px, calc(var(--gutter) / 2 - 1px));
-  top: 30%;
-  width: 2px;
-  height: 40%;
-  overflow: hidden;
-  border-radius: 2px;
-  background: var(--line);
-}
-
-.progress > span {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, var(--brand-orange), var(--brand-teal-bright));
-  transform: scale(0);
-  transform-origin: top center;
-}
-
-/* Desktop: the scene dissolves into the page well before the text column, so the copy reads on a clean ground */
-@media (min-width: 1024px) and (hover: hover) {
-  .canvas,
-  .labels {
-    -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 34%, rgba(0, 0, 0, 0.3) 44%, #000 56%);
-    mask-image: linear-gradient(90deg, transparent 0%, transparent 34%, rgba(0, 0, 0, 0.3) 44%, #000 56%);
-  }
-}
-
-/* Touch tablets in landscape: the same fade as an overlay, since masking a live canvas can flicker */
-@media (min-width: 1024px) and (hover: none) {
-  .stage::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      90deg,
-      var(--bg) 0%,
-      var(--bg) 34%,
-      color-mix(in srgb, var(--bg) 70%, transparent) 44%,
-      color-mix(in srgb, var(--bg) 0%, transparent) 56%
-    );
-    pointer-events: none;
-  }
-}
-
-/* The story text */
-.inner {
+/* ── The index: all ten, filling as the story moves, each one a way in ── */
+.index {
   position: relative;
   z-index: 1;
-  max-width: calc(1440px + var(--gutter) * 2);
+  grid-column: 1 / -1;
+  grid-row: 2;
+  padding-top: clamp(10px, 2vh, 20px);
 }
 
-.track {
+.indexList {
   position: relative;
-  max-width: min(600px, 42vw);
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 6px clamp(10px, 1.1vw, 18px);
 }
 
-/* The section's own heading opens the story, beside the scene's establishing shot */
-.intro {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  min-height: 74vh;
-  padding: clamp(48px, 9vh, 96px) 0 0;
-}
-
-.intro :global(.section-head) {
-  margin: 0;
-}
-
-.step {
-  display: flex;
-  align-items: center;
-  min-height: 88vh;
-}
-
-.outro {
-  height: 120vh;
-}
-
-.stepInner {
-  transition: opacity 600ms var(--ease);
-}
-
-.step:not(.on) .stepInner {
-  opacity: 0.18;
-}
-
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 2px 14px;
-  font-size: 16px;
-  line-height: 1.45;
-}
-
-.meta b,
-.analyser {
-  color: var(--brand-orange);
-  font-family: var(--font-display);
-  font-size: 19px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-:root[data-theme='dark'] .meta b,
-:root[data-theme='dark'] .analyser {
-  color: #ffb066;
-}
-
-.meta span {
+.opt {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 12px 0 2px;
   color: var(--muted);
+  text-align: left;
+  transition: color 300ms var(--ease);
 }
 
-.analyser {
-  text-decoration: underline;
-  text-decoration-color: rgba(255, 138, 36, 0.6);
-  text-decoration-thickness: 1.5px;
-  text-underline-offset: 5px;
-  transition: color var(--dur) var(--ease);
+.optTrack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--line-strong);
 }
 
-.analyser:hover {
-  color: var(--accent-text);
+.optFill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--brand-orange), var(--brand-teal-bright));
+  transform: scaleX(0);
+  transform-origin: left center;
 }
 
-/* The copy leads: a large title and a comfortable reading size */
-.title {
-  margin-top: 16px;
-  font-size: clamp(2.25rem, 1.25rem + 2.25vw, 3.5rem);
-  line-height: 1.04;
-  letter-spacing: -0.036em;
-}
-
-.body {
-  margin-top: 20px;
-  color: var(--text);
-  font-size: clamp(1.0625rem, 0.95rem + 0.3vw, 1.25rem);
-  line-height: 1.62;
-}
-
-.summary {
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
-  color: var(--ink);
-  font-size: 15.5px;
-  font-weight: 500;
-  line-height: 1.6;
+.optNum {
+  color: var(--faint);
+  font-size: 11.5px;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
+  transition: color 300ms var(--ease);
 }
 
-.cta {
-  margin-top: 26px;
-  font-size: 17px;
+.optName {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.22;
+  letter-spacing: -0.008em;
 }
 
-/* Phones and tablets: the stage is a blended band pinned under the header; the story scrolls beneath it.
-   The band is kept to 40% of the screen so each chapter's title and text have room below their model. */
+.opt:hover,
+.optOn {
+  color: var(--ink);
+}
+
+.optOn .optNum {
+  color: var(--brand-orange);
+}
+
+.opt:focus-visible {
+  outline: 2px solid var(--brand-teal-bright);
+  outline-offset: 5px;
+  border-radius: 4px;
+}
+
+/* Laptops and tablets in landscape: the index in two lines of five */
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+  .indexList {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+/* ── Phones and tablets: the scene on top, the index under it, then the copy, all on one screen ── */
 @media (max-width: 1023.98px) {
+  .story {
+    --step: 72svh;
+    height: calc(100vh + var(--span) * 72vh);
+    height: calc(100svh + var(--span) * var(--step));
+  }
+  .pin {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    column-gap: 0;
+    padding: calc(var(--header-space) + 2px) 0 10px;
+  }
   .stage {
-    top: var(--header-space);
-    z-index: 2;
-    height: 40svh;
-    min-height: 250px;
-    max-height: 480px;
-    margin-bottom: 0;
-    background: var(--bg);
+    grid-column: 1;
+    grid-row: 1;
+    height: clamp(180px, 34svh, 460px);
   }
-  .stage::before,
-  .stage::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    pointer-events: none;
-  }
-  .stage::before {
-    bottom: 100%;
-    height: calc(var(--header-space) + 8px);
-    background: var(--bg);
-  }
-  .stage::after {
-    top: 100%;
-    height: 36px;
-    background: linear-gradient(var(--bg), color-mix(in srgb, var(--bg) 0%, transparent));
+  /* Tablets in portrait have the height for a larger scene */
+  @media (min-width: 600px) {
+    .stage {
+      height: clamp(300px, 50svh, 600px);
+    }
   }
   .label {
     font-size: 11px;
   }
-  .progress {
-    left: var(--gutter);
-    right: var(--gutter);
-    top: auto;
-    bottom: 6px;
-    width: auto;
-    height: 2px;
+  .index {
+    grid-row: 2;
+    padding-top: 2px;
   }
-  .progress > span {
-    background: var(--grad-signature);
-    transform-origin: left center;
+  .indexList {
+    display: flex;
+    gap: 22px;
+    padding: 0 var(--gutter) 2px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
   }
-  .track {
-    max-width: 640px;
+  .indexList::-webkit-scrollbar {
+    display: none;
   }
-  .intro {
-    min-height: 0;
-    padding: 28px 0 12svh;
+  .opt {
+    flex: none;
+    grid-template-columns: auto auto;
+    align-items: baseline;
+    gap: 8px;
+    padding: 12px 0 6px;
+    scroll-snap-align: center;
   }
-  .step {
-    align-items: flex-start;
-    min-height: 70svh;
-    padding-top: 8px;
+  .optName {
+    font-size: 14px;
+    white-space: nowrap;
   }
-  .step:not(.on) .stepInner {
-    opacity: 0.28;
+  .panels {
+    grid-column: 1;
+    grid-row: 3;
+    align-items: start;
+    padding: clamp(10px, 2svh, 22px) var(--gutter) 0;
+  }
+  .meta {
+    font-size: calc(15px * var(--fit));
   }
   .meta b,
   .analyser {
-    font-size: 18px;
+    font-size: calc(17px * var(--fit));
   }
   .title {
-    margin-top: 12px;
-    font-size: clamp(1.9rem, 1.25rem + 3vw, 2.75rem);
-    line-height: 1.06;
+    margin-top: calc(8px * var(--fit));
+    font-size: calc(clamp(1.6rem, 1.15rem + 2.4vw, 2.5rem) * var(--fit));
+    line-height: 1.07;
   }
   .body {
-    margin-top: 14px;
-    font-size: 17.5px;
-    line-height: 1.6;
+    margin-top: calc(10px * var(--fit));
+    font-size: calc(clamp(1rem, 0.94rem + 0.3vw, 1.125rem) * var(--fit));
+    line-height: 1.55;
+  }
+  .summary {
+    font-size: calc(14px * var(--fit));
   }
   .cta {
-    margin-top: 20px;
+    margin-top: calc(14px * var(--fit));
+    font-size: 16px;
   }
-  .outro {
-    height: 50svh;
+  .introPanel :global(.section-head) {
+    gap: 10px;
+  }
+  .introPanel :global(.section-head > h2) {
+    font-size: calc(clamp(1.75rem, 1.2rem + 2.6vw, 2.6rem) * var(--fit));
+  }
+  .introPanel :global(.lede) {
+    font-size: calc(clamp(1rem, 0.95rem + 0.3vw, 1.125rem) * var(--fit));
+  }
+}
+
+/* Before the script runs (or without it), the story is plain text in flow */
+.story:not([data-live]) {
+  height: auto;
+}
+
+.story:not([data-live]) .pin {
+  position: relative;
+  display: block;
+  height: auto;
+}
+
+.story:not([data-live]) .panels {
+  display: grid;
+  gap: 48px;
+}
+
+.story:not([data-live]) .panel {
+  grid-area: auto;
+  opacity: 1;
+  visibility: visible;
+}
+
+.story:not([data-live]) .stage,
+.story:not([data-live]) .index {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .panel.on {
+    transition: none;
+  }
+  .panel.on > * {
+    animation: none;
   }
 }

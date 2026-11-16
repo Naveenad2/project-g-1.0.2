@@ -82,10 +82,41 @@ paint, so there is no flash. All colours are tokens in `src/styles/tokens.css`, 
   than a full-width image.
 - **Closing call to action (`CtaBand`):** open to the page, not a card. Centred copy sits on saturated tangerine
   and teal light that fades into the page on every side.
-- **How it works (`CapabilityStory` + `src/components/story/scene.ts`):** a frameless three.js scene that blends
-  into the page, with the copy in the lead: large titles and body text, and the scene fading out well before the
-  text column. The section's heading opens the story beside an establishing shot: the policy document on its tray,
-  on a faint drafting grid, with dashed footprints and guide paths where the capabilities will be built.
+- **Every compliance week (`WeekStory`):** right after the hero, the story from Gieom's design: five moments from
+  "A new circular lands on Friday evening" to "Thursday arrives and the auditor asks for proof". Each pairs the copy
+  with a live product demo (`CoverageDemo`, `DraftDemo`, `GovernDemo`, `SopDemo` and `ProofDemo`, where the auditor's
+  questions are answered one click each).
+  - **The thread:** an SVG thread runs through the week (a faint dotted route, the drawn line in the tangerine-to-teal
+    gradient, a soft glow and a bright head). Each chapter's node catches light, with a small burst, when the
+    thread reaches it.
+  - **Desktop:** copy and demo alternate either side, and the thread weaves between them. It draws itself under the
+    reading line as you scroll, with its head following the eye. The chapter being read is fully lit, with the
+    light of its day behind its demo, and the others rest a little back. Demos drift with a light parallax.
+  - **Phones and tablets:** one column with the thread down the left, and the demos at full width. The thread
+    travels on to each chapter as you reach it, as a timed move rather than one tied to the scroll.
+  - **Arrival:** each title rises in word by word, the answer, body and buttons follow, the list rules draw, and
+    the demo slides in from its side. Every arrival plays once. Chapters already on screen are never hidden, and
+    with reduced motion or without scripts everything is simply there.
+- **How it works (`CapabilityStory` + `src/components/story/scene.ts`):** "Gieom.cloud brings all of it together"
+  as a pinned 3D story with an index.
+  - **Pinned:** the section holds still while you scroll through it. Scrolling moves the story along: the copy for
+    each capability changes in place, and the camera moves through one scene, coming in to the document for Magpie
+    AI and rising for the Impact Analyser's shockwave. The opening shot is the section's heading beside the policy
+    document on its tray, on a faint drafting grid, with dashed footprints and guide paths.
+  - **One capability at a time:** only the capability being told is built, as you reach it, and it folds away as you
+    leave. The document, the other capabilities and the light links between them appear only for the opening shot
+    and the Impact Analyser's overview.
+  - **The index:** all ten capabilities stay in view as plain names, each with a hairline that fills as the story
+    passes through it. Tapping one moves the page to that point in the section, and the camera flies straight there
+    instead of sweeping through every capability between.
+  - **Desktop:** copy on the left, the scene in its own column on the right, the index along the foot.
+  - **Phones and tablets:** the scene on top (taller on tablets), the index under it (scrolling sideways, keeping
+    the current capability centred), then the copy, all within one screen. Copy that would not fit its space on a
+    short phone is set slightly smaller (`--fit`).
+  - **No flicker:** nothing is laid over or masked on the live canvas. Its edges fade inside WebGL (a full-screen
+    pass that multiplies the drawing towards the edges), and no text scrolls across it.
+  - **Fallbacks:** before the script runs, or without it, the story is plain text in flow. Without WebGL the copy
+    and index still work.
   - **Models:** each capability is drawn as the product shows it, not as abstract shapes. Thin matte cards carry
     printed interface detail: tabbed register cards, Magpie's suggestions lifting off the clauses they touch, a
     policy joined to its regulation, control, risk and owner, an SOP flow in two swimlanes, a workflow canvas with
@@ -93,18 +124,9 @@ paint, so there is no flash. All colours are tokens in `src/styles/tokens.css`, 
     and a dashboard. There are no spheres, cubes, glass or gloss.
   - **How it is built:** every model is a few merged meshes built from flat outlines (`Geo`), coloured by role from
     one palette uniform, so a theme switch is a single uniform update. Connectors are constant-width screen-space
-    lines (`Lines`) that draw in, carry a travelling highlight and the Impact Analyser's wave. A whole chapter is
-    under 80 draw calls and about 20k triangles. Quality also adapts: if frames run long, the scene renders fewer
-    pixels.
-  - **Scroll:** the steps scroll as real text. Scroll position, measured from the steps' own positions, drives a
-    camera that orbits from one capability to the next, comes in to the document for Magpie AI, rises for the
-    Impact Analyser's shockwave and pulls back to show everything connected. Objects out of focus fade into the page
-    colour. The original illustration labels are plain HTML annotations projected beside the objects, never in
-    boxes.
-  - **Layout:** on desktop the stage is pinned full-bleed behind the text, and the camera steps back on narrower
-    screens so each model stays clear of the copy. On phones and tablets it is a band, 40% of the screen, pinned
-    under the header, and a chapter begins as its title reaches the top of the reading area below the band. Without
-    WebGL the story still reads as text.
+    lines (`Lines`) that draw in, carry a travelling highlight and the Impact Analyser's wave. Quality adapts: if
+    frames run long, the scene renders fewer pixels. The original illustration labels are plain HTML annotations
+    projected beside the objects, never in boxes.
 - **Motion:** `MotionProvider` runs Lenis smooth scrolling on GSAP's ticker. On every route it reveals `.reveal`
   blocks with staggered fades and section headings line by line (SplitText, reverted afterwards). Only content that
   starts below the fold is ever hidden, so nothing flashes and nothing stays hidden if scripts fail. Hero copy enters
@@ -127,7 +149,7 @@ paint, so there is no flash. All colours are tokens in `src/styles/tokens.css`, 
   - Nothing masks a live WebGL canvas or the regulators marquee. The home earth fades out inside its own canvas,
     the regulators marquee simply runs off the screen edges, and soft overlays do the other fades.
   - Scrolling is native: Lenis is off, and there are no scroll-linked reveals, parallax or text movement.
-  - The feature tabs advance only when tapped.
+  - The week story's thread moves chapter to chapter, never with the scroll position.
   - The page transition is a plain fade.
   - The globe canvases keep their drawing buffer within a pixel budget phones and tablets will allocate.
 - **No template tropes:** no icons in tinted squares, no status pills with dots, no numbered step badges, no glass
@@ -155,7 +177,7 @@ src/
     globe/                   Globe (React wrapper), scene (three.js), coastlines (encoded land outlines)
     blocks/                  PageHero, ProblemGrid, FeatureStep, Tiles, CtaBand, Timeline, Faq,
                              IndustryPage template, LegalLayout
-    home/                    HomeHero, CapabilityStory, FeatureTabs, PlatformStack index, product demos
+    home/                    HomeHero, WeekStory, CapabilityStory, PlatformStack index, product demos
     story/                   scene (three.js) for the How it works story
     mocks/                   Product UI mock-ups used across pages (registers, RCSA, workflow…)
     forms/                   Field primitives, Contact/Demo/Trial forms, StaticForm

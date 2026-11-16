@@ -353,8 +353,8 @@
   z-index: 1;
 }
 
-/* ── Feature tabs ───────────────────────────────────── */
-.steps {
+/* ── Every compliance week ──────────────────────────── */
+.week {
   isolation: isolate;
 }
 
