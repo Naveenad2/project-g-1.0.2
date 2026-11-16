@@ -199,27 +199,20 @@ export default function HomePage() {
     <>
       <HomeHero
         intro={
-          <>
-            <p className={`${styles.kicker} load-in`} style={delay(60)}>
-              <b>Gieom.cloud</b>
-              <span>Policy &amp; procedure management for regulated industries</span>
-            </p>
-            <h1 className={styles.heroTitle}>
-              <Rise>AI-powered policies and procedures.</Rise>{' '}
-              <span className={styles.heroSub}>
-                <Rise offset={4}>Always</Rise>{' '}
-                <span className={styles.nowrap}>
-                  <Rise offset={5}>audit-ready.</Rise>
-                </span>
+          <h1 className={styles.heroTitle}>
+            <Rise>AI-powered policies and procedures.</Rise>{' '}
+            <span className={styles.heroSub}>
+              <Rise offset={4}>Always</Rise>{' '}
+              <span className={styles.nowrap}>
+                <Rise offset={5}>audit-ready.</Rise>
               </span>
-            </h1>
-          </>
+            </span>
+          </h1>
         }
         lede={
           <p className={`lede load-in ${styles.heroLede}`} style={delay(560)}>
-            Compliance teams lose weeks matching policies to regulators&apos; circulars by hand. Gieom.cloud ties every policy clause to the
-            rule it meets, turns procedures into flows staff can follow, runs the approvals and keeps the evidence. The next audit becomes a
-            walkthrough rather than a scramble.
+            Gieom.cloud ties every policy clause to the rule it meets, turns procedures into flows staff can follow, runs the approvals and
+            keeps the evidence.
           </p>
         }
         actions={
@@ -230,33 +223,7 @@ export default function HomePage() {
             <ButtonLink href={routes.demo} variant="secondary">
               Book a demo
             </ButtonLink>
-            <Link href={`${routes.productPolicy}#tour`} className={styles.tourLink}>
-              <span className={styles.tourIcon} aria-hidden="true">
-                <Icon name="play" size={12} />
-              </span>
-              Watch the 2-minute tour
-            </Link>
           </div>
-        }
-        proof={
-          <ul className={`${styles.proof} load-in`} style={delay(900)} aria-label="What the platform records for every clause">
-            <li>
-              <b>Clause</b>
-              <span>the rule it meets</span>
-            </li>
-            <li>
-              <b>Version</b>
-              <span>who approved it</span>
-            </li>
-            <li>
-              <b>Policy</b>
-              <span>who has read it</span>
-            </li>
-            <li>
-              <b>Change</b>
-              <span>what it affects</span>
-            </li>
-          </ul>
         }
         band={
           <section className={`${styles.regsBand} load-in`} style={delay(1100)} aria-label="Regulatory frameworks covered">
@@ -316,10 +283,10 @@ export default function HomePage() {
       </section>
 
       {/* How it works: the ten capabilities around one document, explored in 3D */}
-      <section id="how" className={`section ${styles.how}`}>
-        <GradientBg variant="soft" />
+      <section id="how" className={styles.how}>
         <div id="map" className={`${styles.layer} ${styles.mapWrap}`}>
           <CapabilityStory
+            backdrop={<GradientBg variant="soft" />}
             intro={
               <SectionHeader
                 split={false}

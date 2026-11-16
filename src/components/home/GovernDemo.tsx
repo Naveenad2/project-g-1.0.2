@@ -46,7 +46,9 @@ export function GovernDemo() {
     <div ref={ref} className={`frame ${d.govern}`}>
       <div className={d.top}>
         <span className={d.topTitle}>Risk Management Policy</span>
-        <Status tone={G >= 7 ? 'success' : G >= 3 ? 'info' : 'warning'}>{status}</Status>
+        <Status tone={G >= 7 ? 'success' : G >= 3 ? 'info' : 'warning'} className={d.topStatus}>
+          {status}
+        </Status>
         <span className={d.topMeta} style={{ marginLeft: 'auto' }}>
           wf-005
         </span>

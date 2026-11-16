@@ -1,28 +1,6 @@
-/* ── Hero copy ──────────────────────────────────────── */
-
-/* Product line: two plain lines, as in the original */
-.kicker {
-  display: grid;
-  gap: 4px;
-  font-size: 15px;
-  line-height: 1.4;
-}
-
-.kicker b {
-  color: var(--primary-text);
-  font-family: var(--font-display);
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.kicker span {
-  color: var(--muted);
-}
-
+/* ── Hero copy: a headline, one sentence and the two actions ── */
 .heroTitle {
   max-width: 17ch;
-  margin-top: 22px;
   font-size: clamp(2.6rem, 1.3rem + 3.6vw, 4.5rem);
   font-weight: 600;
   line-height: 0.99;
@@ -46,87 +24,6 @@
 
 .heroActions {
   margin-top: 30px;
-}
-
-.tourLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 48px;
-  padding: 0 6px;
-  color: var(--ink);
-  font-size: 15px;
-  font-weight: 600;
-  background: linear-gradient(currentColor, currentColor) 50px calc(100% - 10px) / 0 1px no-repeat;
-  transition: background-size 360ms var(--ease-out);
-}
-
-.tourLink:hover {
-  color: var(--ink);
-  background-size: calc(100% - 56px) 1px;
-}
-
-.tourIcon {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  padding-left: 2px;
-  border-radius: 50%;
-  background: var(--brand-navy);
-  color: #ffffff;
-  box-shadow: 0 10px 22px -10px rgba(15, 45, 61, 0.7);
-  transition: background-color var(--dur) var(--ease);
-}
-
-.tourLink:hover .tourIcon {
-  background: var(--brand-orange);
-  color: var(--brand-navy);
-}
-
-:root[data-theme='dark'] .tourIcon {
-  background: #ffffff;
-  color: var(--brand-navy);
-}
-
-/* What the platform records for every clause: an editorial row of four */
-.proof {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px 0;
-  width: 100%;
-  margin-top: clamp(28px, 3.4vw, 40px);
-  padding-top: 18px;
-  border-top: 1px solid var(--line-strong);
-}
-
-.proof li {
-  display: grid;
-  gap: 2px;
-  padding-right: 14px;
-}
-
-.proof b {
-  color: var(--ink);
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.proof span {
-  color: var(--muted);
-  font-size: 13.5px;
-  line-height: 1.4;
-}
-
-@media (min-width: 720px) {
-  .proof {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-  .proof li + li {
-    padding-left: 14px;
-    border-left: 1px solid var(--line);
-  }
 }
 
 /* ── Regulators band along the foot of the hero ─────── */
@@ -167,7 +64,7 @@
 
 .regs li {
   display: grid;
-  align-content: center;
+  align-content: start;
   gap: 2px;
   width: 236px;
   padding: 4px 26px;
@@ -334,10 +231,10 @@
 }
 
 /* ── How it works ───────────────────────────────────── */
+/* The pinned 3D story fills its section, with its own light inside the pinned screen */
 .how {
+  position: relative;
   isolation: isolate;
-  padding-top: clamp(24px, 3vw, 48px);
-  padding-bottom: clamp(24px, 3vw, 48px);
 }
 
 .wide {

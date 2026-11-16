@@ -78,15 +78,13 @@ const LABELS: [string, number, string, Align?][] = [
  * Phones and tablets: the scene on top, the index under it, then the copy, all within one screen.
  * Nothing is masked over the live canvas (its edges fade inside WebGL), so scrolling stays flicker-free.
  */
-export function CapabilityStory({ intro }: { intro?: ReactNode }) {
+export function CapabilityStory({ intro, backdrop }: { intro?: ReactNode; backdrop?: ReactNode }) {
   const storyRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const labelsRef = useRef<HTMLDivElement>(null);
   const panelsRef = useRef<HTMLDivElement>(null);
-  const indexRef = useRef<HTMLDivElement>(null);
   const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const optRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const fillRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const handleRef = useRef<StoryHandle | null>(null);
   const progressRef = useRef(-1);
@@ -188,7 +186,8 @@ export function CapabilityStory({ intro }: { intro?: ReactNode }) {
     };
   }, []);
 
-  // Copy that would not fit its space (short phones, the analyser's longer text) is set a little smaller.
+  // Copy that would not fit its space (short phones, the analyser's longer text) is set a little smaller,
+  // panel by panel. Each panel's top line keeps its size, so every title starts at the same height.
   useEffect(() => {
     const area = panelsRef.current;
     if (!area) return;
@@ -198,7 +197,7 @@ export function CapabilityStory({ intro }: { intro?: ReactNode }) {
         if (!p) return;
         p.style.setProperty('--fit', '1');
         if (p.scrollHeight <= max) return;
-        let lo = 0.7;
+        let lo = 0.66;
         let hi = 1;
         for (let k = 0; k < 7; k++) {
           const mid = (lo + hi) / 2;
@@ -216,15 +215,6 @@ export function CapabilityStory({ intro }: { intro?: ReactNode }) {
     return () => ro.disconnect();
   }, []);
 
-  // Keep the current capability in view in the sideways index (phones and tablets).
-  useEffect(() => {
-    const index = indexRef.current;
-    const opt = active >= 0 ? optRefs.current[active] : null;
-    if (!index || !opt || index.scrollWidth <= index.clientWidth + 1) return;
-    const left = opt.offsetLeft - (index.clientWidth - opt.offsetWidth) / 2;
-    index.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
-  }, [active]);
-
   /** Go to a capability: the page jumps within the pinned section and the camera flies there. */
   const go = useCallback((i: number) => {
     const story = storyRef.current;
@@ -237,8 +227,13 @@ export function CapabilityStory({ intro }: { intro?: ReactNode }) {
   }, []);
 
   return (
-    <div ref={storyRef} className={`${s.story} ${ready ? s.ready : ''}`} style={{ '--span': SPAN } as CSSProperties}>
+    <div ref={storyRef} className={`${s.story} ${ready ? s.ready : ''}`} style={{ '--span': SPAN } as CSSProperties} data-motion-skip="">
       <div className={s.pin}>
+        {backdrop && (
+          <div className={s.backdrop} aria-hidden="true">
+            {backdrop}
+          </div>
+        )}
         <div ref={panelsRef} className={s.panels}>
           <div
             ref={(el) => void (panelRefs.current[N] = el)}
@@ -286,12 +281,12 @@ export function CapabilityStory({ intro }: { intro?: ReactNode }) {
           </div>
         </div>
 
+        {/* Desktop: all ten by name. Phones and tablets: one tappable segment each, and a count. */}
         <nav className={s.index} aria-label="Capabilities">
-          <div ref={indexRef} className={s.indexList}>
+          <div className={s.indexList}>
             {STAGES.map((st, i) => (
               <button
                 key={st.label}
-                ref={(el) => void (optRefs.current[i] = el)}
                 type="button"
                 className={`${s.opt} ${i === active ? s.optOn : ''}`}
                 aria-current={i === active ? 'step' : undefined}
@@ -307,6 +302,10 @@ export function CapabilityStory({ intro }: { intro?: ReactNode }) {
               </button>
             ))}
           </div>
+          <span className={s.count} aria-hidden="true">
+            {String(Math.max(0, active) + 1).padStart(2, '0')}
+            <span> / {N}</span>
+          </span>
         </nav>
       </div>
     </div>

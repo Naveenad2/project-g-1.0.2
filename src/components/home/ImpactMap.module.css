@@ -1,0 +1,1105 @@
+/* ── The hero's board: liquid-glass widgets over soft light ──
+   Placed in percentages and sized in container units, so it scales as one piece; below 440px wide it
+   becomes a flowing column with the text kept readable. */
+.wrap {
+  container-type: inline-size;
+  width: 100%;
+}
+
+.map {
+  --t1: clamp(12px, 2.45cqw, 15.5px);
+  --t2: clamp(10.5px, 2.05cqw, 13px);
+  --t3: clamp(9.5px, 1.78cqw, 11.5px);
+  --pad: clamp(10px, 2cqw, 15px);
+  --r: clamp(12px, 2.4cqw, 18px);
+  --gap: 6px;
+  position: relative;
+  aspect-ratio: 0.98;
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.3;
+}
+
+/* ── Light for the glass to catch: a fine drafting grid and two soft lights ── */
+.mesh {
+  position: absolute;
+  inset: -4%;
+  background-image:
+    linear-gradient(rgba(15, 45, 61, 0.075) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 45, 61, 0.075) 1px, transparent 1px);
+  background-size: 34px 34px;
+  background-position: center;
+  -webkit-mask: radial-gradient(closest-side, #000 35%, transparent);
+  mask: radial-gradient(closest-side, #000 35%, transparent);
+  pointer-events: none;
+}
+
+:root[data-theme='dark'] .mesh {
+  background-image:
+    linear-gradient(rgba(237, 249, 246, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(237, 249, 246, 0.06) 1px, transparent 1px);
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.orbTeal {
+  left: 34%;
+  top: 4%;
+  width: 64%;
+  aspect-ratio: 1;
+  background: radial-gradient(closest-side, rgba(0, 179, 170, 0.5), rgba(0, 179, 170, 0.16) 55%, transparent);
+}
+
+.orbWarm {
+  left: -2%;
+  top: 44%;
+  width: 54%;
+  aspect-ratio: 1;
+  background: radial-gradient(closest-side, rgba(255, 138, 36, 0.46), rgba(255, 138, 36, 0.14) 55%, transparent);
+}
+
+/* ── Layers that drift apart in depth with the pointer ── */
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.wires {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+/* ── Liquid glass: clear and saturated, a bright lensed rim, light from the top left ── */
+.glass {
+  --mx: -500px;
+  --my: -500px;
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: var(--r);
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.36) 52%, rgba(255, 255, 255, 0.52)) padding-box,
+    linear-gradient(140deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.36) 30%, rgba(255, 255, 255, 0.12) 62%, rgba(255, 255, 255, 0.8))
+      border-box;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -22px 36px -30px rgba(0, 128, 122, 0.42),
+    inset 16px 0 30px -30px rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(7, 28, 36, 0.06),
+    0 26px 52px -26px rgba(7, 28, 36, 0.36);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] .glass {
+  background:
+    linear-gradient(155deg, rgba(36, 92, 114, 0.68), rgba(15, 45, 61, 0.48) 56%, rgba(23, 66, 84, 0.6)) padding-box,
+    linear-gradient(
+        140deg,
+        rgba(255, 255, 255, 0.5),
+        rgba(255, 255, 255, 0.08) 30%,
+        rgba(255, 255, 255, 0.03) 62%,
+        rgba(94, 224, 214, 0.42)
+      )
+      border-box;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -22px 36px -30px rgba(0, 179, 170, 0.36),
+    0 30px 56px -26px rgba(0, 0, 0, 0.66);
+}
+
+/* light that follows the pointer across the glass */
+.glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(260px circle at var(--mx) var(--my), rgba(255, 255, 255, 0.6), transparent 62%);
+  opacity: 0;
+  transition: opacity 500ms var(--ease);
+  pointer-events: none;
+}
+
+:root[data-theme='dark'] .glass::before {
+  background: radial-gradient(260px circle at var(--mx) var(--my), rgba(94, 224, 214, 0.18), transparent 62%);
+}
+
+/* a slow sheen crossing the glass now and then */
+.glass::after {
+  content: '';
+  position: absolute;
+  top: -30%;
+  bottom: -30%;
+  left: 0;
+  z-index: 2;
+  width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.42) 50%, transparent);
+  transform: translateX(-180%) skewX(-14deg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* With a mouse or trackpad: a real, clear backdrop (light blur, strong saturation) */
+@media (hover: hover) {
+  .glass {
+    -webkit-backdrop-filter: blur(5px) saturate(1.9) brightness(1.05);
+    backdrop-filter: blur(5px) saturate(1.9) brightness(1.05);
+  }
+  .map:hover .glass::before {
+    opacity: 1;
+  }
+}
+
+/* Touch screens: the same glass without backdrop blur (which can flicker while scrolling there) */
+@media (hover: none) {
+  .glass {
+    background:
+      linear-gradient(155deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.64) 52%, rgba(255, 255, 255, 0.76)) padding-box,
+      linear-gradient(
+          140deg,
+          rgba(255, 255, 255, 1),
+          rgba(255, 255, 255, 0.4) 30%,
+          rgba(255, 255, 255, 0.16) 62%,
+          rgba(255, 255, 255, 0.85)
+        )
+        border-box;
+  }
+  :root[data-theme='dark'] .glass {
+    background:
+      linear-gradient(155deg, rgba(36, 92, 114, 0.9), rgba(17, 50, 67, 0.86) 56%, rgba(23, 66, 84, 0.9)) padding-box,
+      linear-gradient(
+          140deg,
+          rgba(255, 255, 255, 0.5),
+          rgba(255, 255, 255, 0.08) 30%,
+          rgba(255, 255, 255, 0.03) 62%,
+          rgba(94, 224, 214, 0.42)
+        )
+        border-box;
+  }
+}
+
+/* ── Shared type ── */
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: var(--pad) var(--pad) calc(var(--pad) * 0.7);
+}
+
+.headText {
+  display: grid;
+  gap: 2px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--t1);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: var(--t3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── The regulations feed: the new circular drops in at the top ── */
+.feed {
+  --x: 0%;
+  --y: 8%;
+  --w: 40%;
+  --at: 300ms;
+  --float: 7.2s;
+}
+
+.feedList {
+  display: grid;
+  grid-auto-rows: 1fr;
+  gap: var(--gap);
+  padding: 0 calc(var(--pad) * 0.7) calc(var(--pad) * 0.7);
+}
+
+.feedRow {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 4px 9px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: calc(var(--r) - 5px);
+  background: rgba(255, 255, 255, 0.5);
+  font-size: var(--t2);
+}
+
+:root[data-theme='dark'] .feedRow {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(15, 45, 61, 0.42);
+}
+
+.feedText {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.feedText b {
+  font-weight: 600;
+}
+
+.feedText span {
+  color: var(--muted);
+  font-size: var(--t3);
+}
+
+.isNew {
+  border-color: rgba(255, 138, 36, 0.85);
+  background: rgba(255, 244, 233, 0.72);
+  box-shadow: 0 0 0 3px rgba(255, 138, 36, 0.14);
+}
+
+:root[data-theme='dark'] .isNew {
+  border-color: rgba(255, 154, 64, 0.8);
+  background: rgba(90, 69, 51, 0.5);
+}
+
+.newTag {
+  color: var(--accent-text);
+  font-size: var(--t3);
+  font-weight: 800;
+}
+
+.scan {
+  position: relative;
+  grid-column: 1 / -1;
+  display: block;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--ink) 9%, transparent);
+}
+
+.scan i {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--brand-orange), var(--brand-teal-bright));
+  transform-origin: left center;
+}
+
+.ok,
+.docIcon {
+  display: grid;
+  place-items: center;
+  width: clamp(14px, 2.6cqw, 18px);
+}
+
+.ok {
+  color: var(--brand-teal-bright);
+}
+
+.docIcon {
+  color: var(--muted);
+}
+
+.ok svg,
+.docIcon svg {
+  width: 100%;
+  height: auto;
+}
+
+/* ── The impact map ── */
+.panel {
+  --x: 49%;
+  --y: 14%;
+  --w: 51%;
+  --at: 900ms;
+  --float: 9s;
+}
+
+.panel .head {
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.live {
+  font-size: var(--t3);
+}
+
+.rows {
+  position: relative;
+  display: grid;
+  padding: 4px calc(var(--pad) * 0.55);
+}
+
+.row {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: clamp(30px, 6.6cqw, 44px);
+  padding: 6px calc(var(--pad) * 0.45);
+  font-size: var(--t2);
+}
+
+.row + .row {
+  border-top: 1px solid color-mix(in srgb, var(--ink) 7%, transparent);
+}
+
+/* a policy the circular hits: tinted as its light line arrives */
+.row[data-hit]::before {
+  content: '';
+  position: absolute;
+  inset: 3px 0;
+  z-index: -1;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(255, 138, 36, 0.16), rgba(255, 138, 36, 0.06));
+}
+
+.row:nth-child(1) {
+  --at: 2750ms;
+}
+
+.row:nth-child(2) {
+  --at: 2900ms;
+}
+
+.row:nth-child(3) {
+  --at: 3050ms;
+}
+
+.row:nth-child(4) {
+  --at: 3250ms;
+}
+
+.row:nth-child(5) {
+  --at: 3350ms;
+}
+
+.rowText {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.rowText b {
+  font-weight: 600;
+}
+
+.rowText span {
+  color: var(--muted);
+  font-size: var(--t3);
+}
+
+.update {
+  flex: none;
+  color: var(--accent-text);
+  font-size: var(--t3);
+  font-weight: 800;
+}
+
+.none {
+  flex: none;
+  color: var(--faint);
+  font-size: var(--t3);
+}
+
+/* the analyser reading down the policies, once */
+.beam {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+      180deg,
+      transparent,
+      rgba(0, 179, 170, 0.16) 42%,
+      rgba(255, 255, 255, 0.55) 50%,
+      rgba(0, 179, 170, 0.16) 58%,
+      transparent
+    )
+    no-repeat;
+  background-size: 100% 52px;
+  background-position: 0 -60px;
+  pointer-events: none;
+}
+
+.foot {
+  display: grid;
+  gap: 6px;
+  padding: calc(var(--pad) * 0.7) var(--pad) var(--pad);
+  border-top: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.bar {
+  position: relative;
+  display: block;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--ink) 9%, transparent);
+}
+
+.bar i {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--brand-teal-bright), #5ee0d6);
+  transform-origin: left center;
+}
+
+.notified {
+  color: var(--muted);
+  font-size: var(--t3);
+}
+
+/* ── Linkage coverage ── */
+.coverage {
+  --x: 3%;
+  --y: 57%;
+  --w: 41%;
+  --at: 600ms;
+  --float: 8.2s;
+}
+
+.bars {
+  display: grid;
+  gap: 7px;
+  padding: 0 var(--pad);
+}
+
+.barRow {
+  display: grid;
+  grid-template-columns: 5.6em minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--t3);
+}
+
+.barLabel {
+  color: var(--text);
+}
+
+.barN {
+  color: var(--ink);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.track {
+  position: relative;
+  display: block;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--ink) 9%, transparent);
+  -webkit-mask: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 7px);
+  mask: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 7px);
+}
+
+.track i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  transform-origin: left center;
+}
+
+.barRow[data-tone='reg'] .track i {
+  background: var(--success);
+}
+
+.barRow[data-tone='ctl'] .track i {
+  background: var(--brand-orange);
+}
+
+.barRow[data-tone='risk'] .track i {
+  background: var(--brand-teal-bright);
+}
+
+.barRow:nth-child(2) {
+  --bar: 1250ms;
+}
+
+.barRow:nth-child(3) {
+  --bar: 1400ms;
+}
+
+.warn {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: calc(var(--pad) * 0.8) var(--pad) var(--pad);
+  padding-top: calc(var(--pad) * 0.7);
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 18%, transparent);
+  color: var(--ink);
+  font-size: var(--t3);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.warn svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  margin-top: 1px;
+  color: var(--warning);
+}
+
+/* ── The approval ── */
+.toast {
+  --x: 56%;
+  --y: 6%;
+  --w: 44%;
+  --at: 3700ms;
+  --float: 6.6s;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: calc(var(--pad) * 0.75) var(--pad);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: clamp(26px, 4.6cqw, 32px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: linear-gradient(140deg, #00b3aa, #00807a);
+  color: #ffffff;
+  font-size: var(--t3);
+  font-weight: 700;
+}
+
+.toastText {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  font-size: var(--t2);
+}
+
+.toastText b {
+  font-weight: 600;
+}
+
+.toastText span {
+  color: var(--muted);
+  font-size: var(--t3);
+}
+
+.approved {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--success);
+  font-size: var(--t3);
+  font-weight: 700;
+}
+
+.approved svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* ── Acknowledgement: a ring that fills as people read ── */
+.ack {
+  --x: 63%;
+  --y: 68%;
+  --w: 31%;
+  --at: 3900ms;
+  --float: 7.6s;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: var(--pad);
+}
+
+.ack .title {
+  justify-self: start;
+}
+
+.ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 72%;
+  aspect-ratio: 1;
+}
+
+.ring svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ringTrack {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ink) 9%, transparent);
+  stroke-width: 10;
+}
+
+.ringArc {
+  fill: none;
+  stroke: url(#ack-ring);
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 0.046;
+  transform: rotate(-90deg);
+  transform-origin: 60px 60px;
+}
+
+.ringText {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+}
+
+.ringText b {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: calc(var(--t1) * 1.35);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ringText span {
+  color: var(--muted);
+  font-size: var(--t3);
+}
+
+/* ── Light lines ── */
+.wire {
+  fill: none;
+  stroke: url(#impact-wire);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 0;
+}
+
+/* a light casing under each line, so it reads over the glass and the light behind */
+.wire.casing {
+  stroke: rgba(255, 255, 255, 0.8);
+  stroke-width: 5;
+}
+
+:root[data-theme='dark'] .wire.casing {
+  stroke: rgba(15, 45, 61, 0.72);
+}
+
+.pulse {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-dasharray: 0.07 1.2;
+  stroke-dashoffset: 0.07;
+  opacity: 0;
+}
+
+:root[data-theme='dark'] .pulse {
+  stroke: #ffe3c2;
+}
+
+.node {
+  fill: var(--brand-teal-bright);
+  stroke: #ffffff;
+  stroke-width: 1.5;
+}
+
+.origin {
+  fill: var(--brand-orange);
+}
+
+:root[data-theme='dark'] .node {
+  stroke: #12384a;
+}
+
+/* ── Annotations: plain text, never chips ── */
+.note,
+.caption {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  font-size: var(--t2);
+  font-weight: 600;
+  white-space: nowrap;
+  text-shadow:
+    0 0 10px var(--bg),
+    0 0 3px var(--bg);
+}
+
+.note svg,
+.caption svg {
+  flex: none;
+  width: clamp(13px, 2.3cqw, 16px);
+  height: auto;
+}
+
+.time {
+  left: 0.5%;
+  top: 1%;
+  --at: 4400ms;
+}
+
+.time svg {
+  color: var(--primary-text);
+}
+
+.hits {
+  left: 3%;
+  top: 49.5%;
+  --at: 4300ms;
+}
+
+.hits svg {
+  color: var(--brand-orange);
+}
+
+.caption {
+  left: 3%;
+  bottom: 0;
+  --at: 4600ms;
+  font-weight: 500;
+}
+
+.caption svg {
+  color: var(--brand-teal-bright);
+}
+
+.caption b {
+  color: var(--primary-text);
+  font-weight: 700;
+}
+
+/* ── The entrance: plays once, from the page's own load, without script ── */
+@media (prefers-reduced-motion: no-preference) {
+  .glass {
+    animation: glass-in 950ms var(--ease-out) var(--at, 0ms) both;
+  }
+  .toast {
+    animation: glass-in-x 900ms var(--ease-out) var(--at, 0ms) both;
+  }
+  .note,
+  .caption {
+    animation: im-in 800ms var(--ease-out) var(--at, 0ms) both;
+  }
+  /* the feed: the two mapped circulars start a slot higher, then make room for the new one */
+  .feedRow {
+    animation:
+      im-fade 600ms var(--ease) 650ms both,
+      feed-shift 850ms var(--ease-out) 1500ms both;
+  }
+  .isNew {
+    animation: feed-new 800ms var(--ease-out) 1550ms both;
+  }
+  .scan i {
+    animation: im-fill 1000ms var(--ease-out) 1950ms both;
+  }
+  .row[data-hit]::before {
+    animation: im-fade 700ms var(--ease) var(--at) both;
+  }
+  .row .update,
+  .row .none {
+    animation: im-in 650ms var(--ease-out) var(--at) both;
+  }
+  .row .update {
+    --fx: 8px;
+    --fy: 0px;
+  }
+  .beam {
+    animation: im-beam 1400ms cubic-bezier(0.45, 0, 0.25, 1) 2250ms both;
+  }
+  .bar i {
+    animation: im-fill 1000ms var(--ease-out) 3450ms both;
+  }
+  .notified {
+    animation: im-fade 600ms var(--ease) 3650ms both;
+  }
+  .track i {
+    animation: im-fill 1100ms var(--ease-out) var(--bar, 1100ms) both;
+  }
+  .warn {
+    animation: im-fade 600ms var(--ease) 2300ms both;
+  }
+  .tick {
+    animation: im-tick 520ms var(--ease) 4150ms both;
+  }
+  .approved {
+    animation: im-fade 400ms var(--ease) 4100ms both;
+  }
+  .ringArc {
+    animation: im-ring 1500ms cubic-bezier(0.22, 1, 0.36, 1) 4000ms both;
+  }
+  .node {
+    animation: im-fade 400ms var(--ease) both;
+  }
+  .origin {
+    animation-delay: 2300ms;
+  }
+  .pulse {
+    animation: im-pulse 2.8s linear infinite;
+  }
+  .live svg {
+    animation: im-breathe 2.4s var(--ease) 3s infinite;
+  }
+  /* with a mouse or trackpad: the board breathes, and a sheen crosses each pane in turn */
+  @media (hover: hover) {
+    .glass {
+      animation:
+        glass-in 950ms var(--ease-out) var(--at, 0ms) both,
+        im-float var(--float, 8s) ease-in-out calc(var(--at, 0ms) + 1200ms) infinite alternate;
+    }
+    .toast {
+      animation:
+        glass-in-x 900ms var(--ease-out) var(--at, 0ms) both,
+        im-float var(--float, 8s) ease-in-out calc(var(--at, 0ms) + 1200ms) infinite alternate;
+    }
+    .glass::after {
+      animation: im-sheen 11s var(--ease) calc(var(--at, 0ms) + 2600ms) infinite;
+    }
+    .orbTeal {
+      animation: im-drift 17s ease-in-out infinite alternate;
+    }
+    .orbWarm {
+      animation: im-drift 21s ease-in-out -6s infinite alternate-reverse;
+    }
+  }
+}
+
+/* panes unfold from the top as they arrive (the clip opens past the edges, so the shadow is never cut) */
+@keyframes glass-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+    clip-path: inset(0 0 100% 0 round var(--r));
+  }
+  to {
+    clip-path: inset(-70px round var(--r));
+  }
+}
+
+@keyframes glass-in-x {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+}
+
+@keyframes im-in {
+  from {
+    opacity: 0;
+    transform: translate(var(--fx, 0px), var(--fy, 14px));
+  }
+}
+
+@keyframes im-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes im-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes feed-shift {
+  from {
+    transform: translateY(calc(-100% - var(--gap)));
+  }
+}
+
+@keyframes feed-new {
+  from {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+}
+
+@keyframes im-beam {
+  0% {
+    opacity: 0;
+    background-position: 0 -60px;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    background-position: 0 calc(100% + 60px);
+  }
+}
+
+@keyframes im-tick {
+  from {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes im-ring {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes im-float {
+  to {
+    translate: 0 -6px;
+  }
+}
+
+@keyframes im-sheen {
+  0% {
+    opacity: 0;
+    transform: translateX(-180%) skewX(-14deg);
+  }
+  4% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(380%) skewX(-14deg);
+  }
+  21%,
+  100% {
+    opacity: 0;
+    transform: translateX(380%) skewX(-14deg);
+  }
+}
+
+@keyframes im-drift {
+  to {
+    translate: -6% 5%;
+  }
+}
+
+@keyframes im-pulse {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 0.07;
+  }
+  10% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    stroke-dashoffset: -1;
+  }
+}
+
+@keyframes im-breathe {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* ── Narrow (phones): one flowing column, the light lines running down the left ── */
+@container (max-width: 439.98px) {
+  .map {
+    --t1: 13px;
+    --t2: 11.5px;
+    --t3: 10.5px;
+    --pad: 11px;
+    --r: 14px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      'time time'
+      'feed feed'
+      'panel panel'
+      'ack toast'
+      'hits hits'
+      'cap cap';
+    gap: 10px;
+    aspect-ratio: auto;
+  }
+  /* the layers stop being separate planes (no pointer parallax on phones) and their panes join the flow */
+  .layer {
+    display: contents;
+  }
+  .glass,
+  .note,
+  .caption {
+    position: relative;
+    left: auto;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    z-index: 1;
+    width: auto;
+  }
+  .orbTeal {
+    left: 20%;
+    top: 18%;
+    width: 90%;
+  }
+  .orbWarm {
+    left: -20%;
+    top: 58%;
+    width: 80%;
+  }
+  .time {
+    grid-area: time;
+  }
+  .feed {
+    grid-area: feed;
+  }
+  .panel {
+    grid-area: panel;
+    margin: 24px 0 0 13%;
+  }
+  .row:not([data-hit]) {
+    display: none;
+  }
+  .coverage {
+    display: none;
+  }
+  .ack {
+    grid-area: ack;
+  }
+  .ring {
+    width: 64%;
+  }
+  .toast {
+    grid-area: toast;
+    align-self: start;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .approved {
+    grid-column: 1 / -1;
+  }
+  .hits {
+    grid-area: hits;
+    margin-top: 6px;
+  }
+  .caption {
+    grid-area: cap;
+    white-space: normal;
+  }
+}

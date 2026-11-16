@@ -190,18 +190,34 @@ export function WeekStory({ chapters }: { chapters: WeekChapter[] }) {
     items.forEach((li) => reading.observe(li));
 
     measure();
-    // Re-measure on any size change; sections below only need their scroll positions refreshed when the height moves.
-    let lastH = root.offsetHeight;
-    let refreshId = 0;
-    const ro = new ResizeObserver(() => {
-      measure();
-      const h = root.offsetHeight;
-      if (Math.abs(h - lastH) < 2) return;
-      lastH = h;
-      window.clearTimeout(refreshId);
-      refreshId = window.setTimeout(() => ScrollTrigger.refresh(), 250);
-    });
+    // The thread follows any size change. (Scroll positions are refreshed by ScrollTrigger itself on resize.)
+    const ro = new ResizeObserver(measure);
     ro.observe(root);
+
+    // A demo never changes the page's height while it plays: each one keeps the tallest height it has
+    // shown at this width, so nothing below it (the pinned 3D story included) ever moves.
+    const holds = items.map((li) => {
+      const visual = li.querySelector<HTMLElement>(`.${s.visual}`);
+      const inner = li.querySelector<HTMLElement>(`.${s.drift}`);
+      return { visual, inner, width: 0, max: 0 };
+    });
+    const hold = new ResizeObserver(() => {
+      for (const h of holds) {
+        if (!h.visual || !h.inner) continue;
+        const w = h.visual.clientWidth;
+        const ht = h.inner.offsetHeight;
+        if (w !== h.width) {
+          h.width = w;
+          h.max = 0;
+          h.visual.style.minHeight = '';
+        }
+        if (ht > h.max) {
+          h.max = ht;
+          h.visual.style.minHeight = `${ht}px`;
+        }
+      }
+    });
+    holds.forEach((h) => h.inner && hold.observe(h.inner));
 
     /* ── Desktop: the thread draws itself under the reading line ── */
     const st = scrub
@@ -214,8 +230,8 @@ export function WeekStory({ chapters }: { chapters: WeekChapter[] }) {
       : null;
 
     return () => {
-      window.clearTimeout(refreshId);
       ro.disconnect();
+      hold.disconnect();
       arrive.disconnect();
       reading.disconnect();
       st?.kill();

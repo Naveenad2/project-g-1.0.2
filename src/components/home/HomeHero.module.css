@@ -32,7 +32,7 @@
   z-index: 2;
 }
 
-/* Phones and tablets: intro, actions, then the earth in the first screen, then the intro paragraph */
+/* Phones and tablets: intro, actions, then the board in the first screen, then the intro paragraph */
 .intro {
   order: 1;
 }
@@ -41,36 +41,18 @@
   order: 2;
 }
 
-.earthSlot {
+.visual {
   position: relative;
   z-index: 1;
   order: 3;
-  width: 100vw;
-  height: clamp(300px, 92vw, 720px);
-  margin: clamp(8px, 2vw, 20px) 0 0 calc(var(--gutter) * -1);
-  pointer-events: none;
-}
-
-/* The earth fades out (inside its canvas) before the paragraph below starts, so no copy sits on it.
-   Measured: that paragraph starts at 0.70–0.76 of the canvas height on phones and tablets. */
-.earth {
-  --globe-fade: 0.58 0.68;
-  --size: min(148vw, 1080px);
-  position: absolute;
-  top: calc(var(--size) * -0.07);
-  left: 50%;
-  width: var(--size);
-  aspect-ratio: 1;
-  margin-left: calc(var(--size) / -2);
+  width: 100%;
+  max-width: 600px;
+  margin-top: clamp(32px, 7vw, 48px);
 }
 
 .lede {
   order: 4;
-  margin-top: clamp(-40px, -6vw, -16px);
-}
-
-.proof {
-  order: 5;
+  margin-top: clamp(10px, 3vw, 20px);
 }
 
 .band {
@@ -79,34 +61,40 @@
   padding: clamp(32px, 5vw, 56px) 0 clamp(22px, 3vw, 34px);
 }
 
-/* Desktop: copy on the left in reading order; the earth fills the right of the stage */
+/* Desktop: copy on the left in reading order; the board fills the right of the stage */
 @media (min-width: 1100px) {
   .grid {
-    position: static;
     flex: 1;
   }
   .copy {
-    position: static;
-    display: block;
-    max-width: min(47vw, 660px);
+    display: grid;
+    grid-template-columns: min(47vw, 660px) minmax(0, 1fr);
+    grid-template-rows: 1fr auto auto auto 1fr;
+    column-gap: clamp(28px, 3.4vw, 64px);
+    max-width: none;
+  }
+  .intro {
+    grid-column: 1;
+    grid-row: 2;
   }
   .lede {
+    grid-column: 1;
+    grid-row: 3;
     margin-top: 0;
   }
-  .earthSlot {
-    position: absolute;
-    inset: 0;
-    width: auto;
-    height: auto;
-    margin: 0;
+  .actions {
+    grid-column: 1;
+    grid-row: 4;
   }
-  .earth {
-    --globe-fade: none;
-    --size: min(94vw, 148vh, 1560px);
-    left: auto;
-    right: calc(var(--size) / -2 + 17vw);
-    top: calc(50% - var(--size) / 2 + 40px);
-    margin: 0;
+  .visual {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: center;
+    justify-self: end;
+    /* the board may reach a little into the margin on the right, so its glass has room */
+    width: calc(100% + min(var(--gutter), 48px));
+    max-width: 700px;
+    margin: 0 calc(min(var(--gutter), 48px) * -1) 0 0;
   }
   .band {
     padding-top: clamp(28px, 3vw, 40px);

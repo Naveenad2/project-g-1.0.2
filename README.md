@@ -68,16 +68,36 @@ paint, so there is no flash. All colours are tokens in `src/styles/tokens.css`, 
   near the hubs are disputed. Arcs in the signature gradient link the regulators the site names: RBI, SEBI, IRDAI,
   CBUAE, ADGM, DFSA, SAMA, CBB, QFCRA and FATF. The scene also has pulsing hubs, travelling light, two dotted orbits
   and an atmosphere halo. It loads only when it nears the viewport, renders only while it is visible and the tab is
-  active, and fades in on its first frame. Framings: `hero` (home), `art` (inner heroes without a product visual)
-  and `horizon` (a low, wide view, not used at present). A parent can set `--globe-fade: <start> <end>` (fractions
+  active, and fades in on its first frame. Framings: `art` (inner heroes without a product visual), and `hero` and
+  `horizon` (a giant and a low, wide view, not used at present). A parent can set `--globe-fade: <start> <end>` (fractions
   of the canvas height) to fade the drawing out towards its foot. The fade is done inside the canvas, not with a CSS
   mask, which flickers over a live canvas on phones.
-- **Home hero:** a full-width gradient panel with rounded lower corners, like the inner heroes. It holds the copy,
-  the giant earth and the regulators band. The next section (the live linking demo, with a short introduction beside
-  it) follows in normal flow. Its field rises out of the page under the hero, so nothing slides over anything. As the
-  hero scrolls away, the earth turns and moves closer inside its canvas. With a mouse, the copy also lifts and fades;
-  on touch screens only the earth responds, so nothing jitters against native scrolling. On phones and tablets the
-  earth sits between the buttons and the paragraph, and fades out before the paragraph starts.
+- **Home hero:** a full-width gradient panel with rounded lower corners, like the inner heroes, with the original
+  type sizes. Following the design team's note to keep it light on text, it holds only the headline, one sentence
+  and the two actions, beside the widget board, with the regulators band along its foot. The next section follows in
+  normal flow, so nothing slides over anything. With a mouse, the copy and the board lift as the hero scrolls away;
+  touch screens keep native scrolling with nothing moving against it. On phones and tablets the board sits between
+  the actions and the sentence, as the earth used to.
+- **Widget board (`ImpactMap`):** the hero's visual: the idea of the impact map in Gieom's design, built as a board
+  of liquid-glass widgets with product content from the rest of the site.
+  - **The story:** a new circular (CBUAE Circular 1/2026) drops into the regulations feed above two already mapped.
+    A light reads down the impact map, light lines run into the three policies it hits ("Update"), and the owners
+    are notified. Michael Torres approves, the acknowledgement ring fills as the readers count up to 1,240 of 1,300,
+    and linkage coverage (AML-POL-0115) fills beside.
+  - **The glass:** clear and saturated rather than frosted (a light backdrop blur with strong saturation), with a
+    bright lensed rim, an inner glow, a light that follows the pointer and a slow sheen crossing each pane in turn.
+    Behind it sit a fine drafting grid and two soft lights for the glass to catch. Touch screens get the same look
+    without backdrop blur or pointer effects, which keeps scrolling there free of flicker.
+  - **Sharp text:** every widget is real text on flat layers, never 3D, scaled or rotated. Depth comes from the
+    glass, shadows, a slow float and three layers that drift apart with the pointer (2D translation only).
+    Annotations are plain text, never chips.
+  - **The entrance:** about five seconds, played once in CSS from the page's own load (so nothing flashes and it
+    needs no script). Panes unfold from the top, and the feed makes room for the new circular. The light lines
+    (measured from the layout, with a casing and travelling pulses) and the count are run by script on the same
+    clock. Reduced motion shows the finished board.
+  - **Sizes:** the board is placed in percentages and sized in container units, so it scales as one piece. Below
+    440px wide it becomes a flowing column: the feed, the three policies hit (the lines running down the left), the
+    ring and the approval side by side, then the notes.
 - **Tour:** the heading, the tour's title and chapters, and a link sit beside a contained, glass-framed poster rather
   than a full-width image.
 - **Closing call to action (`CtaBand`):** open to the page, not a card. Centred copy sits on saturated tangerine
@@ -97,6 +117,9 @@ paint, so there is no flash. All colours are tokens in `src/styles/tokens.css`, 
   - **Arrival:** each title rises in word by word, the answer, body and buttons follow, the list rules draw, and
     the demo slides in from its side. Every arrival plays once. Chapters already on screen are never hidden, and
     with reduced motion or without scripts everything is simply there.
+  - **Steady height:** a playing demo never changes the page's height, so nothing below it (the pinned 3D story
+    included) moves. The Draft demo keeps space for its inserted clause and shows "Drafting…" where the draft will
+    appear, and each visual also keeps the tallest height it has shown at its width.
 - **How it works (`CapabilityStory` + `src/components/story/scene.ts`):** "Gieom.cloud brings all of it together"
   as a pinned 3D story with an index.
   - **Pinned:** the section holds still while you scroll through it. Scrolling moves the story along: the copy for
@@ -106,13 +129,18 @@ paint, so there is no flash. All colours are tokens in `src/styles/tokens.css`, 
   - **One capability at a time:** only the capability being told is built, as you reach it, and it folds away as you
     leave. The document, the other capabilities and the light links between them appear only for the opening shot
     and the Impact Analyser's overview.
-  - **The index:** all ten capabilities stay in view as plain names, each with a hairline that fills as the story
-    passes through it. Tapping one moves the page to that point in the section, and the camera flies straight there
-    instead of sweeping through every capability between.
-  - **Desktop:** copy on the left, the scene in its own column on the right, the index along the foot.
-  - **Phones and tablets:** the scene on top (taller on tablets), the index under it (scrolling sideways, keeping
-    the current capability centred), then the copy, all within one screen. Copy that would not fit its space on a
-    short phone is set slightly smaller (`--fit`).
+  - **The index:** all ten capabilities stay in view, each with a hairline that fills as the story passes through
+    it. Tapping one moves the page to that point in the section, and the camera flies straight there instead of
+    sweeping through every capability between.
+  - **Desktop:** copy on the left, the scene in its own column on the right, the index of names along the foot.
+  - **Phones and tablets:** the scene on top, the index under it as one tappable segment per capability with a
+    count, then the copy, all within one screen. Nothing scrolls sideways.
+  - **Steady copy:** every chapter's copy starts at the same line, so the title never jumps as the chapter
+    changes. Copy that would not fit its space on a short screen is set slightly smaller, chapter by chapter
+    (`--fit`), and the line above the title keeps its size.
+  - **Steady background:** the section's light is part of the pinned screen, so nothing slides behind the copy
+    while it holds still. The screen is full-bleed (its light reaches both edges on wide screens) while the content
+    keeps to the page width.
   - **No flicker:** nothing is laid over or masked on the live canvas. Its edges fade inside WebGL (a full-screen
     pass that multiplies the drawing towards the edges), and no text scrolls across it.
   - **Fallbacks:** before the script runs, or without it, the story is plain text in flow. Without WebGL the copy
@@ -177,7 +205,8 @@ src/
     globe/                   Globe (React wrapper), scene (three.js), coastlines (encoded land outlines)
     blocks/                  PageHero, ProblemGrid, FeatureStep, Tiles, CtaBand, Timeline, Faq,
                              IndustryPage template, LegalLayout
-    home/                    HomeHero, WeekStory, CapabilityStory, PlatformStack index, product demos
+    home/                    HomeHero, ImpactMap (widget board), WeekStory, CapabilityStory,
+                             PlatformStack index, product demos
     story/                   scene (three.js) for the How it works story
     mocks/                   Product UI mock-ups used across pages (registers, RCSA, workflow…)
     forms/                   Field primitives, Contact/Demo/Trial forms, StaticForm
