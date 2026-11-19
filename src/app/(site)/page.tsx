@@ -270,15 +270,25 @@ export default function HomePage() {
         }
       />
 
-      {/* Every compliance week: the story from the circular to the auditor */}
+      {/* Every compliance week: the story from the circular to the auditor, under one heading with the calls to action */}
       <section id="week" className={`section ${styles.week}`}>
         <GradientBg variant="soft" warm />
         <div className={`container ${styles.layer}`}>
-          <SectionHeader
+          <WeekStory
             title="Every compliance week tells the same story."
             lede="It begins with a circular and ends with an auditor. Here is how the week usually goes and how it can go with Gieom.cloud."
+            actions={
+              <>
+                <ButtonLink href={routes.demo} arrow>
+                  Book a demo
+                </ButtonLink>
+                <ButtonLink href={routes.trial} variant="secondary">
+                  Start free trial
+                </ButtonLink>
+              </>
+            }
+            chapters={week}
           />
-          <WeekStory chapters={week} />
         </div>
       </section>
 

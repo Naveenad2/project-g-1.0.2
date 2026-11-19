@@ -56,6 +56,66 @@
   opacity: 0.28;
 }
 
+/* ── The heading: the section's statement and its two calls to action, centred over the thread ── */
+.intro {
+  display: grid;
+  justify-items: center;
+  max-width: 1040px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.heading {
+  max-width: 22ch;
+  font-size: clamp(2.4rem, 1.25rem + 3vw, 4.1rem);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.introLede {
+  max-width: 58ch;
+  margin-top: clamp(18px, 2vw, 26px);
+  text-wrap: pretty;
+}
+
+.introActions {
+  justify-content: center;
+  margin-top: clamp(26px, 3vw, 36px);
+}
+
+/* Where the thread begins: a point of light under the buttons */
+.origin {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 12px;
+  height: 12px;
+  margin: clamp(44px, 6vh, 64px) auto 0;
+  border-radius: 50%;
+  background: var(--brand-orange);
+  box-shadow:
+    0 0 0 5px rgba(255, 138, 36, 0.16),
+    0 0 22px rgba(255, 138, 36, 0.6);
+}
+
+.origin::after {
+  content: '';
+  position: absolute;
+  inset: -9px;
+  border: 1.5px solid rgba(255, 138, 36, 0.7);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .origin::after {
+    animation: week-ping 2.8s var(--ease) infinite;
+  }
+}
+
 .chapters {
   display: grid;
 }
@@ -69,7 +129,7 @@
 }
 
 .chapter:first-child {
-  padding-top: clamp(16px, 3vh, 32px);
+  padding-top: clamp(48px, 7vh, 84px);
 }
 
 .chapter:last-child {
@@ -230,10 +290,6 @@
   font-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1.0625rem);
 }
 
-.actions {
-  margin-top: 26px;
-}
-
 /* The demo, with the light of its day behind it */
 .visual {
   position: relative;
@@ -340,13 +396,27 @@
     --node: 16px;
     --gap: 34px;
   }
+  .intro {
+    justify-items: start;
+    margin: 0;
+    text-align: left;
+  }
+  .heading {
+    max-width: 22ch;
+    font-size: clamp(2.2rem, 1.25rem + 4.2vw, 3.5rem);
+    line-height: 1.03;
+  }
+  .introActions {
+    justify-content: flex-start;
+  }
+  /* the point sits on the rail, where the thread runs down the left */
+  .origin {
+    margin: clamp(36px, 6vw, 48px) 0 0 calc(var(--node) / 2 - 6px);
+  }
   .chapter,
   .chapter[data-side] {
     grid-template-columns: minmax(0, 1fr);
     padding: clamp(44px, 8vh, 80px) 0 clamp(44px, 8vh, 80px) var(--gap);
-  }
-  .chapter:first-child {
-    padding-top: 6px;
   }
   .chapter:last-child {
     padding-bottom: 8px;
@@ -365,9 +435,6 @@
     left: 0;
     margin-top: 0;
     font-size: clamp(1.8rem, 1.2rem + 2.6vw, 2.5rem);
-  }
-  .chapter:first-child .node {
-    top: calc(6px + 0.54em - var(--node) / 2);
   }
   .title {
     max-width: 20ch;
@@ -398,19 +465,21 @@
 }
 
 @media (max-width: 479.98px) {
-  .actions {
+  .introActions {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 10px;
+    width: 100%;
   }
-  .actions :global(.btn) {
+  .introActions :global(.btn) {
     justify-content: center;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .chapter[data-lit] .node::before,
-  .chapter[data-now] .node::after {
+  .chapter[data-now] .node::after,
+  .origin::after {
     animation: none;
   }
   .visual::before {

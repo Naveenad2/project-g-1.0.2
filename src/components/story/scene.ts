@@ -38,8 +38,8 @@ export interface StoryOptions {
 }
 
 export interface StoryHandle {
-  /** Story position: -1 (intro) … 0–9 (chapters) … 10–11 (closing view). */
-  setProgress(t: number): void;
+  /** Story position: -1 (intro) … 0–9 (chapters) … 10–11 (closing view). `jump`: a tap on the index. */
+  setProgress(t: number, jump?: boolean): void;
   setLayout(desktop: boolean): void;
   runImpact(): void;
   setTheme(dark: boolean): void;
@@ -2242,6 +2242,8 @@ export function createStory(canvas: HTMLCanvasElement, opts: StoryOptions): Stor
       if (slow > 30 && ratioCap > 1) {
         ratioCap = Math.max(1, ratioCap - 0.2);
         resize();
+        // resizing clears the canvas: draw again at once, so no blank frame can show
+        renderer.render(scene, camera);
       }
       frames = 0;
       slow = 0;
@@ -2274,9 +2276,10 @@ export function createStory(canvas: HTMLCanvasElement, opts: StoryOptions): Stor
   }
 
   return {
-    setProgress(t) {
-      // a jump of more than a chapter (an index tap) becomes a direct flight
-      if (Math.abs(t - tTarget) > 1.2 && !reduced && active) {
+    setProgress(t, jump = false) {
+      // a jump of more than a chapter becomes a direct flight. On touch screens only a tap on the index
+      // does: a fast swipe always moves through the story with the finger, and back again the same way.
+      if (Math.abs(t - tTarget) > 1.2 && !reduced && active && (jump || !touch)) {
         Object.assign(from, { ...cur, target: from.target.copy(cur.target) });
         poseAt(t, to);
         const turn = Math.abs(wrapAngle(to.theta - from.theta));
@@ -2316,7 +2319,8 @@ export function createStory(canvas: HTMLCanvasElement, opts: StoryOptions): Stor
     },
     resize() {
       resize();
-      if (!active || reduced) update(0);
+      // resizing clears the canvas, so draw again at once rather than leave a blank frame until the next tick
+      update(0);
     },
     dispose() {
       cancelAnimationFrame(raf);

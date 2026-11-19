@@ -4,13 +4,13 @@
  */
 .root {
   --g-base: linear-gradient(172deg, #f7fdfb 0%, #e8f8f3 46%, #d6f2ea 100%);
-  --g1: rgba(0, 179, 170, 0.58);
-  --g2: rgba(255, 138, 36, 0.54);
+  --g1: rgba(0, 179, 170, 0.64);
+  --g2: rgba(255, 138, 36, 0.6);
   --g3: rgba(255, 255, 255, 0.82);
-  --g4: rgba(255, 150, 64, 0.58);
-  --g5: rgba(40, 210, 198, 0.58);
+  --g4: rgba(255, 150, 64, 0.64);
+  --g5: rgba(40, 210, 198, 0.64);
   --g-grain: var(--grain);
-  --g-grain-o: 0.5;
+  --g-grain-o: 0.3;
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -96,8 +96,8 @@
   height: 62%;
   border-radius: 50%;
   background:
-    radial-gradient(40% 46% at 30% 50%, rgba(255, 138, 36, 0.26), transparent 72%),
-    radial-gradient(44% 50% at 70% 50%, rgba(0, 179, 170, 0.24), transparent 72%);
+    radial-gradient(40% 46% at 30% 50%, rgba(255, 138, 36, 0.29), transparent 72%),
+    radial-gradient(44% 50% at 70% 50%, rgba(0, 179, 170, 0.27), transparent 72%);
   animation: horizon 26s ease-in-out infinite alternate;
 }
 
@@ -116,11 +116,11 @@
   -webkit-mask-image: linear-gradient(180deg, transparent, #000 12%, #000 88%, transparent);
   mask-image: linear-gradient(180deg, transparent, #000 12%, #000 88%, transparent);
   --g-base: transparent;
-  --g1: rgba(0, 179, 170, 0.32);
-  --g2: rgba(255, 138, 36, 0.28);
+  --g1: rgba(0, 179, 170, 0.36);
+  --g2: rgba(255, 138, 36, 0.32);
   --g3: rgba(255, 255, 255, 0.55);
-  --g4: rgba(255, 160, 80, 0.27);
-  --g5: rgba(40, 210, 198, 0.34);
+  --g4: rgba(255, 160, 80, 0.3);
+  --g5: rgba(40, 210, 198, 0.38);
   --g-grain-o: 0;
 }
 
@@ -131,72 +131,72 @@
 /* Vivid stage: the most saturated light, for showpieces under liquid glass */
 .vivid {
   --g-base: linear-gradient(160deg, #d8f3ed 0%, #f3faf8 42%, #ffead6 100%);
-  --g1: rgba(0, 179, 170, 0.7);
-  --g2: rgba(255, 138, 36, 0.64);
+  --g1: rgba(0, 179, 170, 0.75);
+  --g2: rgba(255, 138, 36, 0.69);
   --g3: rgba(255, 255, 255, 0.8);
-  --g4: rgba(255, 150, 64, 0.62);
-  --g5: rgba(40, 210, 198, 0.68);
-  --g-grain-o: 0.45;
+  --g4: rgba(255, 150, 64, 0.67);
+  --g5: rgba(40, 210, 198, 0.73);
+  --g-grain-o: 0.27;
 }
 
 /* Navy band */
 .deep {
   --g-base: linear-gradient(160deg, #0b2431 0%, #0f2d3d 46%, #113a4c 100%);
-  --g1: rgba(0, 179, 170, 0.62);
-  --g2: rgba(255, 138, 36, 0.46);
+  --g1: rgba(0, 179, 170, 0.66);
+  --g2: rgba(255, 138, 36, 0.5);
   --g3: rgba(94, 224, 214, 0.12);
-  --g4: rgba(255, 160, 72, 0.22);
-  --g5: rgba(0, 128, 122, 0.5);
+  --g4: rgba(255, 160, 72, 0.25);
+  --g5: rgba(0, 128, 122, 0.54);
   --g-grain: var(--grain-light);
-  --g-grain-o: 0.5;
+  --g-grain-o: 0.3;
 }
 
 /* Closing call to action: navy into deep teal with warm light */
 .cta {
   --g-base: linear-gradient(128deg, #0f2d3d 0%, #0d3e4a 48%, #00655f 100%);
-  --g1: rgba(0, 196, 186, 0.68);
-  --g2: rgba(255, 138, 36, 0.58);
+  --g1: rgba(0, 196, 186, 0.72);
+  --g2: rgba(255, 138, 36, 0.62);
   --g3: rgba(94, 224, 214, 0.18);
-  --g4: rgba(255, 170, 90, 0.36);
-  --g5: rgba(0, 128, 122, 0.6);
+  --g4: rgba(255, 170, 90, 0.39);
+  --g5: rgba(0, 128, 122, 0.64);
   --g-grain: var(--grain-light);
-  --g-grain-o: 0.5;
+  --g-grain-o: 0.3;
 }
 
 .warm {
-  --g2: rgba(255, 138, 36, 0.6);
-  --g4: rgba(255, 150, 64, 0.62);
+  --g2: rgba(255, 138, 36, 0.66);
+  --g4: rgba(255, 150, 64, 0.67);
 }
 
 .soft.warm {
-  --g2: rgba(255, 138, 36, 0.3);
-  --g4: rgba(255, 160, 80, 0.28);
+  --g2: rgba(255, 138, 36, 0.34);
+  --g4: rgba(255, 160, 80, 0.31);
 }
 
 .deep.warm,
 .cta.warm {
-  --g2: rgba(255, 138, 36, 0.5);
-  --g4: rgba(255, 170, 90, 0.36);
+  --g2: rgba(255, 138, 36, 0.54);
+  --g4: rgba(255, 170, 90, 0.39);
 }
 
 /* Navy theme */
 :root[data-theme='dark'] .root:not(.deep):not(.cta):not(.soft) {
   --g-base: linear-gradient(172deg, #0c2633 0%, #0f2d3d 50%, #0f3442 100%);
-  --g1: rgba(0, 179, 170, 0.5);
-  --g2: rgba(255, 138, 36, 0.38);
+  --g1: rgba(0, 179, 170, 0.55);
+  --g2: rgba(255, 138, 36, 0.42);
   --g3: rgba(94, 224, 214, 0.08);
-  --g4: rgba(255, 160, 72, 0.24);
-  --g5: rgba(0, 128, 122, 0.5);
+  --g4: rgba(255, 160, 72, 0.27);
+  --g5: rgba(0, 128, 122, 0.55);
   --g-grain: var(--grain);
-  --g-grain-o: 0.55;
+  --g-grain-o: 0.33;
 }
 
 :root[data-theme='dark'] .soft {
-  --g1: rgba(0, 179, 170, 0.24);
-  --g2: rgba(255, 138, 36, 0.16);
+  --g1: rgba(0, 179, 170, 0.27);
+  --g2: rgba(255, 138, 36, 0.18);
   --g3: rgba(94, 224, 214, 0.04);
-  --g4: rgba(255, 160, 72, 0.07);
-  --g5: rgba(0, 128, 122, 0.16);
+  --g4: rgba(255, 160, 72, 0.08);
+  --g5: rgba(0, 128, 122, 0.18);
 }
 
 :root[data-theme='dark'] .deep {

@@ -40,22 +40,24 @@
   /* Film grain: fine, navy-tinted, very low alpha */
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.06 0 0 0 0 0.18 0 0 0 0 0.24 0 0 0 0.36 -0.135'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --grain-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.93 0 0 0 0 0.98 0 0 0 0 0.97 0 0 0 0.32 -0.115'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* The page itself: the same grain, fainter */
+  --grain-page: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.06 0 0 0 0 0.18 0 0 0 0 0.24 0 0 0 0.22 -0.082'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 
   /* Page: off-white with a fine grain; sections bring their own light */
-  --page-bg: var(--grain) 0 0 / 220px 220px repeat, linear-gradient(#fdfdfd, #fdfdfd);
+  --page-bg: var(--grain-page) 0 0 / 220px 220px repeat, linear-gradient(#fdfdfd, #fdfdfd);
 
-  /* Liquid glass: translucent fill with a specular sheen, a bright rim and a soft navy shadow */
+  /* Glass, kept calm: a mostly solid light fill, a soft top highlight, a quiet rim and a soft navy shadow */
   --glass-bg:
-    radial-gradient(130% 90% at 8% -24%, rgba(255, 255, 255, 0.96), transparent 52%),
-    linear-gradient(155deg, rgba(255, 255, 255, 0.76) 0%, rgba(255, 255, 255, 0.44) 56%, rgba(255, 255, 255, 0.62) 100%);
+    radial-gradient(130% 90% at 8% -24%, rgba(255, 255, 255, 0.62), transparent 50%),
+    linear-gradient(155deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.7) 56%, rgba(255, 255, 255, 0.8) 100%);
   --glass-border: rgba(255, 255, 255, 0.82);
   --glass-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 0 0 1px rgba(255, 255, 255, 0.3), inset 0 -22px 36px -30px rgba(0, 128, 122, 0.32),
-    0 1px 2px rgba(15, 45, 61, 0.05), 0 28px 54px -32px rgba(15, 45, 61, 0.34);
+    inset 0 1px 0 rgba(255, 255, 255, 0.85), inset 0 -18px 30px -28px rgba(0, 128, 122, 0.14), 0 1px 2px rgba(15, 45, 61, 0.05),
+    0 24px 48px -32px rgba(15, 45, 61, 0.26);
   --glass-shadow-hover:
-    inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 0 0 1px rgba(255, 255, 255, 0.4), inset 0 -22px 36px -28px rgba(255, 138, 36, 0.32),
-    0 2px 4px rgba(15, 45, 61, 0.05), 0 36px 64px -34px rgba(15, 45, 61, 0.42);
-  --glass-blur: blur(20px) saturate(170%);
+    inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -18px 30px -26px rgba(255, 138, 36, 0.14), 0 2px 4px rgba(15, 45, 61, 0.05),
+    0 32px 58px -34px rgba(15, 45, 61, 0.34);
+  --glass-blur: blur(14px) saturate(130%);
 
   /* Surfaces */
   --bg: #fdfdfd;
@@ -163,7 +165,7 @@
 
 @media (max-width: 767px) {
   :root {
-    --glass-blur: blur(12px) saturate(160%);
+    --glass-blur: blur(10px) saturate(125%);
   }
 }
 
@@ -174,18 +176,17 @@
     radial-gradient(70% 90% at 0% 0%, rgba(0, 179, 170, 0.16), transparent 62%),
     radial-gradient(60% 80% at 100% 100%, rgba(255, 138, 36, 0.1), transparent 62%), linear-gradient(135deg, #0e2b39, #112a36);
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.9 0 0 0 0 0.97 0 0 0 0 0.96 0 0 0 0.26 -0.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  --page-bg: var(--grain) 0 0 / 220px 220px repeat, linear-gradient(#0c2633, #0c2633);
+  --grain-page: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.9 0 0 0 0 0.97 0 0 0 0 0.96 0 0 0 0.16 -0.062'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --page-bg: var(--grain-page) 0 0 / 220px 220px repeat, linear-gradient(#0c2633, #0c2633);
 
   --glass-bg:
-    radial-gradient(130% 90% at 8% -24%, rgba(255, 255, 255, 0.13), transparent 52%),
-    linear-gradient(155deg, rgba(25, 70, 90, 0.66) 0%, rgba(15, 45, 61, 0.46) 56%, rgba(19, 58, 76, 0.58) 100%);
-  --glass-border: rgba(237, 249, 246, 0.15);
+    radial-gradient(130% 90% at 8% -24%, rgba(255, 255, 255, 0.07), transparent 50%),
+    linear-gradient(155deg, rgba(25, 70, 90, 0.78) 0%, rgba(15, 45, 61, 0.64) 56%, rgba(19, 58, 76, 0.72) 100%);
+  --glass-border: rgba(237, 249, 246, 0.13);
   --glass-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.04), inset 0 -22px 36px -30px rgba(0, 179, 170, 0.3),
-    0 28px 54px -30px rgba(0, 0, 0, 0.6);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -18px 30px -28px rgba(0, 179, 170, 0.14), 0 24px 48px -30px rgba(0, 0, 0, 0.5);
   --glass-shadow-hover:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.06), inset 0 -22px 36px -28px rgba(255, 138, 36, 0.3),
-    0 36px 64px -32px rgba(0, 0, 0, 0.7);
+    inset 0 1px 0 rgba(255, 255, 255, 0.13), inset 0 -18px 30px -26px rgba(255, 138, 36, 0.14), 0 32px 58px -32px rgba(0, 0, 0, 0.6);
 
   --bg: #0c2633;
   --bg-subtle: #0f2d3d;

@@ -3,25 +3,74 @@
 }
 
 .toggle {
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
+  max-width: 100%;
   padding: 4px;
   border: 1px solid var(--line-strong);
-  border-radius: 12px;
-  background: var(--surface);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  box-shadow:
+    inset 0 1px 2px rgba(15, 45, 61, 0.07),
+    0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* The pill under the chosen period: teal for monthly, tangerine for annual. It travels along the brand
+   gradient, so the colour sweeps across it as it slides instead of fading through grey. */
+.thumb {
+  position: absolute;
+  z-index: -1;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  width: var(--w, 0px);
+  border-radius: 10px;
+  background: linear-gradient(90deg, #00b3aa 0 33.34%, #8fe3d9 44%, #ffe3c6 56%, #ff8a24 66.66% 100%);
+  background-size: 300% 100%;
+  background-position: 0% 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 6px 16px -8px rgba(0, 128, 122, 0.75);
+  opacity: 0;
+  transform: translateX(var(--x, 0px));
+}
+
+/* a soft highlight on the pill's upper edge, as on the primary button */
+.thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(120% 90% at 30% -30%, rgba(255, 255, 255, 0.5), transparent 55%);
+}
+
+.wrap[data-period='annual'] .thumb {
+  background-position: 100% 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 6px 16px -8px rgba(255, 138, 36, 0.85);
+}
+
+.toggle[data-ready] .thumb {
+  opacity: 1;
+  transition:
+    transform 560ms var(--ease-out),
+    width 560ms var(--ease-out),
+    background-position 560ms var(--ease-out),
+    box-shadow 560ms var(--ease);
 }
 
 .toggle button {
-  min-height: 38px;
-  padding: 0 16px;
-  border-radius: 9px;
+  position: relative;
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 10px;
   color: var(--muted);
   font-size: 14px;
   font-weight: 600;
-  transition:
-    background-color var(--dur-fast) var(--ease),
-    color var(--dur-fast) var(--ease);
+  white-space: nowrap;
+  transition: color 360ms var(--ease);
 }
 
 .toggle button:hover {
@@ -29,9 +78,55 @@
 }
 
 .toggle button[aria-pressed='true'] {
-  background: #ffffff;
-  color: var(--brand-navy);
-  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.35);
+  color: #0f2d3d;
+}
+
+/* before the script measures the pill (or without it), the chosen option is filled itself */
+.toggle:not([data-ready]) button[aria-pressed='true'] {
+  background: #00b3aa;
+}
+
+.wrap[data-period='annual'] .toggle:not([data-ready]) button[aria-pressed='true'] {
+  background: #ff8a24;
+}
+
+.toggle button:focus-visible {
+  outline: 2px solid var(--brand-teal-bright);
+  outline-offset: 2px;
+}
+
+/* the saving reads in the warm accent until annual is chosen */
+.save {
+  color: var(--accent-text);
+  transition: color 360ms var(--ease);
+}
+
+:global(:root[data-theme='dark']) .save {
+  color: #ffb066;
+}
+
+.toggle button[aria-pressed='true'] .save {
+  color: inherit;
+}
+
+@media (max-width: 379.98px) {
+  .toggle button {
+    padding: 0 13px;
+    font-size: 13.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toggle[data-ready] .thumb,
+  .toggle button,
+  .save,
+  .tier,
+  .washTeal,
+  .washWarm,
+  .price,
+  .features li svg {
+    transition: none;
+  }
 }
 
 .tiers {
@@ -50,27 +145,96 @@
 
 .tier {
   position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   gap: 16px;
   padding: clamp(24px, 3vw, 32px);
-  border: 1px solid var(--line);
+  border: 1px solid rgba(0, 179, 170, 0.4);
   border-radius: var(--radius-xl);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--surface) 46%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 18px 40px -30px rgba(0, 128, 122, 0.55);
+  transition:
+    border-color 700ms var(--ease),
+    box-shadow 700ms var(--ease);
 }
 
-/* Recommended tier: light card that stands forward of the glass tiers */
+/* ── The billing period's colour on every card: teal for monthly, tangerine for annual ── */
+.wrap[data-period='annual'] .tier:not(.rec) {
+  border-color: rgba(255, 138, 36, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 18px 40px -30px rgba(214, 104, 14, 0.55);
+}
+
+.light {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.washTeal,
+.washWarm,
+.sweep {
+  position: absolute;
+  inset: 0;
+}
+
+.washTeal,
+.washWarm {
+  transition: opacity 700ms var(--ease);
+}
+
+.washTeal {
+  background:
+    radial-gradient(130% 70% at 100% 0%, rgba(0, 179, 170, 0.17), rgba(0, 179, 170, 0.06) 44%, transparent 74%),
+    linear-gradient(180deg, rgba(0, 179, 170, 0.07), transparent 46%);
+}
+
+.washWarm {
+  background:
+    radial-gradient(130% 70% at 100% 0%, rgba(255, 138, 36, 0.18), rgba(255, 138, 36, 0.07) 44%, transparent 74%),
+    linear-gradient(180deg, rgba(255, 138, 36, 0.08), transparent 46%);
+  opacity: 0;
+}
+
+.wrap[data-period='annual'] .washTeal {
+  opacity: 0;
+}
+
+.wrap[data-period='annual'] .washWarm {
+  opacity: 1;
+}
+
+/* the band of new colour that crosses the card when the period changes (moved by script) */
+.sweep {
+  background: linear-gradient(100deg, transparent 18%, rgba(0, 179, 170, 0.2) 50%, transparent 82%);
+  opacity: 0;
+}
+
+.wrap[data-period='annual'] .sweep {
+  background: linear-gradient(100deg, transparent 18%, rgba(255, 138, 36, 0.22) 50%, transparent 82%);
+}
+
+:global(:root[data-theme='dark']) .tier {
+  background: color-mix(in srgb, var(--surface) 40%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Recommended tier: light card that stands forward of the other tiers. */
 .rec {
   z-index: 1;
   padding-top: calc(clamp(24px, 3vw, 32px) + 30px);
   border-color: transparent;
-  background: radial-gradient(120% 60% at 100% 0%, rgba(0, 179, 170, 0.14), transparent 60%), #ffffff;
+  background: #ffffff;
   box-shadow:
-    0 0 0 1px rgba(94, 224, 214, 0.6),
-    0 40px 90px -30px rgba(0, 0, 0, 0.7);
+    0 0 0 1.5px rgba(0, 179, 170, 0.7),
+    0 40px 90px -30px rgba(0, 96, 92, 0.6);
   --ink: #0f2d3d;
   --text: #3a5361;
   --muted: #5f7783;
@@ -83,8 +247,14 @@
   color: var(--text);
 }
 
+.wrap[data-period='annual'] .rec {
+  box-shadow:
+    0 0 0 1.5px rgba(255, 138, 36, 0.75),
+    0 40px 90px -30px rgba(150, 70, 6, 0.55);
+}
+
 :global(:root[data-theme='dark']) .rec {
-  background: radial-gradient(120% 60% at 100% 0%, rgba(0, 179, 170, 0.2), transparent 60%), #0e1b21;
+  background: #0e1b21;
   --ink: #eef5f7;
   --text: #b8c8ce;
   --muted: #8ba1aa;
@@ -132,8 +302,9 @@
 
 .price {
   padding: 16px 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  border-top: 1px solid rgba(0, 179, 170, 0.28);
+  border-bottom: 1px solid rgba(0, 179, 170, 0.28);
+  transition: border-color 700ms var(--ease);
   color: var(--ink);
   font-family: var(--font-display);
   font-size: 1.75rem;
@@ -169,9 +340,26 @@
   line-height: 1.45;
 }
 
+.wrap[data-period='annual'] .price {
+  border-color: rgba(255, 138, 36, 0.32);
+}
+
 .features li svg {
   margin-top: 2px;
-  color: var(--success);
+  color: #00958d;
+  transition: color 700ms var(--ease);
+}
+
+.wrap[data-period='annual'] .features li:not(.no) svg {
+  color: #d0650f;
+}
+
+:global(:root[data-theme='dark']) .features li:not(.no) svg {
+  color: #4cd0c4;
+}
+
+:global(:root[data-theme='dark']) .wrap[data-period='annual'] .features li:not(.no) svg {
+  color: #ffb066;
 }
 
 .features li.no {

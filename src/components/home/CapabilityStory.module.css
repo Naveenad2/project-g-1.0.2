@@ -90,6 +90,17 @@
   }
 }
 
+/* Phones and tablets: the scroll itself moves the copy (see CapabilityStory), so it has no timed fades */
+.story[data-scrub] .panel,
+.story[data-scrub] .panel.on {
+  opacity: 1;
+  transition: none;
+}
+
+.story[data-scrub] .panel.on > * {
+  animation: none;
+}
+
 .introPanel :global(.section-head) {
   margin: 0;
 }

@@ -18,6 +18,16 @@ const SUMMARY =
 const DESKTOP = '(min-width: 1024px)';
 /** Scroll length in chapters: the opening shot (1), the ten capabilities, and a short hold at the end. */
 const SPAN = N + 1.4;
+/** Phones and tablets: the copy changes with the scroll itself, so scrolling back plays it in reverse. */
+const SCRUB = '(max-width: 1023.98px), (hover: none)';
+/** Where in its chapter (in chapters) a panel rises in and where it leaves, and how far it travels. */
+const ENTER = [-0.02, 0.12] as const;
+const EXIT = [0.86, 1] as const;
+const RISE = 26;
+/** How quickly the copy follows the scroll; the same rate as the scene's camera, so the two move together. */
+const RATE = 7.5;
+const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
+const easeInOut = (x: number) => x * x * (3 - 2 * x);
 
 type Align = 'above' | 'below' | 'left' | 'right';
 
@@ -75,7 +85,9 @@ const LABELS: [string, number, string, Align?][] = [
  * takes you to any capability, with the camera flying straight there.
  *
  * Desktop: copy on the left, the scene in its own column on the right, the index along the foot.
- * Phones and tablets: the scene on top, the index under it, then the copy, all within one screen.
+ * Phones and tablets: the scene on top, the index under it, then the copy, all within one screen. There the
+ * copy moves with the scroll: each panel rises in as its chapter begins and lifts away as it ends, eased
+ * at the camera's rate, so both play backwards when you scroll back up.
  * Nothing is masked over the live canvas (its edges fade inside WebGL), so scrolling stays flicker-free.
  */
 export function CapabilityStory({ intro, backdrop }: { intro?: ReactNode; backdrop?: ReactNode }) {
@@ -88,6 +100,7 @@ export function CapabilityStory({ intro, backdrop }: { intro?: ReactNode; backdr
   const fillRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const handleRef = useRef<StoryHandle | null>(null);
   const progressRef = useRef(-1);
+  const jumpRef = useRef(false);
   const [active, setActive] = useState(-1);
   const [ready, setReady] = useState(false);
 
@@ -161,15 +174,133 @@ export function CapabilityStory({ intro, backdrop }: { intro?: ReactNode; backdr
   useEffect(() => {
     const story = storyRef.current;
     if (!story) return;
-    const apply = (p: number) => {
-      const t = -1 + p * SPAN;
-      progressRef.current = t;
-      handleRef.current?.setProgress(t);
-      setActive(t < 0 ? -1 : Math.min(N - 1, Math.floor(t)));
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const scrubQuery = window.matchMedia(SCRUB);
+    let scrub = false;
+    let target = -1;
+    let cur = -1;
+    let shown = Number.NaN;
+    let raf = 0;
+    let last = 0;
+    const written = new Map<HTMLElement, string>();
+
+    const fill = (t: number) =>
       fillRefs.current.forEach((f, i) => {
-        if (f) f.style.transform = `scaleX(${Math.min(1, Math.max(0, t - i))})`;
+        if (f) f.style.transform = `scaleX(${clamp01(t - i)})`;
+      });
+
+    /** Phones and tablets: every panel's place in its own rise-and-leave, at story position t. Lines of a
+        panel follow one another a little. Only panels on show keep their layers; the rest are let go. */
+    const paint = (t: number) => {
+      for (let k = -1; k < N; k++) {
+        const panel = panelRefs.current[k < 0 ? N : k];
+        if (!panel) continue;
+        const x = t - k;
+        const kids = Array.from(panel.children) as HTMLElement[];
+        const vals = kids.map((_, j) => {
+          // the opening view is there from the start; the last capability stays to the end
+          const e = k < 0 ? 1 : easeInOut(clamp01((x - ENTER[0] - j * 0.014) / (ENTER[1] - ENTER[0])));
+          const q = k === N - 1 ? 0 : easeInOut(clamp01((x - EXIT[0] - j * 0.01) / (EXIT[1] - EXIT[0])));
+          return [Math.round(e * (1 - q) * 1000) / 1000, Math.round(((1 - e) * RISE - q * RISE) * 10) / 10];
+        });
+        const seen = vals.some(([o]) => o > 0);
+        kids.forEach((el, j) => {
+          const [o, y] = vals[j];
+          const key = seen ? `${o}|${y}` : 'off';
+          if (written.get(el) === key) return;
+          written.set(el, key);
+          el.style.opacity = seen ? `${o}` : '0';
+          el.style.transform = seen ? `translate3d(0, ${y}px, 0)` : '';
+        });
+        const vis = seen ? 'visible' : 'hidden';
+        if (panel.style.visibility !== vis) panel.style.visibility = vis;
+      }
+      fill(t);
+    };
+
+    const clear = () => {
+      written.clear();
+      panelRefs.current.forEach((panel) => {
+        if (!panel) return;
+        panel.style.visibility = '';
+        Array.from(panel.children).forEach((child) => {
+          (child as HTMLElement).style.opacity = '';
+          (child as HTMLElement).style.transform = '';
+        });
       });
     };
+
+    // the copy eases after the scroll at the camera's own rate, frame-rate independent
+    const tick = (ms: number) => {
+      const dt = Math.min(0.05, Math.max(0, (ms - last) / 1000));
+      last = ms;
+      cur += (target - cur) * (1 - Math.exp(-dt * RATE));
+      if (Math.abs(target - cur) < 0.0005) cur = target;
+      if (cur !== shown) {
+        shown = cur;
+        paint(cur);
+      }
+      raf = cur === target ? 0 : requestAnimationFrame(tick);
+    };
+
+    /** A tap on the index: the copy is there at once and rises in, while the camera flies. */
+    const riseIn = (t: number) => {
+      const panel = panelRefs.current[t < 0 ? N : Math.min(N - 1, Math.floor(t))];
+      if (!panel) return;
+      Array.from(panel.children).forEach((child, j) =>
+        (child as HTMLElement).animate(
+          [
+            { opacity: 0, transform: `translate3d(0, ${RISE}px, 0)` },
+            { opacity: 1, transform: 'translate3d(0, 0, 0)' },
+          ],
+          { duration: 820, delay: j * 70, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'backwards' },
+        ),
+      );
+    };
+
+    const apply = (p: number) => {
+      const t = -1 + p * SPAN;
+      const jump = jumpRef.current;
+      jumpRef.current = false;
+      progressRef.current = t;
+      handleRef.current?.setProgress(t, jump);
+      setActive(t < 0 ? -1 : Math.min(N - 1, Math.floor(t)));
+      target = t;
+      if (!scrub) {
+        fill(t);
+        return;
+      }
+      if (jump || Number.isNaN(shown)) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+        cur = shown = t;
+        paint(t);
+        if (jump) riseIn(t);
+        return;
+      }
+      if (!raf) {
+        last = performance.now();
+        raf = requestAnimationFrame(tick);
+      }
+    };
+
+    const setMode = () => {
+      const next = !reduced && scrubQuery.matches;
+      if (next === scrub) return;
+      scrub = next;
+      cancelAnimationFrame(raf);
+      raf = 0;
+      shown = Number.NaN;
+      if (scrub) {
+        story.dataset.scrub = '';
+        cur = target;
+        apply(progressRef.current < -1 ? 0 : (progressRef.current + 1) / SPAN);
+      } else {
+        delete story.dataset.scrub;
+        clear();
+      }
+    };
+
     // Pinning starts once the script runs; before that (or without it) the story is plain text in flow.
     story.dataset.live = '';
     const st = ScrollTrigger.create({
@@ -179,10 +310,16 @@ export function CapabilityStory({ intro, backdrop }: { intro?: ReactNode; backdr
       onUpdate: (self) => apply(self.progress),
       onRefresh: (self) => apply(self.progress),
     });
+    setMode();
+    scrubQuery.addEventListener('change', setMode);
     ScrollTrigger.refresh();
     return () => {
       st.kill();
+      cancelAnimationFrame(raf);
+      scrubQuery.removeEventListener('change', setMode);
+      clear();
       delete story.dataset.live;
+      delete story.dataset.scrub;
     };
   }, []);
 
@@ -221,6 +358,9 @@ export function CapabilityStory({ intro, backdrop }: { intro?: ReactNode; backdr
     if (!story) return;
     const distance = story.offsetHeight - window.innerHeight;
     const y = story.getBoundingClientRect().top + window.scrollY + ((i + 1.45) / SPAN) * distance;
+    // the scroll update this causes is a jump, not a swipe (and the mark lapses if the page was already there)
+    jumpRef.current = true;
+    window.setTimeout(() => (jumpRef.current = false), 160);
     const lenis = scrollState.lenis;
     if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
     else window.scrollTo({ top: y, behavior: 'instant' });

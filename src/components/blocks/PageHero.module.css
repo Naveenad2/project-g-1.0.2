@@ -125,64 +125,6 @@
   margin-top: 20px;
 }
 
-/* The earth. Phones and small tablets: it rises from the foot of the hero, under the copy. */
-.withArt {
-  display: flex;
-  flex-direction: column;
-  padding-bottom: 0;
-}
-
-.withArt .grid {
-  order: 1;
-}
-
-.withArt .after {
-  order: 2;
-}
-
-.art {
-  position: relative;
-  z-index: 0;
-  order: 3;
-  height: clamp(200px, 58vw, 420px);
-  margin-top: clamp(24px, 6vw, 48px);
-  pointer-events: none;
-}
-
-.artEarth {
-  --size: min(150vw, 980px);
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: var(--size);
-  aspect-ratio: 1;
-  margin-left: calc(var(--size) / -2);
-}
-
-/* Tablets and up: the earth sits to the right of the copy */
-@media (min-width: 900px) {
-  .withArt {
-    display: block;
-    padding-bottom: clamp(80px, 9vw, 140px);
-  }
-  .withArt .copy {
-    max-width: min(60%, 760px);
-  }
-  .art {
-    position: absolute;
-    inset: 0;
-    height: auto;
-    margin: 0;
-  }
-  .artEarth {
-    --size: clamp(560px, 54vw, 880px);
-    top: calc(50% - var(--size) / 2 + var(--header-space) / 2);
-    left: auto;
-    right: max(-14vw, -220px);
-    margin: 0;
-  }
-}
-
 @media (min-width: 1024px) {
   .split .grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);

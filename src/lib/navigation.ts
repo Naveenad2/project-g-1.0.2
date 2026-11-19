@@ -43,15 +43,6 @@ export const solutionGroups: NavGroup[] = [
       { label: 'Internal audit teams', href: routes.solAudit },
     ],
   },
-  {
-    heading: 'By industry',
-    links: [
-      { label: 'Financial services', href: routes.solFinancial },
-      { label: 'Insurance', href: routes.solInsurance },
-      { label: 'Healthcare', href: routes.solHealthcare },
-      { label: 'Public sector', href: routes.solPublic },
-    ],
-  },
 ];
 
 export const resourceLinks: NavLink[] = [
@@ -89,10 +80,6 @@ export const footerColumns: NavGroup[] = [
       { label: 'Compliance officers', href: routes.solCompliance },
       { label: 'Consultants', href: routes.solConsultants },
       { label: 'Internal audit', href: routes.solAudit },
-      { label: 'Financial services', href: routes.solFinancial },
-      { label: 'Insurance', href: routes.solInsurance },
-      { label: 'Healthcare', href: routes.solHealthcare },
-      { label: 'Public sector', href: routes.solPublic },
     ],
   },
   {

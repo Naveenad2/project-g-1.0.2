@@ -19,7 +19,7 @@ Requires Node 20.9 or newer.
 
 `npm run dev` prints a **Network** address (for example `http://192.168.1.10:3000`); open that on a device on the
 same Wi-Fi. Next.js blocks its dev resources for any host other than `localhost` unless the host is listed in
-`allowedDevOrigins`. Without it, live reload and the on-demand chunks (the globe, the 3D story) fail on the device.
+`allowedDevOrigins`. Without it, live reload and the on-demand chunk for the 3D story fail on the device.
 `next.config.ts` adds this machine's own network addresses automatically, so restart `npm run dev` after it changes
 or when you join a different network. Development mode is unoptimised, so judge smoothness on a production build:
 `npm run build && npm start`, then open the printed network address.
@@ -52,42 +52,33 @@ paint, so there is no flash. All colours are tokens in `src/styles/tokens.css`, 
 - **Palette:** Gieom.cloud Tangerine & Teal. Tangerine `#FF8A24` for primary calls to action, with navy text; teal
   `#00B3AA` for the secondary action and shapes; deep teal `#00807A` for links; navy `#0F2D3D` for headings, body copy
   and dark bands; mint `#EDF9F6` for section backgrounds; and off-white `#FDFDFD` for the page. The tangerine-to-teal
-  signature gradient is kept for accents (globe arcs, progress lines). Every value is a token in `tokens.css`. Dark mode
+  signature gradient is kept for accents (the week story's thread, progress lines, the pricing switch). Every value is a token in `tokens.css`. Dark mode
   is a navy theme, not black.
-- **Surfaces:** the page is off-white with a fine film grain. Heroes are full-width light gradients with rounded lower
+- **Surfaces:** the page is off-white with a very fine film grain, kept faint. Heroes are full-width light gradients with rounded lower
   corners. Mint bands (`.section--mint`) fade in and out at their edges. Navy bands (`.section--deep`), the closing
   call to action and the footer are inset rounded panels with an animated field. Dark panels use the `is-dark` token
   set, and light islands inside them (forms, product windows) use `is-light`.
 - **Gradients:** `GradientBg` layers five soft radial lights (tangerine, teal, white, peach, aqua) that drift on long,
-  offset loops, and adds a static grain. Only `transform` animates, on the compositor, so it never repaints or
+  offset loops, and adds a light static grain (kept low, with the colour a touch richer). Only `transform` animates, on the compositor, so it never repaints or
   flickers. Variants: `hero`, `soft`, `deep`, `cta` and `vivid`. It is static under reduced motion.
-- **The earth:** `Globe` (`src/components/globe`) is a three.js scene drawn as a porcelain sphere with a faint
-  graticule. Land is drawn as fine coastline outlines only, kept light so the copy beside it stays the focus. The
-  outlines come from Natural Earth's 1:110m land data (public domain), packed into `coastlines.ts`. Each one is a
-  continuous ribbon about 1 CSS pixel wide on any screen. Country borders are left out on purpose, because several
-  near the hubs are disputed. Arcs in the signature gradient link the regulators the site names: RBI, SEBI, IRDAI,
-  CBUAE, ADGM, DFSA, SAMA, CBB, QFCRA and FATF. The scene also has pulsing hubs, travelling light, two dotted orbits
-  and an atmosphere halo. It loads only when it nears the viewport, renders only while it is visible and the tab is
-  active, and fades in on its first frame. Framings: `art` (inner heroes without a product visual), and `hero` and
-  `horizon` (a giant and a low, wide view, not used at present). A parent can set `--globe-fade: <start> <end>` (fractions
-  of the canvas height) to fade the drawing out towards its foot. The fade is done inside the canvas, not with a CSS
-  mask, which flickers over a live canvas on phones.
+- **Inner heroes (`PageHero`):** the copy on the full-width gradient, with a product visual beside it where a page
+  has one. No hero on the site uses an earth or any other 3D art.
 - **Home hero:** a full-width gradient panel with rounded lower corners, like the inner heroes, with the original
   type sizes. Following the design team's note to keep it light on text, it holds only the headline, one sentence
   and the two actions, beside the widget board, with the regulators band along its foot. The next section follows in
   normal flow, so nothing slides over anything. With a mouse, the copy and the board lift as the hero scrolls away;
   touch screens keep native scrolling with nothing moving against it. On phones and tablets the board sits between
-  the actions and the sentence, as the earth used to.
+  the actions and the sentence.
 - **Widget board (`ImpactMap`):** the hero's visual: the idea of the impact map in Gieom's design, built as a board
-  of liquid-glass widgets with product content from the rest of the site.
+  of glass widgets with product content from the rest of the site.
   - **The story:** a new circular (CBUAE Circular 1/2026) drops into the regulations feed above two already mapped.
     A light reads down the impact map, light lines run into the three policies it hits ("Update"), and the owners
     are notified. Michael Torres approves, the acknowledgement ring fills as the readers count up to 1,240 of 1,300,
     and linkage coverage (AML-POL-0115) fills beside.
-  - **The glass:** clear and saturated rather than frosted (a light backdrop blur with strong saturation), with a
-    bright lensed rim, an inner glow, a light that follows the pointer and a slow sheen crossing each pane in turn.
-    Behind it sit a fine drafting grid and two soft lights for the glass to catch. Touch screens get the same look
-    without backdrop blur or pointer effects, which keeps scrolling there free of flicker.
+  - **The glass:** kept calm: a mostly solid light fill over a slight backdrop blur, a soft rim, a faint inner glow
+    and a gentle light that follows the pointer. Behind it sit a fine drafting grid and two soft lights. Touch
+    screens get the same look without backdrop blur or pointer effects, which keeps scrolling there free of
+    flicker.
   - **Sharp text:** every widget is real text on flat layers, never 3D, scaled or rotated. Depth comes from the
     glass, shadows, a slow float and three layers that drift apart with the pointer (2D translation only).
     Annotations are plain text, never chips.
@@ -106,15 +97,19 @@ paint, so there is no flash. All colours are tokens in `src/styles/tokens.css`, 
   "A new circular lands on Friday evening" to "Thursday arrives and the auditor asks for proof". Each pairs the copy
   with a live product demo (`CoverageDemo`, `DraftDemo`, `GovernDemo`, `SopDemo` and `ProofDemo`, where the auditor's
   questions are answered one click each).
+  - **The heading:** the section opens with one main heading block: the title, the sentence under it and the
+    section's two calls to action (Book a demo, Start free trial), which appear here only, not in each chapter.
+    It is centred over the thread on desktop and aligned to the thread's rail on phones and tablets, where the
+    buttons stack at full width on narrow screens.
   - **The thread:** an SVG thread runs through the week (a faint dotted route, the drawn line in the tangerine-to-teal
-    gradient, a soft glow and a bright head). Each chapter's node catches light, with a small burst, when the
-    thread reaches it.
+    gradient, a soft glow and a bright head), starting from a point of light under the heading's buttons. Each
+    chapter's node catches light, with a small burst, when the thread reaches it.
   - **Desktop:** copy and demo alternate either side, and the thread weaves between them. It draws itself under the
     reading line as you scroll, with its head following the eye. The chapter being read is fully lit, with the
     light of its day behind its demo, and the others rest a little back. Demos drift with a light parallax.
   - **Phones and tablets:** one column with the thread down the left, and the demos at full width. The thread
     travels on to each chapter as you reach it, as a timed move rather than one tied to the scroll.
-  - **Arrival:** each title rises in word by word, the answer, body and buttons follow, the list rules draw, and
+  - **Arrival:** each title rises in word by word, the answer and body follow, the list rules draw, and
     the demo slides in from its side. Every arrival plays once. Chapters already on screen are never hidden, and
     with reduced motion or without scripts everything is simply there.
   - **Steady height:** a playing demo never changes the page's height, so nothing below it (the pinned 3D story
@@ -135,6 +130,11 @@ paint, so there is no flash. All colours are tokens in `src/styles/tokens.css`, 
   - **Desktop:** copy on the left, the scene in its own column on the right, the index of names along the foot.
   - **Phones and tablets:** the scene on top, the index under it as one tappable segment per capability with a
     count, then the copy, all within one screen. Nothing scrolls sideways.
+  - **Moves with the scroll on touch:** on phones and tablets (and any narrow window) the copy is moved by the
+    scroll itself rather than by timed fades. Each capability's copy rises in, line by line, as its chapter begins
+    and lifts away as it ends, eased at the camera's own rate, so the copy and the scene move together and play
+    backwards when you scroll back up. Only a tap on the index makes the camera fly; a fast swipe always moves
+    through the story with the finger. Desktop keeps the copy changing in place with a short rise.
   - **Steady copy:** every chapter's copy starts at the same line, so the title never jumps as the chapter
     changes. Copy that would not fit its space on a short screen is set slightly smaller, chapter by chapter
     (`--fit`), and the line above the title keeps its size.
@@ -153,7 +153,8 @@ paint, so there is no flash. All colours are tokens in `src/styles/tokens.css`, 
   - **How it is built:** every model is a few merged meshes built from flat outlines (`Geo`), coloured by role from
     one palette uniform, so a theme switch is a single uniform update. Connectors are constant-width screen-space
     lines (`Lines`) that draw in, carry a travelling highlight and the Impact Analyser's wave. Quality adapts: if
-    frames run long, the scene renders fewer pixels. The original illustration labels are plain HTML annotations
+    frames run long, the scene renders fewer pixels, and it redraws at once after any resize so the canvas
+    never shows a blank frame. The original illustration labels are plain HTML annotations
     projected beside the objects, never in boxes.
 - **Motion:** `MotionProvider` runs Lenis smooth scrolling on GSAP's ticker. On every route it reveals `.reveal`
   blocks with staggered fades and section headings line by line (SplitText, reverted afterwards). Only content that
@@ -167,19 +168,27 @@ paint, so there is no flash. All colours are tokens in `src/styles/tokens.css`, 
   `<html data-scroll-behavior="smooth">` lets Next.js switch CSS smooth scrolling off during route changes.
 - **Sharp text by rule:** nothing that contains text is rotated, scaled or put in perspective. Motion on text is
   translate and opacity only, cleared when it ends.
-- **Liquid glass:** cards, the secondary button, the header, the demo window and the replay control share the
-  `--glass-*` tokens. These give a translucent fill with a specular sheen, a bright rim, a soft teal inner glow and a
-  navy shadow. Real backdrop blur is kept to the few surfaces with detail behind them, so scrolling stays light on
-  phones.
+- **Glass, kept calm:** cards, the secondary button, the header, the demo window and the replay control share the
+  `--glass-*` tokens: a mostly solid light fill, a soft top highlight, a quiet rim, a faint teal inner glow and a
+  navy shadow, with a light blur and little added saturation. Real backdrop blur is kept to the few surfaces with
+  detail behind them, so scrolling stays light on phones.
+- **Pricing switch (`PricingTiers`):** a pill slides under the chosen billing period and turns from teal (monthly)
+  to tangerine (annual) along the brand gradient, so the colour sweeps across it as it moves. The three cards follow
+  it: a band of the new colour crosses each card in turn (the way the pill moved), each card settles, and its light,
+  rim, price rules and ticks turn teal or tangerine; the prices roll over to the new period. Without script the
+  chosen option is simply filled, and with reduced motion the colours change at once.
+- **Navigation:** the Solutions menu lists the three roles. The four industry pages are still built, but nothing in
+  the menu or footer links to them.
 - **Phones and tablets (touch screens):** built to avoid the usual causes of mobile flicker.
   - Gradients stay still.
   - Only the header bar keeps a backdrop blur.
-  - Nothing masks a live WebGL canvas or the regulators marquee. The home earth fades out inside its own canvas,
-    the regulators marquee simply runs off the screen edges, and soft overlays do the other fades.
-  - Scrolling is native: Lenis is off, and there are no scroll-linked reveals, parallax or text movement.
+  - Nothing masks a live WebGL canvas or the regulators marquee. The 3D story fades its edges inside its own
+    canvas, the regulators marquee simply runs off the screen edges, and soft overlays do the other fades.
+  - Scrolling is native: Lenis is off, and there are no scroll-linked reveals or parallax. The one scroll-linked
+    motion is the copy of the pinned 3D story, which moves inside a screen that is itself holding still.
   - The week story's thread moves chapter to chapter, never with the scroll position.
   - The page transition is a plain fade.
-  - The globe canvases keep their drawing buffer within a pixel budget phones and tablets will allocate.
+  - The 3D story's canvas keeps its drawing buffer within a pixel budget phones and tablets will allocate.
 - **No template tropes:** no icons in tinted squares, no status pills with dots, no numbered step badges, no glass
   kicker pills and no gradient text. Lists use a short teal rule.
 - **Interaction:** `SpotlightController` lights `[data-spotlight]` cards under the cursor with one delegated listener.
@@ -194,7 +203,7 @@ src/
     (site)/                  Pages that share the header and footer
       page.tsx               Home
       products/*             Six product pages
-      solutions/*            Seven solution pages (role + industry)
+      solutions/*            Seven solution pages (three roles linked; four industry pages built but unlinked)
       about, customers, partners, careers, blog, guides, webinars, help, glossary,
       pricing, trust, contact, demo, trial, status, privacy, terms, dpa
     login/                   Sign-in (own split layout)
@@ -202,7 +211,6 @@ src/
   components/
     layout/                  Header (floating bar, mega menu, drawer), Footer, ThemeToggle, SpotlightController
     motion/                  MotionProvider (Lenis + GSAP reveals, scroll position when pages change)
-    globe/                   Globe (React wrapper), scene (three.js), coastlines (encoded land outlines)
     blocks/                  PageHero, ProblemGrid, FeatureStep, Tiles, CtaBand, Timeline, Faq,
                              IndustryPage template, LegalLayout
     home/                    HomeHero, ImpactMap (widget board), WeekStory, CapabilityStory,

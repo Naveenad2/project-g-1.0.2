@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import type { CSSProperties, ReactNode } from 'react';
-import { Globe } from '@/components/globe/Globe';
 import { GradientBg } from '@/components/ui/GradientBg';
 import { Rise } from '@/components/ui/Rise';
 import { Showcase } from '@/components/ui/Showcase';
@@ -20,8 +19,6 @@ interface PageHeroProps {
   caption?: ReactNode;
   /** Present the visual without the glass plate. */
   flatVisual?: boolean;
-  /** Show the earth beside heroes that have no visual (tablet and up). */
-  art?: boolean;
   /** Narrow the heading measure on single-column heroes. */
   titleWidth?: 'narrow' | 'medium' | 'wide';
   tone?: 'mint' | 'peach' | 'plain';
@@ -41,29 +38,16 @@ export function PageHero({
   visual,
   caption,
   flatVisual,
-  art = true,
   titleWidth = 'medium',
   tone = 'mint',
   compact,
   children,
 }: PageHeroProps) {
   const split = Boolean(visual);
-  const showArt = !visual && art;
   return (
     <section className={styles.hero}>
-      <div
-        className={[styles.panel, compact ? styles.compact : '', split ? styles.split : '', showArt ? styles.withArt : '']
-          .filter(Boolean)
-          .join(' ')}
-      >
+      <div className={[styles.panel, compact ? styles.compact : '', split ? styles.split : ''].filter(Boolean).join(' ')}>
         <GradientBg variant="hero" warm={tone === 'peach'} horizon />
-        {showArt && (
-          <div className={styles.art}>
-            <div className={styles.artEarth} data-parallax="0.06">
-              <Globe variant="art" />
-            </div>
-          </div>
-        )}
         <div className={`container ${styles.grid}`}>
           <div className={styles.copy}>
             {crumb && (

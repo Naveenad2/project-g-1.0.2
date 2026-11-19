@@ -3,9 +3,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Fragment, useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
-import { ButtonLink } from '@/components/ui/ButtonLink';
 import { Showcase } from '@/components/ui/Showcase';
-import { routes } from '@/lib/routes';
 import s from './WeekStory.module.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -26,9 +24,10 @@ const vars = (v: Record<string, number | string>) => v as CSSProperties;
 const GLOW = ['255, 138, 36', '255, 160, 92', '120, 200, 170', '40, 190, 178', '0, 179, 170'];
 
 /**
- * "Every compliance week tells the same story": five moments from the circular to the auditor.
+ * "Every compliance week tells the same story": five moments from the circular to the auditor, under one
+ * heading that carries the section's two calls to action.
  *
- * A thread runs through the week. On desktop it weaves between the chapters (copy and live demo alternate
+ * A thread runs through the week, starting from a point under the heading's buttons. On desktop it weaves between the chapters (copy and live demo alternate
  * either side) and draws itself under the reading line as you scroll, its glowing head following your eye;
  * on phones and tablets it runs down the left and travels on to each chapter as you reach it. Each node
  * catches light when the thread arrives. Titles rise in word by word, the list rules draw, the demo slides
@@ -37,8 +36,19 @@ const GLOW = ['255, 138, 36', '255, 160, 92', '120, 200, 170', '40, 190, 178', '
  * Scroll-linked motion is kept to desktop pointers; touch screens get one-shot transitions only. Chapters
  * already on screen are never hidden, and with reduced motion or without scripts everything is simply there.
  */
-export function WeekStory({ chapters }: { chapters: WeekChapter[] }) {
+export function WeekStory({
+  title,
+  lede,
+  actions,
+  chapters,
+}: {
+  title: string;
+  lede: string;
+  actions: ReactNode;
+  chapters: WeekChapter[];
+}) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const originRef = useRef<HTMLSpanElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const drawRef = useRef<SVGPathElement>(null);
@@ -56,7 +66,8 @@ export function WeekStory({ chapters }: { chapters: WeekChapter[] }) {
     const glow = glowRef.current;
     const grad = gradRef.current;
     const head = headRef.current;
-    if (!root || !svg || !path || !draw || !glow || !grad || !head) return;
+    const origin = originRef.current;
+    if (!root || !svg || !path || !draw || !glow || !grad || !head || !origin) return;
     const items = itemRefs.current.filter((li): li is HTMLLIElement => li !== null);
     const nodes = nodeRefs.current.filter((n): n is HTMLSpanElement => n !== null);
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -118,8 +129,10 @@ export function WeekStory({ chapters }: { chapters: WeekChapter[] }) {
       if (!pts.length) return;
       // a weave on desktop, a straight run down the left on phones and tablets
       const swing = w >= 1024 ? Math.min(72, w * 0.05) : 0;
-      const lead = Math.min(150, pts[0].y);
-      let d = `M ${pts[0].x} ${pts[0].y - lead} L ${pts[0].x} ${pts[0].y}`;
+      // the thread starts at the point under the heading's buttons
+      const ox = origin.offsetLeft + origin.offsetWidth / 2;
+      const oy = origin.offsetTop + origin.offsetHeight / 2;
+      let d = `M ${ox} ${oy} L ${pts[0].x} ${pts[0].y}`;
       for (let i = 1; i < pts.length; i++) {
         const a = pts[i - 1];
         const b = pts[i];
@@ -128,7 +141,7 @@ export function WeekStory({ chapters }: { chapters: WeekChapter[] }) {
         d += ` C ${a.x + side * swing} ${a.y + dy * 0.36} ${b.x + side * swing} ${b.y - dy * 0.36} ${b.x} ${b.y}`;
       }
       for (const el of [path, draw, glow]) el.setAttribute('d', d);
-      grad.setAttribute('y1', `${pts[0].y - lead}`);
+      grad.setAttribute('y1', `${oy}`);
       grad.setAttribute('y2', `${pts[pts.length - 1].y}`);
       total = Math.max(1, path.getTotalLength());
       step = Math.max(2, total / 1400);
@@ -241,6 +254,15 @@ export function WeekStory({ chapters }: { chapters: WeekChapter[] }) {
 
   return (
     <div ref={rootRef} className={s.story}>
+      <div className={s.intro}>
+        <h2 className={s.heading} data-split="">
+          {title}
+        </h2>
+        <p className={`lede reveal ${s.introLede}`}>{lede}</p>
+        <div className={`actions reveal ${s.introActions}`}>{actions}</div>
+      </div>
+      <span ref={originRef} className={s.origin} aria-hidden="true" />
+
       <svg ref={svgRef} className={s.thread} aria-hidden="true" focusable="false">
         <defs>
           <linearGradient ref={gradRef} id="week-thread" gradientUnits="userSpaceOnUse" x1="0" x2="0" y1="0" y2="1">
@@ -300,14 +322,6 @@ export function WeekStory({ chapters }: { chapters: WeekChapter[] }) {
                     </li>
                   ))}
                 </ul>
-                <div className={`actions ${s.actions}`} style={vars({ '--i': 7 })}>
-                  <ButtonLink href={routes.demo} arrow>
-                    Book a demo
-                  </ButtonLink>
-                  <ButtonLink href={routes.trial} variant="secondary">
-                    Start free trial
-                  </ButtonLink>
-                </div>
               </div>
               <div className={s.visual}>
                 <div className={s.drift} data-parallax="0.04">
