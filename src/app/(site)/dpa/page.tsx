@@ -28,7 +28,6 @@ export default function DpaPage() {
     <>
       <PageHero
         compact
-        crumb="Legal · DPA"
         eyebrow="Legal"
         title="Data processing agreement and sub-processors"
         lede={

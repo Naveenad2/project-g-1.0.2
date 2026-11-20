@@ -20,7 +20,6 @@ export default function BlogPage() {
     <>
       <PageHero
         compact
-        crumb="Resources · Blog"
         eyebrow="Blog"
         title="Regulatory news, product updates and GRC commentary."
         lede="Written for compliance officers and the consultants who serve them. No press releases."

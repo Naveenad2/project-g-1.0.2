@@ -29,7 +29,6 @@ export default function ReportingPage() {
   return (
     <>
       <PageHero
-        crumb="Product"
         eyebrow="Reporting & dashboards"
         title="Board reporting without the slide-building."
         lede="A configurable dashboard for every role, a report designer that works on platform data, and an execution history across every process. The numbers come from the registers and workflows themselves so that they are current the moment you open them."

@@ -56,7 +56,6 @@ export default function ComplianceOfficersPage() {
   return (
     <>
       <PageHero
-        crumb="Solutions · By role"
         eyebrow="For compliance officers"
         title={<>Answer the auditor&apos;s &ldquo;show me&rdquo; with one click.</>}
         lede="You own dozens of policies across several regulators and you have to justify every purchase internally. Gieom.cloud gives you the one thing a shared drive never will: proof. Which policy, which version, who approved it, who read it, which rule it satisfies."

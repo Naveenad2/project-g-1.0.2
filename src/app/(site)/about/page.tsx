@@ -18,7 +18,6 @@ export default function AboutPage() {
   return (
     <>
       <PageHero
-        crumb="Company · About"
         eyebrow="About Gieom"
         title="We build the systems regulated organisations run their governance on."
         titleWidth="wide"

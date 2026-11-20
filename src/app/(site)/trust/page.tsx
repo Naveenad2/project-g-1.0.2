@@ -1,12 +1,11 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { PageHero } from '@/components/blocks/PageHero';
 import { Tiles } from '@/components/blocks/Tiles';
 import { Field, FormCard, Input, Select, Textarea } from '@/components/forms/Field';
 import { StaticForm } from '@/components/forms/StaticForm';
 import { Table, Tr, mockStyles as m } from '@/components/mocks/primitives';
 import { ArrowLink } from '@/components/ui/ButtonLink';
-import { Ph, Section, SectionHeader, SectionLabel } from '@/components/ui/Section';
+import { Section, SectionHeader, SectionLabel } from '@/components/ui/Section';
 import { routes } from '@/lib/routes';
 import styles from '@/styles/page.module.css';
 import t from './trust.module.css';
@@ -14,7 +13,7 @@ import t from './trust.module.css';
 export const metadata: Metadata = {
   title: 'Trust and security',
   description:
-    'Security held to the standard of a bank. Certifications, data handling, access control, availability, sub-processors and the DPA.',
+    'How Gieom.cloud protects your data: certifications, data handling, access control, availability, sub-processors and the DPA.',
 };
 
 const toc = [
@@ -27,30 +26,26 @@ const toc = [
 ];
 
 const kv: [string, React.ReactNode][] = [
-  [
-    'Single sign-on',
-    'SAML 2.0 and OIDC with your identity provider (Microsoft Entra ID, Okta, Google Workspace and others). Enforced SSO available per tenant.',
-  ],
-  ['Multi-factor authentication', 'Enforced through your identity provider, or natively for accounts without SSO.'],
-  ['Role-based access', 'Roles at tenant, workspace, document and workflow-step level, including read-only roles for audit.'],
+  ['Single sign-on (planned)', 'Sign-in through your own identity provider using SAML 2.0 or OIDC is on our roadmap.'],
+  ['Password security', 'Passwords are stored using industry-standard adaptive hashing.'],
+  ['Role-based access', 'Permissions are checked on the server for every action, including read-only roles for audit.'],
   [
     'Audit logs',
-    <>
-      Every create, read, update, approval and export is logged with actor, time and source. Logs are retained for <Ph>[period]</Ph> and
-      exportable to your SIEM.
-    </>,
+    'Changes, approvals and exports are logged with user, time and source. Audit records are kept for the life of your subscription and can be exported on request.',
   ],
-  ['Session controls', 'Configurable session timeouts and concurrent-session limits.'],
-  ['Internal access', 'Gieom staff access to customer data is restricted, logged, and granted only for support with your approval.'],
+  ['Session controls', 'Sessions expire after a period of inactivity, and each user can have only one active session at a time.'],
+  [
+    'Internal access',
+    'Access to production by Gieom staff is limited to named administrators, logged, and used only to operate and support the service.',
+  ],
 ];
 
 export default function TrustPage() {
   return (
     <>
       <PageHero
-        crumb="Trust & Security"
         eyebrow="Trust & Security"
-        title="Security held to the standard of a bank."
+        title="Security built for risk and compliance teams."
         titleWidth="wide"
         lede="This page is written to stand alone. Forward it to your IT security team, your legal counsel or your client's compliance officer, and it should answer “is this safe to put our risk data in” without the rest of the site."
         extra={
@@ -71,36 +66,18 @@ export default function TrustPage() {
           lede="Reports are available to customers and prospects under NDA through the request form below."
         />
         <Tiles
-          columns={3}
+          columns={2}
           variant="cards"
           items={[
             {
-              title: 'SOC 2 Type II',
-              body: (
-                <>
-                  Security, availability and confidentiality trust services criteria. <Ph>[Report period and auditor]</Ph>
-                </>
-              ),
-              footer: <ArrowLink href="#docs">Request the report</ArrowLink>,
-            },
-            {
               title: 'ISO/IEC 27001',
-              body: (
-                <>
-                  Information security management system. <Ph>[Certificate number, scope and expiry]</Ph>
-                </>
-              ),
+              body: 'Our information security management system is certified to ISO/IEC 27001:2022.',
               footer: <ArrowLink href="#docs">Request the certificate</ArrowLink>,
             },
             {
-              title: 'Regional assessments',
-              body: (
-                <>
-                  Alignment with regulator cloud and outsourcing guidance for India and the GCC.{' '}
-                  <Ph>[List applicable assessments, e.g. RBI outsourcing, CBUAE cloud guidance, UAE IAS]</Ph>
-                </>
-              ),
-              footer: <ArrowLink href="#docs">Request the mapping</ArrowLink>,
+              title: 'ISO 22301',
+              body: 'Our business continuity management system is certified to ISO 22301:2019.',
+              footer: <ArrowLink href="#docs">Request the certificate</ArrowLink>,
             },
           ]}
         />
@@ -114,41 +91,27 @@ export default function TrustPage() {
           items={[
             {
               title: 'Hosting regions',
-              body: (
-                <>
-                  Customer data is hosted in <Ph>[region, e.g. UAE (Dubai) and India (Mumbai)]</Ph>. The region is chosen at provisioning
-                  and does not change without your written instruction.
-                </>
-              ),
+              body: 'Customer data is hosted on Microsoft Azure in the United States. The hosting location does not change without your written agreement.',
             },
             {
               title: 'Data residency',
-              body: 'Residency options for customers with regulatory or contractual requirements. Backups stay within the same region.',
+              body: 'Customer data and its backups stay in the United States. Organisations that need data kept in their own country can deploy Blueprint+ in their own environment.',
             },
             {
               title: 'Encryption',
-              body: "TLS 1.2 or higher in transit; AES-256 at rest for databases, file storage and backups. Keys managed through the cloud provider's key management service.",
+              body: 'TLS 1.2 or higher in transit; AES-256 at rest for all stored data and backups, with encryption keys managed by the cloud provider.',
             },
             {
               title: 'Tenant isolation',
-              body: "Each customer is a separate tenant with logically isolated data. A consulting firm's clients each run in their own deployment, isolated from one another.",
+              body: 'Each customer is a separate tenant with logically isolated data.',
             },
             {
               title: 'Backups and retention',
-              body: (
-                <>
-                  Daily encrypted backups with <Ph>[retention period]</Ph> retention; point-in-time restore tested <Ph>[frequency]</Ph>.
-                </>
-              ),
+              body: 'Daily encrypted backups, kept for up to 12 months. Recovery is tested through regular disaster-recovery drills.',
             },
             {
               title: 'Data export and deletion',
-              body: (
-                <>
-                  Export your documents, registers and histories at any time in standard formats. On termination, data is deleted within{' '}
-                  <Ph>[period]</Ph> and confirmed in writing.
-                </>
-              ),
+              body: 'You can request an export of your documents, registers and histories in standard formats at any time. After termination, data is deleted from the live service within 30 days, removed from backups as they expire, and deletion is confirmed in writing.',
             },
           ]}
         />
@@ -160,8 +123,8 @@ export default function TrustPage() {
           <div className={`${styles.stickyHead} reveal`}>
             <h2>Every action has an actor and every actor has a role.</h2>
             <p className="lede" style={{ marginTop: '1rem' }}>
-              Gieom.cloud is built on role-based access from the document down to the workflow step. The audit log that compliance teams use
-              for their own evidence is the same log that records access.
+              Gieom.cloud enforces role-based permissions on the server for every action. The audit trail compliance teams use for their own
+              evidence also records who did what, and when.
             </p>
           </div>
           <dl className={`${t.kv} reveal reveal--late`}>
@@ -181,34 +144,19 @@ export default function TrustPage() {
           items={[
             {
               title: 'Uptime',
-              body: (
-                <>
-                  Service level objective of <Ph>[99.9%]</Ph> monthly availability with service credits defined in the enterprise agreement.
-                  Live and historical status at <Link href={routes.status}>the status page</Link>.
-                </>
-              ),
+              body: 'We target 99.5% monthly availability, excluding scheduled maintenance announced in advance.',
             },
             {
               title: 'Vulnerability management',
-              body: (
-                <>
-                  Annual third-party penetration testing, continuous dependency scanning, and a defined patch window by severity.{' '}
-                  <Ph>[Last test date]</Ph>.
-                </>
-              ),
+              body: 'Independent penetration testing at least annually, continuous code and dependency scanning, and patching timelines set by severity.',
             },
             {
               title: 'Incident response',
-              body: (
-                <>
-                  A documented incident response process with customer notification within <Ph>[period]</Ph> of a confirmed incident
-                  affecting your data.
-                </>
-              ),
+              body: 'A documented incident response process. We notify you without undue delay, and within 72 hours, of a confirmed incident affecting your data.',
             },
             {
               title: 'Business continuity',
-              body: 'Multi-zone deployment within the region and a tested disaster-recovery plan with defined RPO and RTO.',
+              body: 'Backups are stored across multiple data-centre zones, and our disaster-recovery plan, with defined recovery objectives, is tested through regular drills.',
             },
             {
               title: 'Secure development',
@@ -216,7 +164,7 @@ export default function TrustPage() {
             },
             {
               title: 'AI co-pilot data use',
-              body: 'Magpie AI processes your content to produce drafts and suggestions for you. Your data is not used to train models shared with other customers. The co-pilot can be disabled per tenant.',
+              body: 'Magpie AI processes your content to produce drafts and suggestions for you, using AI services hosted on Microsoft Azure in the United States. Your data is not used to train AI models. The co-pilot can be disabled per tenant.',
             },
           ]}
         />
@@ -228,8 +176,8 @@ export default function TrustPage() {
           <div className="reveal">
             <h2>Who else touches the data and under what terms.</h2>
             <p className="lede" style={{ marginTop: '1rem' }}>
-              Our Data Processing Agreement is available to every customer with the current sub-processor list. Changes are notified{' '}
-              <Ph>[notice period]</Ph> in advance. <ArrowLink href={routes.dpa}>Read the DPA and the full list</ArrowLink>
+              Our Data Processing Agreement is available to every customer with the current sub-processor list. Changes are notified 30 days
+              in advance. <ArrowLink href={routes.dpa}>Read the DPA and the full list</ArrowLink>
             </p>
           </div>
           <div className="frame reveal reveal--late">
@@ -240,19 +188,14 @@ export default function TrustPage() {
                 <span>Location</span>
               </Tr>
               {[
-                ['[Cloud provider]', 'Hosting, storage, backups'],
-                ['[Email provider]', 'Transactional email'],
-                ['[AI model provider]', 'Magpie AI drafting'],
-                ['[Support tooling]', 'Customer support'],
-              ].map(([who, what]) => (
+                ['Microsoft Azure', 'Hosting, storage, backups', 'United States'],
+                ['Microsoft (Azure Communication Services)', 'Transactional email', 'United States'],
+                ['Microsoft (Azure OpenAI, Azure AI Document Intelligence)', 'Magpie AI features', 'United States'],
+              ].map(([who, what, where]) => (
                 <Tr key={who}>
-                  <span>
-                    <Ph>{who}</Ph>
-                  </span>
+                  <span className={m.ink}>{who}</span>
                   <span className={m.ink}>{what}</span>
-                  <span>
-                    <Ph>[Region]</Ph>
-                  </span>
+                  <span>{where}</span>
                 </Tr>
               ))}
             </Table>
@@ -266,11 +209,11 @@ export default function TrustPage() {
           <div className="reveal">
             <h2>Request the security pack.</h2>
             <p className="lede" style={{ marginTop: '1rem' }}>
-              The SOC 2 report, ISO certificate, penetration-test summary, security whitepaper and completed questionnaires (SIG, CAIQ) are
-              shared under NDA. Tell us who you are and what you need.
+              Our ISO certificates, penetration-test summary, security whitepaper and completed security questionnaires are shared under
+              NDA. Tell us who you are and what you need.
             </p>
             <ul className="checklist" style={{ marginTop: '1.5rem' }}>
-              <li>SOC 2 Type II report</li>
+              <li>ISO 22301 certificate</li>
               <li>ISO/IEC 27001 certificate and statement of applicability</li>
               <li>Penetration-test executive summary</li>
               <li>Security whitepaper</li>

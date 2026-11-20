@@ -158,7 +158,6 @@ export default function GlossaryPage() {
     <>
       <PageHero
         compact
-        crumb="Resources · Glossary"
         eyebrow="Glossary"
         title="GRC terms explained in a paragraph each."
         lede="Short definitions of the words used across governance, risk and compliance work, with a pointer to where each one shows up in Gieom.cloud."

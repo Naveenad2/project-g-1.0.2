@@ -31,7 +31,6 @@ export default function StatusPage() {
     <>
       <PageHero
         compact
-        crumb="Status"
         eyebrow="Service status"
         title="Gieom.cloud status"
         extra={

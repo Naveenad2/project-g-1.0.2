@@ -60,7 +60,6 @@ export default function PartnersPage() {
   return (
     <>
       <PageHero
-        crumb="Company · Partners"
         eyebrow="Partner programme"
         title="Consultants are how governance gets built. We built the programme around that."
         lede="Advisory, audit and GRC consulting firms refer, resell and deliver Gieom.cloud for their clients. The programme gives you the platform, the commercial terms and the marketing to go with it."

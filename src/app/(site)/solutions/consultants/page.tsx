@@ -19,7 +19,6 @@ export default function ConsultantsPage() {
   return (
     <>
       <PageHero
-        crumb="Solutions · By role"
         eyebrow="For risk & GRC consultants"
         title="Hand every client a working system."
         lede="Each client runs in its own Gieom.cloud deployment with its own login, registers, respondents and branding. Your consultants work inside it with a consultant role, carry templates from one engagement to the next, and the reports go out under the client's name."

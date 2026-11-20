@@ -199,7 +199,7 @@ export function Header() {
           </nav>
 
           <div className={styles.actions}>
-            <Link href={routes.demo} className={styles.textAction}>
+            <Link href={routes.demo} className="btn btn--secondary btn--sm">
               Book a demo
             </Link>
             <Link href={routes.trial} className="btn btn--primary btn--sm">

@@ -30,7 +30,47 @@ or when you join a different network. Development mode is unoptimised, so judge 
 Cloudflare Pages, Netlify, S3/CloudFront or any static host. `public/_redirects` maps the old prototype URLs
 (`/About.html`, `/ProductPolicy.html`, …) to the new routes with 301s on Cloudflare Pages and Netlify.
 
-On Cloudflare Pages: build command `npm run build`, output directory `out`.
+On Cloudflare Pages: build command `npm run build`, output directory `out`. `public/_headers` stops the pricing admin
+from being framed, indexed or cached.
+
+## Live prices and the pricing admin (Firebase)
+
+The prices on `/pricing` come from the Firebase Realtime Database (project `gieom-cloud`, node `/pricing`), and change
+on the page the moment new ones are published. They are edited in the pricing admin at **`/admin`**, which is linked
+from nowhere and is not indexed.
+
+- **Reading prices:** `PricingTiers` follows `/pricing` live (`src/lib/pricing.ts`). While prices load, each price is a
+  quiet bar the size of a price, so nothing moves. With nothing published, or no connection, the page shows the
+  bracketed placeholders. The Firebase SDK loads only on the pages that use it.
+- **The admin:** sign in with the admin account (Firebase Authentication, email and password). The dashboard edits
+  the currency, the saving shown on the billing switch, Starter's and Professional's monthly and annual prices, and
+  Starter's user limit.
+  - **Preview and checks:** a live preview shows the cards with the new values. The saving each tier gives is worked
+    out, and a mismatch with the advertised saving is flagged.
+  - **Publishing:** a confirmation lists every change, and publishing writes the prices and a history entry in one
+    step. The last 20 publishes can be loaded back into the form.
+  - **Safety:** edits in progress are kept if someone else publishes, and leaving with unpublished changes asks first.
+    The admin can change the password (after confirming the current one) or have a reset link emailed. The session
+    is for that browser tab only and ends after 30 minutes without activity.
+- **Security:** `database.rules.json` is the real protection; the web config in `src/lib/firebase.ts` is public by
+  design.
+  - **Who can do what:** anyone may read `/pricing`; only the admin account (`ADMIN_UID`) may write it or read and
+    add to `/pricingHistory`; everything else is closed.
+  - **Server-side checks:** every value is checked on the server (types, ranges, whole numbers, a three-letter
+    currency code, the server's own time and the signed-in admin's email). Prices cannot be deleted, and history
+    entries cannot be changed or removed.
+- **First-time setup in the Firebase console:**
+  1. **Turn on sign-in:** Authentication → Get started → Sign-in method → Email/Password → Enable.
+  2. **Create the admin:** Authentication → Users → Add user, with the admin's email and password.
+  3. **Block other accounts:** Authentication → Settings → User actions, untick “Enable create (sign-up)” so no
+     one else can create accounts.
+  4. **Publish the rules:** sign in at `/admin`. Until the rules are published it shows them with this account's ID
+     filled in, ready to copy into Realtime Database → Rules → Publish; then press “Check again”.
+  - **Command-line alternative:** to deploy the rules from the command line instead, replace `ADMIN_UID` in
+    `database.rules.json` and run `npx firebase-tools deploy --only database` (project set in `.firebaserc`).
+- **Testing without the live project:** build with `NEXT_PUBLIC_FIREBASE_EMULATORS=1` and run
+  `npx firebase-tools emulators:start --only auth,database` (settings in `firebase.json`). The site then talks to
+  the local Auth and Database emulators.
 
 ## Typography
 
@@ -207,6 +247,7 @@ src/
       about, customers, partners, careers, blog, guides, webinars, help, glossary,
       pricing, trust, contact, demo, trial, status, privacy, terms, dpa
     login/                   Sign-in (own split layout)
+    admin/                   Pricing admin (own layout, not indexed)
     not-found.tsx
   components/
     layout/                  Header (floating bar, mega menu, drawer), Footer, ThemeToggle, SpotlightController
@@ -218,7 +259,8 @@ src/
     story/                   scene (three.js) for the How it works story
     mocks/                   Product UI mock-ups used across pages (registers, RCSA, workflow…)
     forms/                   Field primitives, Contact/Demo/Trial forms, StaticForm
-    pricing/, resources/     Pricing tiers toggle, case-study and blog filters
+    pricing/, resources/     Pricing tiers (live prices) and switch, case-study and blog filters
+    admin/                   Pricing admin: sign-in, setup step, dashboard, password change, form checks
     ui/                      GradientBg, Showcase, Status, Rise, Icon, Logo, ButtonLink, Section, Screenshot, VideoPlayer
   lib/
     routes.ts                Every internal URL in one place
@@ -227,6 +269,8 @@ src/
     scroll.ts                Smooth-scroll instance, scroll lock, page-start and scroll-to helpers
     geometry.ts              Layout offsets for demo cursor targets, unaffected by entrance transforms
     theme.ts                 Theme bootstrap and toggle logic
+    firebase.ts              Firebase config and on-demand Database / Auth (emulators for test builds)
+    pricing.ts               Price shape, checks, formatting and the live subscription
   styles/                    Design tokens, fonts, shared page modules
 ```
 

@@ -30,7 +30,6 @@ export default function RegistersPage() {
   return (
     <>
       <PageHero
-        crumb="Product"
         eyebrow="Risk & control registers"
         title="Every risk linked to its control and its policy."
         lede="The Risk Register and Control Registry sit beside your document library and follow the same lifecycle. Link them to each other and to policy clauses. The Impact Analyzer shows what else moves when one of them changes."

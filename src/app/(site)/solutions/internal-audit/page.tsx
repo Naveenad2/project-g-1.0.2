@@ -18,7 +18,6 @@ export default function InternalAuditPage() {
   return (
     <>
       <PageHero
-        crumb="Solutions · By role"
         eyebrow="For internal audit teams"
         title="Independent visibility without asking anyone."
         lede="The third line should not depend on the second line's spreadsheet. Gieom.cloud gives internal audit read access to the same registers, assessments and approval histories the business works in with an audit log on every action."

@@ -66,7 +66,6 @@ export default function GuidesPage() {
     <>
       <PageHero
         compact
-        crumb="Resources · Guides & templates"
         eyebrow="Guides & templates"
         title="Playbooks for the work and templates you can use today."
         lede="The guides are longer reads for a work email. The templates are free, ungated, and yours to edit whether or not you ever use Gieom.cloud."

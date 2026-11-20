@@ -19,7 +19,6 @@ export default function RegulatoryPage() {
   return (
     <>
       <PageHero
-        crumb="Product"
         eyebrow="Regulatory change tracking"
         title="Know which policies a regulation touches, down to the clause."
         lede="The Regulations Library holds the obligations you answer to. Each one is linked clause by clause to the policies and controls that satisfy it. When a regulator issues a change you can see exactly what needs to move."

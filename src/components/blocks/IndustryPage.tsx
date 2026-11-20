@@ -41,7 +41,6 @@ export function IndustryPage(p: IndustryPageProps) {
   return (
     <>
       <PageHero
-        crumb="Solutions · By industry"
         eyebrow={p.eyebrow}
         title={p.title}
         lede={p.lede}

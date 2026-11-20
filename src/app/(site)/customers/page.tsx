@@ -23,7 +23,6 @@ export default function CustomersPage() {
     <>
       <PageHero
         compact
-        crumb="Customers"
         eyebrow="Customers"
         title="Compliance teams and consulting firms in their own words."
         lede="Case studies filterable by industry and by role so that a consultant can find consultant-specific proof and a bank can find a bank."

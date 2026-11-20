@@ -15,7 +15,6 @@ export default function PrivacyPage() {
     <>
       <PageHero
         compact
-        crumb="Legal · Privacy"
         eyebrow="Legal"
         title="Privacy policy"
         lede={

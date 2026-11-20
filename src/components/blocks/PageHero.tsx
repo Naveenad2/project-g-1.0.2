@@ -1,14 +1,10 @@
-import Link from 'next/link';
 import type { CSSProperties, ReactNode } from 'react';
 import { GradientBg } from '@/components/ui/GradientBg';
 import { Rise } from '@/components/ui/Rise';
 import { Showcase } from '@/components/ui/Showcase';
-import { routes } from '@/lib/routes';
 import styles from './PageHero.module.css';
 
 interface PageHeroProps {
-  /** Trail after "Home", e.g. "Product" or "Solutions · By role". Omit to hide the breadcrumb. */
-  crumb?: string;
   eyebrow: ReactNode;
   title: ReactNode;
   lede?: ReactNode;
@@ -29,7 +25,6 @@ interface PageHeroProps {
 const delay = (ms: number) => ({ '--d': ms }) as CSSProperties;
 
 export function PageHero({
-  crumb,
   eyebrow,
   title,
   lede,
@@ -50,16 +45,6 @@ export function PageHero({
         <GradientBg variant="hero" warm={tone === 'peach'} horizon />
         <div className={`container ${styles.grid}`}>
           <div className={styles.copy}>
-            {crumb && (
-              <nav aria-label="Breadcrumb" className={`${styles.crumb} load-in`} style={delay(40)}>
-                <ol>
-                  <li>
-                    <Link href={routes.home}>Home</Link>
-                  </li>
-                  <li aria-current="page">{crumb}</li>
-                </ol>
-              </nav>
-            )}
             <p className="eyebrow load-in" style={delay(100)}>
               {eyebrow}
             </p>

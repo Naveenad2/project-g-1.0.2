@@ -30,7 +30,6 @@ export default function WorkflowPage() {
   return (
     <>
       <PageHero
-        crumb="Product"
         eyebrow="Workflow automation"
         title="The engine behind every approval, review and escalation without writing code."
         lede="Every lifecycle in Gieom.cloud runs on the same workflow engine. Define a process on a visual canvas, set who can act at each step, add an escalation matrix, test it, and watch every run in the execution log."

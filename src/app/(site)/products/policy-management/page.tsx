@@ -21,7 +21,6 @@ export default function PolicyManagementPage() {
   return (
     <>
       <PageHero
-        crumb="Product"
         eyebrow="Policy & procedure management"
         title="One system of record for every policy from first draft to last signature."
         lede="Gieom.cloud gives compliance teams a single place to write, review, approve, publish and track acknowledgement of policies and procedures. The regulation each clause satisfies is attached to the document itself."

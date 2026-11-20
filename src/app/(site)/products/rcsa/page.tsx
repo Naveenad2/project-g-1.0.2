@@ -31,7 +31,6 @@ export default function RcsaPage() {
   return (
     <>
       <PageHero
-        crumb="Product"
         eyebrow="Risk & control self-assessment"
         title="Run an RCSA in days with the discussion and the report in the same place."
         lede="Assessments run directly on the risk and control registers. Checklists, scoring, threaded review with the business, and a generated PDF report, without the spreadsheet that usually goes back and forth eleven times."

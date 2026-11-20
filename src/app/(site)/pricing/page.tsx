@@ -35,17 +35,31 @@ const rows: [string, Cell, Cell, Cell][] = [
   ['Contract', 'Monthly or annual, online', 'Monthly or annual, online or invoice', 'Annual MSA'],
 ];
 
-function renderCell(c: Cell) {
-  if (c === '—') return <td className={p.dash}>—</td>;
-  if (typeof c === 'object') return <td className={p.ok}>{c.ok}</td>;
-  return <td>{c}</td>;
+/** A tier's cell; on phones the tier's name shows above its value (data-tier). */
+function renderCell(c: Cell, tier: string) {
+  if (c === '—')
+    return (
+      <td role="cell" className={p.dash} data-tier={tier}>
+        —
+      </td>
+    );
+  if (typeof c === 'object')
+    return (
+      <td role="cell" className={p.ok} data-tier={tier}>
+        {c.ok}
+      </td>
+    );
+  return (
+    <td role="cell" data-tier={tier}>
+      {c}
+    </td>
+  );
 }
 
 export default function PricingPage() {
   return (
     <>
       <PageHero
-        crumb="Pricing"
         eyebrow="Pricing"
         title="Start with one team. Grow to the whole organisation, or to every client."
         titleWidth="wide"
@@ -58,22 +72,33 @@ export default function PricingPage() {
 
       <Section>
         <div className={`${p.tableWrap} reveal`}>
-          <table className={p.table}>
-            <thead>
-              <tr>
-                <th scope="col">Capability</th>
-                <th scope="col">Starter</th>
-                <th scope="col">Professional</th>
-                <th scope="col">Enterprise</th>
+          {/* the roles keep it a table for screen readers when phones lay it out as rows of three */}
+          <table className={`${p.table} ${p.compare}`} role="table">
+            <thead role="rowgroup">
+              <tr role="row">
+                <th scope="col" role="columnheader">
+                  Capability
+                </th>
+                <th scope="col" role="columnheader">
+                  Starter
+                </th>
+                <th scope="col" role="columnheader">
+                  Professional
+                </th>
+                <th scope="col" role="columnheader">
+                  Enterprise
+                </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody role="rowgroup">
               {rows.map(([cap, a, b, c]) => (
-                <tr key={cap}>
-                  <th scope="row">{cap}</th>
-                  {renderCell(a)}
-                  {renderCell(b)}
-                  {renderCell(c)}
+                <tr key={cap} role="row">
+                  <th scope="row" role="rowheader">
+                    {cap}
+                  </th>
+                  {renderCell(a, 'Starter')}
+                  {renderCell(b, 'Professional')}
+                  {renderCell(c, 'Enterprise')}
                 </tr>
               ))}
             </tbody>

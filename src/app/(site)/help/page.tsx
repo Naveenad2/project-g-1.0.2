@@ -86,7 +86,6 @@ export default function HelpPage() {
     <>
       <PageHero
         compact
-        crumb="Resources · Help center"
         eyebrow="Help center"
         title="How do I…"
         titleWidth="narrow"

@@ -15,7 +15,6 @@ export default function TermsPage() {
     <>
       <PageHero
         compact
-        crumb="Legal · Terms"
         eyebrow="Legal"
         title="Terms of service"
         lede={

@@ -63,7 +63,6 @@ export default function WebinarsPage() {
     <>
       <PageHero
         compact
-        crumb="Resources · Webinars"
         eyebrow="Webinars"
         title="Forty-five minutes with people who do this work."
         lede="Live sessions co-hosted with a consulting partner on the practical side of policy, risk and regulatory change. Recordings stay up."

@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { ButtonLink } from '@/components/ui/ButtonLink';
 import { Icon } from '@/components/ui/Icon';
+import { DEFAULT_SAVING, formatPercent, formatPrice, subscribePricing, type Pricing } from '@/lib/pricing';
 import { routes } from '@/lib/routes';
 import styles from './Pricing.module.css';
 
@@ -10,18 +11,23 @@ type Feature = [text: string, included: boolean];
 
 interface Tier {
   name: string;
+  /** Where the tier's live prices are kept (`/pricing/<key>` in the Realtime Database). */
+  key?: 'starter' | 'professional';
   fits: string;
+  /** Placeholder shown until prices are published. */
   price: string | null;
   customNote?: string;
   cta: { label: string; href: string; variant: 'primary' | 'secondary' | 'dark' };
   features: Feature[];
-  note: React.ReactNode;
+  /** The line at the foot of the card; Starter's carries the user limit. */
+  note: ReactNode | ((seats: ReactNode) => ReactNode);
   recommended?: boolean;
 }
 
 const tiers: Tier[] = [
   {
     name: 'Starter',
+    key: 'starter',
     fits: 'A single team piloting policy management.',
     price: '[Starter price]',
     cta: { label: 'Start free trial', href: routes.trial, variant: 'secondary' },
@@ -37,14 +43,11 @@ const tiers: Tier[] = [
       ['Custom workflows and forms', false],
       ['SSO / SAML', false],
     ],
-    note: (
-      <>
-        Self-serve checkout · up to <span className="ph">[seat cap]</span> users
-      </>
-    ),
+    note: (seats) => <>Self-serve checkout · up to {seats} users</>,
   },
   {
     name: 'Professional',
+    key: 'professional',
     fits: "The full policy lifecycle plus RCSA for several departments or a consultant's first clients.",
     price: '[Pro price]',
     recommended: true,
@@ -87,12 +90,34 @@ const tiers: Tier[] = [
 
 const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
 
+/** Roll the prices in: up from below (annual or a new price) or down from above (monthly). */
+function rollPrices(root: HTMLElement | null, dir: 1 | -1) {
+  root?.querySelectorAll<HTMLElement>('[data-price]').forEach((el, i) => {
+    el.getAnimations().forEach((a) => a.cancel());
+    el.animate(
+      [
+        { opacity: 0, transform: `translateY(${12 * dir}px)` },
+        { opacity: 1, transform: 'none' },
+      ],
+      { duration: 520, delay: i * 60, easing: EASE, fill: 'backwards' },
+    );
+  });
+}
+
+/** How long to wait for prices before showing the placeholders instead (slow or no connection). */
+const WAIT_MS = 8000;
+
 /**
  * The three tiers under a billing switch. The switch's pill slides under the chosen period and turns from
  * teal (monthly) to tangerine (annual) along the brand gradient. The cards follow it: a band of the new colour
  * sweeps across each one in turn (in the direction the pill moved), each card settles, its light, rim and
  * ticks turn teal or tangerine, and the prices roll over to the new period (down for annual, up for monthly).
  * Without script the chosen option is simply filled, and with reduced motion the colours change at once.
+ *
+ * The prices are live: they come from the Realtime Database (`/pricing`, edited in the pricing admin at /admin)
+ * and change on the page the moment new ones are published. While they load, each price is a quiet
+ * placeholder bar of the same size, so nothing moves; with no prices published, or no connection, the page
+ * shows the bracketed placeholders.
  */
 export function PricingTiers() {
   const [yearly, setYearly] = useState(true);
@@ -101,6 +126,66 @@ export function PricingTiers() {
   const toggleRef = useRef<HTMLDivElement>(null);
   const tiersRef = useRef<HTMLDivElement>(null);
   const changed = useRef(false);
+  const [live, setLive] = useState<{ loading: boolean; pricing: Pricing | null }>({ loading: true, pricing: null });
+  const { loading, pricing } = live;
+
+  // Follow the published prices.
+  useEffect(() => {
+    let heard = false;
+    const timer = window.setTimeout(() => {
+      if (!heard) setLive((cur) => (cur.pricing ? cur : { loading: false, pricing: null }));
+    }, WAIT_MS);
+    const stop = subscribePricing(
+      (next) => {
+        heard = true;
+        window.clearTimeout(timer);
+        setLive({ loading: false, pricing: next });
+      },
+      () => {
+        heard = true;
+        window.clearTimeout(timer);
+        setLive((cur) => (cur.pricing ? { ...cur, loading: false } : { loading: false, pricing: null }));
+      },
+    );
+    return () => {
+      window.clearTimeout(timer);
+      stop();
+    };
+  }, []);
+
+  // New prices (the first ones, or a change published while the page is open) roll in.
+  const signature = pricing ? JSON.stringify([pricing.currency, pricing.starter, pricing.professional]) : '';
+  useEffect(() => {
+    if (!signature || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    rollPrices(tiersRef.current, 1);
+  }, [signature]);
+
+  const saving = formatPercent(pricing?.annualSaving ?? DEFAULT_SAVING);
+  const skeleton = (wide: boolean) => (
+    <>
+      <span className={`${styles.skel} ${wide ? '' : styles.skelSmall}`} aria-hidden="true" />
+      <span className="sr-only">Loading</span>
+    </>
+  );
+  // while loading, the placeholder text is in the page too (hidden), for browsers without script
+  const waiting = (wide: boolean, text: string) => (
+    <>
+      {skeleton(wide)}
+      <span className={`ph ${styles.fallback}`}>{text}</span>
+    </>
+  );
+  const priceOf = (tier: Tier) => {
+    if (pricing && tier.key) return <span className={styles.amount}>{formatPrice(pricing[tier.key][period], pricing.currency)}</span>;
+    if (loading) return waiting(true, tier.price ?? '');
+    return <span className="ph">{tier.price}</span>;
+  };
+  const seats = pricing ? (
+    pricing.starter.seatCap.toLocaleString('en-US')
+  ) : loading ? (
+    waiting(false, '[seat cap]')
+  ) : (
+    <span className="ph">[seat cap]</span>
+  );
 
   // The pill is measured to the chosen option, so it fits each label exactly at any width.
   useLayoutEffect(() => {
@@ -156,27 +241,21 @@ export function PricingTiers() {
         { duration: 1000, delay: i * 90, easing: 'cubic-bezier(0.45, 0, 0.2, 1)', fill: 'backwards' },
       );
     });
-    tiersRef.current?.querySelectorAll<HTMLElement>('[data-price]').forEach((el, i) => {
-      el.getAnimations().forEach((a) => a.cancel());
-      el.animate(
-        [
-          { opacity: 0, transform: `translateY(${12 * dir}px)` },
-          { opacity: 1, transform: 'none' },
-        ],
-        { duration: 520, delay: i * 60, easing: EASE, fill: 'backwards' },
-      );
-    });
+    rollPrices(tiersRef.current, dir);
   }, [yearly]);
 
   return (
     <div className={styles.wrap} data-period={period}>
+      <noscript>
+        <style>{`.${styles.skel}{display:none!important}.${styles.fallback}{display:inline!important}`}</style>
+      </noscript>
       <div ref={toggleRef} className={styles.toggle} role="group" aria-label="Billing period">
         <span className={styles.thumb} aria-hidden="true" />
         <button type="button" aria-pressed={!yearly} onClick={() => setYearly(false)}>
           Monthly
         </button>
         <button type="button" aria-pressed={yearly} onClick={() => setYearly(true)}>
-          Annual · <span className={styles.save}>save 15%</span>
+          Annual · <span className={styles.save}>save {saving}%</span>
         </button>
       </div>
 
@@ -194,13 +273,12 @@ export function PricingTiers() {
             <p className={styles.fits}>{tier.fits}</p>
             <div className={styles.price}>
               {tier.price ? (
-                <p data-price="">
-                  <span className="ph">{tier.price}</span>
-                  <small> / user / month{billing}</small>
+                <p data-price="" aria-live="polite">
+                  {priceOf(tier)} <small>/ user / month{billing}</small>
                 </p>
               ) : (
                 <p>
-                  Custom<small>{tier.customNote}</small>
+                  Custom <small>{tier.customNote?.trim()}</small>
                 </p>
               )}
             </div>
@@ -218,7 +296,7 @@ export function PricingTiers() {
                 </li>
               ))}
             </ul>
-            <p className={styles.note}>{tier.note}</p>
+            <p className={styles.note}>{typeof tier.note === 'function' ? tier.note(seats) : tier.note}</p>
           </article>
         ))}
       </div>

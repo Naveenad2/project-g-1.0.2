@@ -76,7 +76,6 @@ export default function CareersPage() {
   return (
     <>
       <PageHero
-        crumb="Company · Careers"
         eyebrow="Careers"
         title="Build the software that regulated organisations trust with their rulebook."
         titleWidth="wide"

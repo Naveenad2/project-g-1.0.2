@@ -10,7 +10,7 @@
   --g4: rgba(255, 150, 64, 0.64);
   --g5: rgba(40, 210, 198, 0.64);
   --g-grain: var(--grain);
-  --g-grain-o: 0.3;
+  --g-grain-o: 0.16;
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -136,7 +136,7 @@
   --g3: rgba(255, 255, 255, 0.8);
   --g4: rgba(255, 150, 64, 0.67);
   --g5: rgba(40, 210, 198, 0.73);
-  --g-grain-o: 0.27;
+  --g-grain-o: 0.15;
 }
 
 /* Navy band */
@@ -148,7 +148,7 @@
   --g4: rgba(255, 160, 72, 0.25);
   --g5: rgba(0, 128, 122, 0.54);
   --g-grain: var(--grain-light);
-  --g-grain-o: 0.3;
+  --g-grain-o: 0.16;
 }
 
 /* Closing call to action: navy into deep teal with warm light */
@@ -160,7 +160,7 @@
   --g4: rgba(255, 170, 90, 0.39);
   --g5: rgba(0, 128, 122, 0.64);
   --g-grain: var(--grain-light);
-  --g-grain-o: 0.3;
+  --g-grain-o: 0.16;
 }
 
 .warm {
@@ -188,7 +188,7 @@
   --g4: rgba(255, 160, 72, 0.27);
   --g5: rgba(0, 128, 122, 0.55);
   --g-grain: var(--grain);
-  --g-grain-o: 0.33;
+  --g-grain-o: 0.18;
 }
 
 :root[data-theme='dark'] .soft {
